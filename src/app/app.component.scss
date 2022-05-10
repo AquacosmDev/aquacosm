@@ -1,0 +1,17 @@
+@import "node_modules/include-media/dist/include-media";
+:host {
+
+  h1 {
+    font-size: 48px;
+  }
+
+  .logo-container {
+    flex: 0 0 100px;
+  }
+
+  @include media("<tablet") {
+    h1 {
+      font-size: 32px;
+    }
+  }
+}

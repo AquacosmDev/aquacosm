@@ -21,6 +21,8 @@
     "@angular/router": "~13.0.0",
     "@ternwebdesign/firebase-store": "^0.2.4",
     "firebase": "^9.8.1",
+    "include-media": "^1.4.10",
+    "ng-inline-svg": "^13.1.2",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

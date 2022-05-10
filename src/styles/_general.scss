@@ -1,0 +1,64 @@
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: url(../assets/img/aqc_background.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  overflow-x: hidden;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+html, body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+
+$spaceamounts: (0, 3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100);
+$sides: (top, bottom, left, right);
+
+@each $space in $spaceamounts {
+
+  .m-#{$space} {
+    margin: #{$space}px;
+  }
+
+  .p-#{$space} {
+    padding: #{$space}px;
+  }
+  @each $side in $sides {
+    .m-#{str-slice($side, 0, 1)}-#{$space} {
+      margin-#{$side}: #{$space}px;
+    }
+
+    .p-#{str-slice($side, 0, 1)}-#{$space} {
+      padding-#{$side}: #{$space}px;
+    }
+  }
+}
+
+$widths: (5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100);
+
+@each $width in $widths {
+  .w-#{$width} {
+    width: $width * 1%;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}

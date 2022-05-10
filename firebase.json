@@ -11,7 +11,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "dist",
+    "public": "dist/aquacosm",
     "ignore": [
       "firebase.json",
       "**/.*",

@@ -1,0 +1,70 @@
+.svg {
+  svg {
+    #half {
+      animation: appear-half 4s infinite ease-in-out;
+    }
+    #three-quarters {
+      animation: appear-three-quarters 4s infinite ease-in-out;
+    }
+    #full {
+      animation: appear-full 4s infinite ease-in-out;
+    }
+    #full, #three-quarters, #half {
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes appear-half {
+  0% {
+    opacity: 0;
+  }
+  24% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes appear-three-quarters {
+  0% {
+    opacity: 0;
+  }
+  49% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes appear-full {
+  0% {
+    opacity: 0;
+  }
+  74% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
