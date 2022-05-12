@@ -2,6 +2,10 @@
   .panel-container {
     .panel {
       flex: 0 0 40%;
+
+      h2 {
+        margin-bottom: 0;
+      }
     }
   }
 }

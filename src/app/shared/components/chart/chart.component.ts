@@ -13,9 +13,15 @@ export class ChartComponent implements OnInit {
   public lineChartData!: ChartConfiguration['data'];
 
   public lineChartOptions: ChartConfiguration['options'] = {
-    elements: {
-      line: {
-        // tension: 0.5
+    responsive: true,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Time'
+        }
+      },
+      y: {
       }
     }
   };
