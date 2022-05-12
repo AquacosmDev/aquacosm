@@ -44,3 +44,5 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/functions/src/aquacosm-data-firebase-adminsdk-z49ge-7b576d58d6.json
+/functions/lib/
