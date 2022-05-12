@@ -1,5 +1,6 @@
 <div class="panel-container">
-  <div class="flex justify-center m-b-20">`
+  <h1 class="text-center">Charts library example</h1>
+  <div class="flex justify-center m-b-20" *ngIf="!isMobile">`
     <div class="panel m-r-20">
       <h2 class="p-l-30">Depth</h2>
       <aqc-chart [dataSets]="depthData"></aqc-chart>
@@ -9,7 +10,7 @@
       <aqc-chart [dataSets]="temperatureData"></aqc-chart>
     </div>
   </div>
-  <div class="flex justify-center">
+  <div class="flex justify-center" *ngIf="!isMobile">
     <div class="panel m-r-20">
       <h2 class="p-l-30">Light</h2>
       <aqc-chart [dataSets]="lightData"></aqc-chart>
@@ -18,5 +19,24 @@
       <h2 class="p-l-30">Oxygen</h2>
       <aqc-chart [dataSets]="oxygenData"></aqc-chart>
     </div>
-  </div>`
+  </div>
+
+  <div class="flex flex-column" *ngIf="isMobile">
+    <div class="panel m-b-20">
+      <h2 class="p-l-30">Depth</h2>
+      <aqc-chart [dataSets]="depthData"></aqc-chart>
+    </div>
+    <div class="panel m-b-20">
+      <h2 class="p-l-30">Temperature</h2>
+      <aqc-chart [dataSets]="temperatureData"></aqc-chart>
+    </div>
+    <div class="panel m-b-20">
+      <h2 class="p-l-30">Light</h2>
+      <aqc-chart [dataSets]="lightData"></aqc-chart>
+    </div>
+    <div class="panel">
+      <h2 class="p-l-30">Oxygen</h2>
+      <aqc-chart [dataSets]="oxygenData"></aqc-chart>
+    </div>
+  </div>
 </div>

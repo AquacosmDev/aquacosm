@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
   selector: 'aqc-chart-example',
@@ -18,9 +19,12 @@ export class ChartExampleComponent implements OnInit {
   public lightData = [ {label: 'Limnotron 1', data: [ 11.02, 11.02, 11.02, 11.02, 11.02, 11.02, 11.02 ] }];
   public oxygenData = [ {label: 'Limnotron 1', data: [ 4.4, 4.4, 4.4, 4.4, 4.4, 4.4, 4.4 ] }];
 
-  constructor() { }
+  public isMobile = false;
+
+  constructor(private detectorService: DeviceDetectorService) { }
 
   ngOnInit(): void {
+    this.isMobile = this.detectorService.isMobile();
   }
 
 }

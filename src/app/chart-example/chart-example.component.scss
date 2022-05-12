@@ -1,10 +1,18 @@
+@import "node_modules/include-media/dist/include-media";
+
 :host {
   .panel-container {
     .panel {
-      flex: 0 0 40%;
-
       h2 {
         margin-bottom: 0;
+      }
+    }
+  }
+
+  @include media(">=tablet") {
+    .panel-container {
+      .panel {
+        flex: 0 0 40%;
       }
     }
   }

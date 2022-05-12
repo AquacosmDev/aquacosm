@@ -28,6 +28,7 @@
     "include-media": "^1.4.10",
     "ng-inline-svg": "^13.1.2",
     "ng2-charts": "^3.0.0-rc.7",
+    "ngx-device-detector": "^3.0.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
