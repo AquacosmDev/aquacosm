@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartType } from 'chart.js';
+import { TimePoint } from '../../models/mesocosm-data.model';
+import { DateService } from '../../../core/date.service';
 
 @Component({
   selector: 'aqc-chart',
@@ -7,7 +9,7 @@ import { ChartConfiguration, ChartType } from 'chart.js';
   styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent implements OnInit {
-  @Input() dataSets!: { label: string, data: number[] }[];
+  @Input() dataSets!: { label: string, data: TimePoint[] }[];
   @Input() lineColor!: string;
 
   public lineChartData!: ChartConfiguration['data'];
@@ -28,17 +30,21 @@ export class ChartComponent implements OnInit {
 
   public lineChartType: ChartType = 'line';
 
-  constructor() { }
+  constructor(private dateService: DateService) { }
 
   ngOnInit(): void {
     this.lineChartData = {
       datasets: this.dataSets.map(dataSet => {
         return {
-          data: dataSet.data,
+          data: dataSet.data
+            .sort((a, b) => a.time.getTime() - b.time.getTime())
+            .map(timepoint => timepoint.value),
           label: dataSet.label
         }
       }),
-      labels: [ ['15:54', '14 april'], '15:55', '15:56', '15:57', '15:58', '15:59', '16:00' ]
+      labels: this.dataSets[ 0 ].data
+        .sort((a, b) => a.time.getTime() - b.time.getTime())
+        .map(timepoint => this.dateService.format(timepoint.time))
     };
   }
 

@@ -1,15 +1,14 @@
 import * as functions from "firebase-functions";
 import * as moment from 'moment';
 import * as express from 'express';
-import { writeBatch, doc, getFirestore } from "firebase/firestore";
 
 const cors = require('cors')({ origin: true });
-const { firebaseHelper } = require('firebase-functions-helper');
+const { firebaseHelper, firestoreHelper } = require('firebase-functions-helper');
 
 import * as serviceAccount from './aquacosm-data-firebase-adminsdk-z49ge-7b576d58d6.json';
-import {  } from '@angular/fire/firestore';
 const app = firebaseHelper.initializeApp(serviceAccount);
-const db = getFirestore(app);
+const db = app.firestore;
+db.settings({ timestampsInSnapshots: true });
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -27,26 +26,84 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
       });
     } else {
       try {
-        const data: DataObject[] = req.body;
+        console.log(req.body);
+        if (!req.body.partnerName) {
+          throw Error('No partner name submitted');
+        }
 
-        let mesocosmDataFrames: MesocosmDataFrame[] = [];
+        const queryArrayPartner = [['name', '==', req.body.partnerName ]];
+        let partner = await firestoreHelper.queryData(db, 'partner', queryArrayPartner);
 
-        data.forEach(dataObject => {
-          const data = mapDataObjectToMesocosmDataFrames(dataObject, [ 'Limnotron 1' ]);
-          mesocosmDataFrames = mesocosmDataFrames.concat(data);
-        });
+        if (typeof partner === 'string') {
+          throw Error('Partner does not exist');
+        }
 
-        console.log(mesocosmDataFrames);
+        partner = FBOtoObject<Partner>(partner)[ 0 ];
 
-        const batch = writeBatch(db);
+        const data: DataObject[] = req.body.data;
 
-        mesocosmDataFrames.forEach(dataFrame => {
-          console.log(dataFrame);
-          const ref = doc(db, 'data', dataFrame.id);
-          batch.set(ref, dataFrame);
-        });
+        const queryArray = [['projectId', '==', partner.id ], [ 'month', '==', getMonthStringFromDataObject(data[ 0 ]) ]];
+        const rawDataPerMonthsObject = await firestoreHelper.queryData(db, 'rawdata', queryArray);
 
-        await batch.commit();
+        let rawDataPerMonth: RawDataPerMonth;
+
+        if (typeof rawDataPerMonthsObject === 'string') {
+          rawDataPerMonth = {
+            partnerId: partner.id,
+            month: getMonthStringFromDataObject(data[ 0 ]),
+            data: data
+          }
+          await firestoreHelper.createNewDocument(db, 'rawdata', rawDataPerMonth);
+        } else {
+          const rawDataPerMonthList = FBOtoObject<RawDataPerMonth>(rawDataPerMonthsObject);
+          rawDataPerMonth = addNewRawData(rawDataPerMonthList[ 0 ], data);
+
+          await firestoreHelper.updateDocument(db, 'rawdata', rawDataPerMonth.id, rawDataPerMonth);
+        }
+
+        const queryArrayVariables = [['partnerId', '==', partner.id ]];
+        const variablesFBO = await firestoreHelper.queryData(db, 'variable', queryArrayVariables);
+        const variables = FBOtoObject<Variable>(variablesFBO);
+
+        const queryArrayMesocosm = [['partnerId', '==', partner.id ]];
+        const mesocosmsFBO = await firestoreHelper.queryData(db, 'mesocosm', queryArrayMesocosm);
+        const mesocosms = FBOtoObject<Mesocosm>(mesocosmsFBO);
+
+        for (const mesocosm of mesocosms) {
+          for (const variable of variables) {
+            const queryArrayMesocosmData = [['variableId', '==', variable.id ], ['mesocosmId', '==', mesocosm.id ]];
+            let mesocosmsDataFBO = await firestoreHelper.queryData(db, 'mesocosmData', queryArrayMesocosmData);
+            let mesocosmData: MesocosmData;
+
+            if (typeof mesocosmsDataFBO === 'string') {
+              mesocosmsDataFBO = {
+                variableId: variable.id!,
+                mesocosmId: mesocosm.id!,
+                data: data.map(dataMeasurement => {
+                  // @ts-ignore
+                  const value = +(dataMeasurement[ mesocosm.dataMapping[ variable.id! ] ].replace(/,/g, '.'));
+                  return { time: getDateDataObject(dataMeasurement), value: value }
+                })
+              }
+              await firestoreHelper.createNewDocument(db, 'mesocosmData', mesocosmsDataFBO);
+            } else {
+              mesocosmData = FBOtoObject<MesocosmData>(mesocosmsDataFBO)[ 0 ];
+              for (const dataMeasurement of data) {
+                const oldTimePoints = mesocosmData.data;
+                if (!oldTimePoints.some(timePoint => !!timePoint && isSameDate(dataMeasurement, (timePoint.time as any).toDate()))) {
+                  // @ts-ignore
+                  const value = +(dataMeasurement[ mesocosm.dataMapping[ variable.id! ] ].replace(/,/g, '.'));
+
+                  mesocosmData.data.push({
+                    time: getDateDataObject(dataMeasurement),
+                    value: value
+                  });
+                  await firestoreHelper.updateDocument(db, 'mesocosmData', mesocosmData.id, mesocosmData);
+                }
+              }
+            }
+          }
+        }
 
         cors(req, res, () => {
           res.status(200).send();
@@ -61,19 +118,41 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
   })();
 });
 
-function mapDataObjectToMesocosmDataFrames(dataObject: DataObject, mesocosms: string[]): MesocosmDataFrame[] {
-  return mesocosms.map(mesocosmId => mapDataObjectToMesocosmDataFrame(dataObject, mesocosmId))
+function addNewRawData(rawDataPerMonth: RawDataPerMonth, newData: DataObject[]): RawDataPerMonth {
+  newData.forEach(data => {
+    if (!rawDataPerMonth.data.some(dataObject => dataObject.Time === data.Time)) {
+      rawDataPerMonth.data.push(data);
+    }
+  })
+
+  return rawDataPerMonth;
 }
 
-function mapDataObjectToMesocosmDataFrame(dataObject: DataObject, mesocosm: string): MesocosmDataFrame {
-  return {
-    id: mesocosm,
-    depth: +dataObject['K1-D.Measured Value'].replace(/,/g, '.'),
-    temperature: +dataObject[ `K1-O2T.Measured Value` ].replace(/,/g, '.'),
-    light: +dataObject[ `Light 1` ].replace(/,/g, '.'),
-    oxygen: +dataObject[ `Oxygen 1` ].replace(/,/g, '.'),
-    time: moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').toDate()
-  }
+function getMonthStringFromDataObject(dataObject: DataObject): string {
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').format('MM-YYYY');
+}
+
+function getDateDataObject(dataObject: DataObject): Date {
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').toDate();
+}
+
+function isSameDate(dataObject: DataObject, newDate: Date): boolean {
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').isSame(newDate, 'minute');
+}
+
+function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
+  return Object.keys(FBO).map(id => {
+    const object = FBO[ id ];
+    (object as any).id = id;
+    return object;
+  });
+}
+
+interface RawDataPerMonth {
+  id?: string;
+  partnerId: string;
+  month: string;
+  data: DataObject[];
 }
 
 interface DataObject {
@@ -86,11 +165,33 @@ interface DataObject {
   'Oxygen 1': string;
 }
 
-interface MesocosmDataFrame {
-  id: string;
+interface Partner {
+  id?: string;
+  name: string;
+  logo: string;
+}
+
+interface Variable {
+  id?: string;
+  name: string;
+  partnerId: string;
+}
+
+interface Mesocosm {
+  id?: string;
+  name: string;
+  partnerId: string;
+  dataMapping: { [variableId: string]: string }
+}
+
+interface MesocosmData {
+  id?: string;
+  variableId: string;
+  mesocosmId: string;
+  data: TimePoint[];
+}
+
+interface TimePoint {
   time: Date;
-  depth: number;
-  temperature: number;
-  light: number;
-  oxygen: number;
+  value: number;
 }

@@ -26,6 +26,7 @@
     "chart.js": "^3.7.1",
     "firebase": "^9.8.1",
     "include-media": "^1.4.10",
+    "moment": "^2.29.3",
     "ng-inline-svg": "^13.1.2",
     "ng2-charts": "^3.0.0-rc.7",
     "ngx-device-detector": "^3.0.0",
