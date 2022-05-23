@@ -57,10 +57,13 @@ export class ChartExampleComponent implements OnInit, OnDestroy {
   private getMesocosmDataTemperature() {
     this.mesocosmDataService.get('1dlqFd9hlcsRpDznRuiM')
       .pipe(takeUntil(this.destroyed$))
-      .subscribe(temperatureData => this.temperatureData = [{
-        label: 'Limnotron 1',
-        data: temperatureData.data
-      }])
+      .subscribe(temperatureData => {
+        console.log(temperatureData);
+        this.temperatureData = [{
+          label: 'Limnotron 1',
+          data: temperatureData.data
+        }]
+      })
   }
 
   private getMesocosmDataLight() {

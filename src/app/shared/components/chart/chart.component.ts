@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { TimePoint } from '../../models/mesocosm-data.model';
 import { DateService } from '../../../core/date.service';
@@ -8,7 +8,7 @@ import { DateService } from '../../../core/date.service';
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss']
 })
-export class ChartComponent implements OnInit {
+export class ChartComponent implements OnInit, OnChanges {
   @Input() dataSets!: { label: string, data: TimePoint[] }[];
   @Input() lineColor!: string;
 
@@ -33,6 +33,17 @@ export class ChartComponent implements OnInit {
   constructor(private dateService: DateService) { }
 
   ngOnInit(): void {
+    this.setLineChartData();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes);
+    if (!!changes['dataSets'].currentValue) {
+      this.setLineChartData();
+    }
+  }
+
+  private setLineChartData() {
     this.lineChartData = {
       datasets: this.dataSets.map(dataSet => {
         return {

@@ -6,6 +6,7 @@ const cors = require('cors')({ origin: true });
 const { firebaseHelper, firestoreHelper } = require('firebase-functions-helper');
 
 import * as serviceAccount from './aquacosm-data-firebase-adminsdk-z49ge-7b576d58d6.json';
+import { firestore } from 'firebase-admin';
 const app = firebaseHelper.initializeApp(serviceAccount);
 const db = app.firestore;
 db.settings({ timestampsInSnapshots: true });
@@ -40,7 +41,7 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
 
         partner = FBOtoObject<Partner>(partner)[ 0 ];
 
-        const data: DataObject[] = req.body.data;
+        const data: DataObject[] = JSON.parse(req.body.data);
 
         const queryArray = [['projectId', '==', partner.id ], [ 'month', '==', getMonthStringFromDataObject(data[ 0 ]) ]];
         const rawDataPerMonthsObject = await firestoreHelper.queryData(db, 'rawdata', queryArray);
@@ -90,7 +91,8 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
               mesocosmData = FBOtoObject<MesocosmData>(mesocosmsDataFBO)[ 0 ];
               for (const dataMeasurement of data) {
                 const oldTimePoints = mesocosmData.data;
-                if (!oldTimePoints.some(timePoint => !!timePoint && isSameDate(dataMeasurement, (timePoint.time as any).toDate()))) {
+                if (!oldTimePoints.some(timePoint => !!timePoint && (timePoint.time instanceof firestore.Timestamp) &&
+                  isSameDate(dataMeasurement, (timePoint.time as any).toDate()))) {
                   // @ts-ignore
                   const value = +(dataMeasurement[ mesocosm.dataMapping[ variable.id! ] ].replace(/,/g, '.'));
 
