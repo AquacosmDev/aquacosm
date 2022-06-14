@@ -7,18 +7,17 @@ import { AppComponent } from './app.component';
 import { InlineSVGModule } from 'ng-inline-svg';
 import { HttpClientModule } from '@angular/common/http';
 import { WorkInProgressComponent } from './work-in-progress/work-in-progress.component';
-import { ChartExampleComponent } from './chart-example/chart-example.component';
-import { SharedModule } from './shared/shared.module';
-import { CoreModule } from './core/core.module';
 import { AngularFireModule } from '@angular/fire/compat';
-import { environment } from '../environments/environment';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { PartnerModule } from '@ptn/partner.module';
+import { SharedModule } from '@shr//shared.module';
+import { CoreModule } from '@core/core.module';
+import { environment } from '@env/environment';
 
 @NgModule({
   declarations: [
     AppComponent,
-    WorkInProgressComponent,
-    ChartExampleComponent
+    WorkInProgressComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +27,8 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
     SharedModule,
     CoreModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFireStorageModule
+    AngularFireStorageModule,
+    PartnerModule
   ],
   providers: [
     // { provide: USE_FIRESTORE_EMULATOR, useValue: !environment.production ? ['localhost', 8080] : undefined },

@@ -1,0 +1,9 @@
+<aqc-checkbox (itemChange)="emitSelectedItems($event)"
+              *ngFor="let item of checklistItems; let i = index"
+              [item]="checklistItems[ i ]"
+              [class.flex-150px]="row"
+              [row]="row"
+              [iconClass]="iconClass"
+              [multiselect]="multiselect"
+              class="m-r-10">
+</aqc-checkbox>

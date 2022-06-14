@@ -1,0 +1,13 @@
+<div class="flex flex-1">
+  <aqc-checklist [class.m-b-10]="selectedItem === 'custom'" *ngIf="checkListItems"
+                 [checklistItems]="checkListItems"
+                 [multiselect]="false"
+                 [row]="true"
+                 class="flex-1"
+                 iconClass="fa-regular fa-calendar"
+                 (selectedItems)="setSelectedItem($event)"></aqc-checklist>
+  <div *ngIf="!!customDateRange" class="custom-date-range cursor-pointer" (click)="openCustomDateRangeSelector()">
+    From {{ customDateRange.start | date:'yyyy-MM-dd HH-mm' }} till {{ customDateRange.end | date:'yyyy-MM-dd HH-mm' }}
+  </div>
+</div>
+<aqc-date-range-input *ngIf="selectedItem === 'custom' && !closeCustomDateRange" (customDateRange)="setCustomDateRange($event)"></aqc-date-range-input>

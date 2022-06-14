@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  max-width: 100%;
+  overflow: hidden;
+  flex: 1;
+
+  .left-sidebar {
+    flex: 0 0 250px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px 20px 20px;
+    overflow: hidden;
+
+    .partner {
+      flex: 0 0 120px;
+    }
+  }
+
+  .right-bar {
+    padding: 20px 20px 20px 0;
+
+    .top-bar {
+      padding-top: 14.5px;
+      padding-bottom: 14px;
+    }
+  }
+
+  .charts {
+    .chart {
+      padding: 0 10px 10px 0;
+
+      &.flex-100 {
+        flex: 0 0 100%;
+      }
+
+      &.flex-50 {
+        flex: 0 0 50%;
+      }
+    }
+  }
+}

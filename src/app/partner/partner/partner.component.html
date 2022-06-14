@@ -1,0 +1,17 @@
+<div class="panel-container flex flex-column justify-center">
+  <div class="panel align-center">
+    <h1>Aquacosm data portal</h1>
+    <div class="logo-container flex overflow-hidden justify-center">
+      <img src="/assets/img/logo_aquacosm.png" alt="Logo Aquacosm" class="p-r-20 mh-100">
+      <img src="/assets/img/logo_aquacosm_plus.png" alt="Logo Aquacosm Plus" class="mh-100">
+    </div>
+    <p class="text-center intro">Spicy jalapeno bacon ipsum dolor amet boudin short ribs beef burgdoggen andouille pork swine cow porchetta cupim salami. Tenderloin swine venison, buffalo rump hamburger jerky. Pastrami short ribs beef ribs hamburger. Pancetta ground round meatball, fatback swine tail turducken sirloin chicken brisket short loin biltong burgdoggen.</p>
+    <h2>Partners</h2>
+    <div class="flex flex-wrap m-b-50 cursor-pointer">
+      <div class="panel flex-row partner align-center" *ngFor="let partner of partners" (click)="navigateToPartner(partner.name)">
+        <img class="m-r-10" [src]="partner.logo"/>
+        <p class="m-0 font-weight-bold">{{ partner.displayName }}
+      </div>
+    </div>
+  </div>
+</div>

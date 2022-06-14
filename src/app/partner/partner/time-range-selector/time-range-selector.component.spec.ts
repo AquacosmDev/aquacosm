@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChartExampleComponent } from './chart-example.component';
+import { TimeRangeSelectorComponent } from './time-range-selector.component';
 
-describe('ChartExampleComponent', () => {
-  let component: ChartExampleComponent;
-  let fixture: ComponentFixture<ChartExampleComponent>;
+describe('TimeRangeSelectorComponent', () => {
+  let component: TimeRangeSelectorComponent;
+  let fixture: ComponentFixture<TimeRangeSelectorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChartExampleComponent ]
+      declarations: [ TimeRangeSelectorComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ChartExampleComponent);
+    fixture = TestBed.createComponent(TimeRangeSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

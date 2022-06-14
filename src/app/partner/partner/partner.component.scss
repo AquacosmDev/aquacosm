@@ -1,0 +1,37 @@
+@import "node_modules/include-media/dist/include-media";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+
+  h1 {
+    font-size: 48px;
+  }
+
+  .logo-container {
+    flex: 0 0 100px;
+  }
+
+  .intro {
+    max-width: 60%;
+  }
+
+  .partner {
+    padding: 10px 20px;
+
+    img {
+      height: 40px;
+    }
+  }
+
+  @include media("<tablet") {
+    h1 {
+      font-size: 32px;
+    }
+
+    .intro {
+      max-width: 100%;
+    }
+  }
+}

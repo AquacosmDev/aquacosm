@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { TimePoint } from '../../models/mesocosm-data.model';
 import { DateService } from '../../../core/date.service';
+import { ChartData } from '@shr//models/chart-data.model';
 
 @Component({
   selector: 'aqc-chart',
@@ -9,13 +10,20 @@ import { DateService } from '../../../core/date.service';
   styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent implements OnInit, OnChanges {
-  @Input() dataSets!: { label: string, data: TimePoint[] }[];
+  @Input() dataSets!: ChartData[];
   @Input() lineColor!: string;
+  @Input() yAxisTitle!: string;
 
   public lineChartData!: ChartConfiguration['data'];
 
   public lineChartOptions: ChartConfiguration['options'] = {
     responsive: true,
+    maintainAspectRatio: false,
+    elements: {
+      point:{
+        radius: 0
+      }
+    },
     scales: {
       x: {
         title: {
@@ -34,10 +42,10 @@ export class ChartComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.setLineChartData();
+    this.setLineChartOptions();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
     if (!!changes['dataSets'].currentValue) {
       this.setLineChartData();
     }
@@ -57,6 +65,15 @@ export class ChartComponent implements OnInit, OnChanges {
         .sort((a, b) => a.time.getTime() - b.time.getTime())
         .map(timepoint => this.dateService.format(timepoint.time))
     };
+  }
+
+  private setLineChartOptions() {
+    this.lineChartOptions!.scales!['y']! = {
+      title: {
+        display: true,
+        text: this.yAxisTitle
+      }
+    }
   }
 
 }

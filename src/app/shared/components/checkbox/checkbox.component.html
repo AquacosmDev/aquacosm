@@ -1,0 +1,12 @@
+<div class="flex align-center cursor-pointer" (click)="toggleItem()">
+  <ng-container *ngIf="row">
+    <i *ngIf="item.checked" class="fa-regular fa-square-check m-r-5"></i>
+    <i *ngIf="!item.checked" class="fa-regular fa-square m-r-5"></i>
+  </ng-container>
+  <i *ngIf="!!iconClass" class="m-r-5" [ngClass]="iconClass"></i>
+  <label class="flex-1 ellipsis cursor-pointer capitalize-first">{{ item.item.name }}</label>
+  <ng-container *ngIf="!row">
+    <i *ngIf="item.checked" class="fa-regular fa-square-check m-l-5"></i>
+    <i *ngIf="!item.checked" class="fa-regular fa-square m-l-5"></i>
+  </ng-container>
+</div>
