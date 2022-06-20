@@ -10,9 +10,10 @@ import { WorkInProgressComponent } from './work-in-progress/work-in-progress.com
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { PartnerModule } from '@ptn/partner.module';
-import { SharedModule } from '@shr//shared.module';
+import { SharedModule } from '@shr/shared.module';
 import { CoreModule } from '@core/core.module';
 import { environment } from '@env/environment';
+import { AdminModule } from '@app/admin/admin.module';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { environment } from '@env/environment';
     CoreModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
-    PartnerModule
+    PartnerModule,
+    AdminModule
   ],
   providers: [
     // { provide: USE_FIRESTORE_EMULATOR, useValue: !environment.production ? ['localhost', 8080] : undefined },

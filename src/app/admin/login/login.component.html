@@ -1,0 +1,29 @@
+<div class="flex flex-column align-center justify-center h-100">
+  <div class="flex logo-container">
+    <img class="logo" src="assets/img/logo_aquacosm.png">
+    <img class="m-l-30" src="assets/img/logo_aquacosm_plus.png">
+  </div>
+
+  <form class="panel m-t-50 p-20">
+    <h1 class="m-t-0 text-center">Login</h1>
+    <div class="form-group">
+      <label>Username:</label>
+      <input type="email" name="name" [(ngModel)]="credentials.name" placeholder="username">
+    </div>
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" name="password" [(ngModel)]="credentials.password" placeholder="password">
+    </div>
+    <div class="error-message" *ngIf="!!error">
+      {{error}}
+    </div>
+    <div class="flex justify-end">
+      <button (click)="login()" [disabled]="credentials.name.length === 0 || credentials.password.length === 0">
+        Login<i class="fa-solid fa-check m-l-5"></i>
+      </button>
+    </div>
+<!--    <div class="flex flex-end">-->
+<!--      <button class="bare">Reset password</button>-->
+<!--    </div>-->
+  </form>
+</div>

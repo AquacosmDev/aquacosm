@@ -20,7 +20,8 @@ import { AngularMyDatePickerModule } from 'angular-mydatepicker';
     ChartComponent,
     CommonModule,
     ChecklistComponent,
-    DateRangeInputComponent
+    DateRangeInputComponent,
+    FormsModule
   ],
   imports: [
     CommonModule,

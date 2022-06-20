@@ -24,7 +24,7 @@
     ],
     "paths": {
       "@app/*": [ "src/app/*" ],
-      "@shr/*": [ "src/app/shared*" ],
+      "@shr/*": [ "src/app/shared/*" ],
       "@core/*": [ "src/app/core/*" ],
       "@cht/*": [ "src/app/chart-example/*" ],
       "@ptn/*": [ "src/app/partner/*" ],
