@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import * as express from 'express';
 
 const cors = require('cors')({ origin: true });
@@ -131,15 +131,15 @@ function addNewRawData(rawDataPerMonth: RawDataPerMonth, newData: DataObject[]):
 }
 
 function getMonthStringFromDataObject(dataObject: DataObject): string {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').format('MM-YYYY');
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').format('MM-YYYY');
 }
 
 function getDateDataObject(dataObject: DataObject): Date {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').toDate();
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').toDate();
 }
 
 function isSameDate(dataObject: DataObject, newDate: Date): boolean {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').isSame(newDate, 'minute');
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').isSame(newDate, 'minute');
 }
 
 function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {

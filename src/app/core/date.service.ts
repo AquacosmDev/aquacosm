@@ -26,4 +26,17 @@ export class DateService {
       end: new Date()
     }
   }
+
+  public isNewDay(date: Date): boolean {
+    const previousMinute = moment(date).add(-1, 'minute');
+    return !moment(date).isSame(previousMinute, 'day');
+  }
+
+  public addHours(date: Date, hours: number): Date {
+    return moment(date).add(hours, 'hours').toDate();
+  }
+
+  public isOnTheHour(date: Date): boolean {
+    return moment(date).format('mm') === '00';
+  }
 }

@@ -1,0 +1,13 @@
+.modal-content {
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+
+  .modal-header {
+    border-bottom: none;
+  }
+
+  .modal-footer {
+    border-top: none;
+  }
+}

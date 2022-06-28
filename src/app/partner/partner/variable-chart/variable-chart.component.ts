@@ -15,6 +15,14 @@ export class VariableChartComponent implements OnInit, OnDestroy {
   @Input() variable!: Variable;
   @Input() mesocosms!: Mesocosm[];
 
+  public yAxisNames: { [variableName: string]: string } = {
+    'light': 'Light (PAR &#181;Mol m&#178; s&#185;)',
+    'oxygen': 'Oxygen (mg/L)',
+    'depth': 'Depth (mm)',
+    'temperature': 'Temperature (&#176;C)'
+  }
+  public yAxisName!: string;
+
   public chartData!: ChartData[];
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
@@ -23,6 +31,7 @@ export class VariableChartComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getChartData();
+    this.yAxisName = this.yAxisNames[ this.variable.name ];
   }
 
   ngOnDestroy() {
@@ -31,7 +40,7 @@ export class VariableChartComponent implements OnInit, OnDestroy {
   }
 
   private getChartData() {
-    this.chartDataService.getChartDataForVariable(this.variable.id!, this.mesocosms)
+    this.chartDataService.getChartData(this.variable.id!, this.mesocosms)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(chartData => this.chartData = chartData);
   }

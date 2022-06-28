@@ -1,8 +1,21 @@
 <div class="panel-container flex flex-column">
-  <div class="panel p-30">
-    <h1 class="m-t-0 flex justify-between">Partners<i class="fa-solid fa-plus cursor-pointer"></i></h1>
-    <div class="flex-1 flex justify-center align-center text-center color-secondary">
-      No partners available.<br>Press + to add a partner.
+  <div class="panel p-30 partners">
+    <h1 class="m-t-0 flex justify-between cursor-pointer" (click)="addPartner()">Partners<i class="fa-solid fa-plus cursor-pointer"></i></h1>
+    <div class="flex-1 flex flex-wrap">
+      <span class="flex-1 flex justify-center align-center text-center color-secondary" *ngIf="!partners || partners.length === 0">No partners available.<br>Press + to add a partner.</span>
+      <div class="panel partner flex-column p-10 m-r-20" *ngFor="let partner of partners">
+        <div class="info">
+          <img [src]="partner.logo">
+          <div>{{ partner.displayName }}</div>
+        </div>
+        <div class="metrics">{{ partnerMetrics[ partner.id! ].mesocosms + ' mesocosms' }}</div>
+        <div class="metrics">{{ partnerMetrics[ partner.id! ].variables + ' variables' }}</div>
+        <div class="flex justify-end">
+          <button (click)="editPartner(partner)">
+            Edit<i class="fa-solid fa-pen m-l-5"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

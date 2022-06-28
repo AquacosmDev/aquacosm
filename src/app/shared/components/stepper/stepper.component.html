@@ -1,0 +1,12 @@
+<div class="steps">
+  <div class="step" *ngFor="let step of stepArray; let i = index">
+    <div class="pointer">
+      <div class="line" [class.show]="i !== 0"></div>
+      <div class="dot" [class.active]="step === selectedStep"></div>
+      <div class="line" [class.show]="i !== (stepArray.length - 1)"></div>
+    </div>
+    <div class="description">
+      {{ steps[ step ]}}
+    </div>
+  </div>
+</div>

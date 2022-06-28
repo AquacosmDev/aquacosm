@@ -7,6 +7,9 @@ import { CheckboxComponent } from './components/checkbox/checkbox.component';
 import { DateRangeInputComponent } from './components/date-range-input/date-range-input.component';
 import { FormsModule } from '@angular/forms';
 import { AngularMyDatePickerModule } from 'angular-mydatepicker';
+import { StepperComponent } from './components/stepper/stepper.component';
+import { ListItemComponent } from './components/list-item/list-item.component';
+import { DecodeHtmlStringPipe } from './pipes/decode-html-string.pipe';
 
 
 @NgModule({
@@ -14,15 +17,21 @@ import { AngularMyDatePickerModule } from 'angular-mydatepicker';
     ChartComponent,
     ChecklistComponent,
     CheckboxComponent,
-    DateRangeInputComponent
-  ],
-  exports: [
-    ChartComponent,
-    CommonModule,
-    ChecklistComponent,
     DateRangeInputComponent,
-    FormsModule
+    StepperComponent,
+    ListItemComponent,
+    DecodeHtmlStringPipe
   ],
+    exports: [
+        ChartComponent,
+        CommonModule,
+        ChecklistComponent,
+        DateRangeInputComponent,
+        FormsModule,
+        StepperComponent,
+        ListItemComponent,
+        DecodeHtmlStringPipe
+    ],
   imports: [
     CommonModule,
     NgChartsModule,

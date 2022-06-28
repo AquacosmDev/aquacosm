@@ -14,13 +14,25 @@ form {
       font-weight: bold;
     }
 
-    input {
-      border-radius: 30px;
-      padding: 10px;
-      background-color: #F8F8F8;
-      box-shadow: inset 1px -3px 5px -3px #000000;
-      flex: 0 0 60%;
-      border: none;
+    &.error {
+      input {
+        border-right: 10px solid red;
+        color: red;
+      }
+
+      .error-message {
+        color: red;
+        font-size: 14px;
+      }
     }
   }
+}
+
+input {
+  border-radius: 30px;
+  padding: 10px;
+  background-color: #F8F8F8;
+  box-shadow: inset 1px -3px 5px -3px #000000;
+  flex: 0 0 60%;
+  border: none;
 }

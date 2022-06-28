@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    font-weight: 700;
+  }
+
+  .flex-200 {
+    flex: 0 0 150px;
+    overflow: hidden;
+  }
+
+  .space-between {
+    flex: 0 0 30px;
+  }
+}

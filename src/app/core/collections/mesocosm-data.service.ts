@@ -15,19 +15,16 @@ export class MesocosmDataService extends FirebaseCollectionService<MesocosmData>
     this.setCollection(db.collection<MesocosmData>('mesocosmData'));
   }
 
-  public getMesocosmDataByVariableAndMesocosm(variableId: string, mesocosmId: string): Observable<MesocosmData> {
-    return this.getQueryRef(variableId, mesocosmId)
+  public getMesocosmDataByVariable(variableId: string): Observable<MesocosmData[]> {
+    return this.getQueryRef(variableId)
       .pipe(
-        map(query => query.docs[ 0 ]),
-        map(list => this.convertDocToItem(list as unknown as DocumentSnapshot<MesocosmData>)));
+        map(query => query.docs.map(doc => this.convertDocToItem(doc as unknown as DocumentSnapshot<MesocosmData>))));
   }
 
-  private getQueryRef(variableId: string, mesocosmId: string) {
+  private getQueryRef(variableId: string) {
     return from(getDocs(
       query(collection(this.db.firestore, 'mesocosmData'),
-        where('variableId', '==', variableId),
-        where('mesocosmId', '==', mesocosmId),
-        limit(1))));
+        where('variableId', '==', variableId))));
   }
 
   override convertItem(item:any): MesocosmData {

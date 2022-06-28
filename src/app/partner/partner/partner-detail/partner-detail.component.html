@@ -18,9 +18,9 @@
                    (selectedItems)="this.selectedVariables=$event">
     </aqc-checklist>
   </div>
-  <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">
-    <aqc-time-range-selector (dateRange)="dateRange=$event"></aqc-time-range-selector>
-  </div>
+<!--  <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">-->
+<!--    <aqc-time-range-selector (dateRange)="dateRange=$event"></aqc-time-range-selector>-->
+<!--  </div>-->
   <div class="charts flex flex-1 flex-wrap p-t-20 overflow-auto p-l-10">
     <div class="chart flex flex-column" *ngFor="let variable of selectedVariables"
          [ngClass]="selectedVariables!.length === 1 ?

@@ -4,7 +4,30 @@
   height: 100%;
   width: 100%;
 
-  .panel {
+  .partners {
     flex: 0 0 80%;
+  }
+
+  .partner {
+    flex: 0 0 20%;
+    max-height: 25%;
+
+    .info {
+      flex: 0 0 25px;
+      display: flex;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 700;
+      align-items: center;
+
+      img {
+        max-height: 100%;
+        margin-right: 5px;
+      }
+    }
+
+    .metrics {
+      font-size: 13px;
+    }
   }
 }

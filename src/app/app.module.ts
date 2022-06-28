@@ -14,6 +14,7 @@ import { SharedModule } from '@shr/shared.module';
 import { CoreModule } from '@core/core.module';
 import { environment } from '@env/environment';
 import { AdminModule } from '@app/admin/admin.module';
+import { defaultSimpleModalOptions, SimpleModalModule } from 'ngx-simple-modal';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,11 @@ import { AdminModule } from '@app/admin/admin.module';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
     PartnerModule,
-    AdminModule
+    AdminModule,
+    SimpleModalModule.forRoot({container:document.body}, {...defaultSimpleModalOptions, ...{
+        closeOnEscape: true,
+        closeOnClickOutside: true,
+      }})
   ],
   providers: [
     // { provide: USE_FIRESTORE_EMULATOR, useValue: !environment.production ? ['localhost', 8080] : undefined },

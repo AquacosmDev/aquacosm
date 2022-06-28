@@ -1,0 +1,13 @@
+<div class="flex align-center m-b-10 p-l-20 header">
+  <div class="flex-200 text-center">Variable</div>
+  <span class="space-between"></span>
+  <div class="flex-200 text-center">Incoming variable</div>
+</div>
+<div class="flex align-center m-b-10 p-l-20" *ngFor="let variable of variables">
+  <div class="flex-200 text-center">{{ variable.name }}</div>
+  <i class="fa-solid fa-arrows-left-right-to-line m-l-5 m-r-5"></i>
+  <input class="flex-200" type="text" name="name"
+         [(ngModel)]="dataMap[ variable.name ]"
+         (blur)="changeVariableLink()"
+         placeholder="Variable name">
+</div>
