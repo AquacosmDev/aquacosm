@@ -132,8 +132,8 @@ export class ChartComponent implements OnInit, OnChanges {
           display: true,
           text: this.yAxisTitle
         },
-        min: dataRange.min - twentyPercent,
-        max: dataRange.max + twentyPercent
+        min: Math.floor(dataRange.min - twentyPercent) > 0 ? Math.floor(dataRange.min - twentyPercent) : 0,
+        max: Math.ceil(dataRange.max + twentyPercent)
       }
     } else {
       this.lineChartOptions!.scales!['y']! = {
