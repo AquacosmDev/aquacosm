@@ -91,7 +91,6 @@ export class ChartComponent implements OnInit, OnChanges {
         }),
         labels: this.getChartLabels(startTime, endTime)
       };
-      console.log(this.lineChartData);
     }
   }
 
