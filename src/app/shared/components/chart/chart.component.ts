@@ -75,29 +75,42 @@ export class ChartComponent implements OnInit, OnChanges {
   }
 
   private setLineChartData() {
-    this.lineChartData = {
-      datasets: this.dataSets.map(dataSet => {
-        return {
-          data: dataSet.data
-            .sort((a, b) => a.time.getTime() - b.time.getTime())
-            .map(timepoint => timepoint.value),
-          label: dataSet.label
-        }
-      }),
-      labels: this.dataSets[ 0 ].data
-        .sort((a, b) => a.time.getTime() - b.time.getTime())
-        .map((timepoint, index) => this.getChartLabel(timepoint, index))
-    };
+    if (this.dataSets[ 0 ].data && this.dataSets[ 0 ].data.length > 0) {
+      const sortedDates = this.dataSets[0].data
+        .sort((a, b) => a.time.getTime() - b.time.getTime());
+      const startTime = sortedDates[0].time;
+      const endTime = sortedDates[sortedDates.length - 1].time;
+      this.lineChartData = {
+        datasets: this.dataSets.map(dataSet => {
+          return {
+            data: dataSet.data
+              .sort((a, b) => a.time.getTime() - b.time.getTime())
+              .map(timepoint => timepoint.value),
+            label: dataSet.label
+          }
+        }),
+        labels: this.getChartLabels(startTime, endTime)
+      };
+      console.log(this.lineChartData);
+    }
   }
 
-  private getChartLabel(timepoint: TimePoint, index: number) {
-    const correctTime = this.dateService.addHours(timepoint.time, -2);
-    const timeInMinutes = this.dateService.format(correctTime);
-    if (this.dateService.isNewDay(timepoint.time) || index === 0) {
-      return [ timeInMinutes, this.dateService.format(timepoint.time, 'YYYY-MM-DD')]
-    } else {
-      return timeInMinutes
+  private getChartLabels(start: Date, end: Date): Array<string | string[]> {
+    const chartLabels = [];
+    let correctStartTime = this.dateService.addHours(start, -2);
+    const correctEndTime = this.dateService.addHours(end, -2);
+    let index = 0;
+    while (!this.dateService.isSame(correctStartTime, correctEndTime)) {
+      const timeInMinutes = index === 0 ? '' : this.dateService.format(correctStartTime);
+      if (this.dateService.isNewDay(correctStartTime) || index === 0) {
+        chartLabels.push([ timeInMinutes, this.dateService.format(correctStartTime, 'YYYY-MM-DD')])
+      } else {
+        chartLabels.push(timeInMinutes);
+      }
+      index++;
+      correctStartTime = this.dateService.addMinutes(correctStartTime, 1);
     }
+    return chartLabels;
   }
 
   private setLineChartOptions() {

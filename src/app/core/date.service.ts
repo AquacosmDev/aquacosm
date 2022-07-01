@@ -32,8 +32,16 @@ export class DateService {
     return !moment(date).isSame(previousMinute, 'day');
   }
 
+  public isSame(date: Date, comparedDate: Date): boolean {
+    return moment(date).isSame(comparedDate, 'minute');
+  }
+
   public addHours(date: Date, hours: number): Date {
     return moment(date).add(hours, 'hours').toDate();
+  }
+
+  public addMinutes(date: Date, minutes: number): Date {
+    return moment(date).add(minutes, 'minutes').toDate();
   }
 
   public isOnTheHour(date: Date): boolean {
