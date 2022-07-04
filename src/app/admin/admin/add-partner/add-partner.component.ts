@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { SimpleModalComponent, SimpleModalService } from 'ngx-simple-modal';
+import { SimpleModalComponent } from 'ngx-simple-modal';
 import { Partner } from '@shr/models/partner-model';
 import { Variable } from '@shr/models/variable.model';
 import { Mesocosm } from '@shr/models/mesocosm.model';
 import { PartnerService } from '@core/collections/partner.service';
-import { Observable, combineLatest, switchMap, map, take } from 'rxjs';
+import { Observable, combineLatest, switchMap, map, take, of } from 'rxjs';
 import { VariableService } from '@core/collections/variable.service';
 import { MesocosmService } from '@core/collections/mesocosm.service';
 
@@ -31,9 +31,11 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
 
   public variable: Variable = {} as Variable;
   public variables: Variable[] = [];
+  private deletedVariables: Variable[] = [];
 
   public mesocosm: Mesocosm = { dataMapping: {} } as Mesocosm;
   public mesocosms: Mesocosm[] = [];
+  private deletedMesocosms: Mesocosm[] = [];
 
   constructor(private partnerService: PartnerService, private variableService: VariableService,
               private mesocosmService: MesocosmService) {
@@ -101,6 +103,7 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
   }
 
   public deleteVariable(variable: Variable | Mesocosm) {
+    this.deletedVariables.push(variable as Variable);
     this.variables = this.removeFromList<Variable>(this.variables, variable as Variable);
   }
 
@@ -113,12 +116,12 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
     if(!this.editing) {
       this.mesocosms.push(this.mesocosm);
     }
-    console.log(this.mesocosm);
     this.mesocosm = { dataMapping: {} } as Mesocosm;
     this.editing = false;
   }
 
   public deleteMesocosm(mesocosm: Variable | Mesocosm) {
+    this.deletedMesocosms.push(mesocosm as Mesocosm);
     this.mesocosms = this.removeFromList<Mesocosm>(this.mesocosms, mesocosm as Mesocosm);
     this.mesocosm = { dataMapping: {} } as Mesocosm;
   }
@@ -139,23 +142,34 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
   private savePartnerAndVariables() {
     this.savePartner()
       .pipe(
+        switchMap(partner => this.deleteVariables(partner)),
         switchMap(partner => this.saveVariables(partner)),
-        switchMap(result => this.saveMesocosms(result)))
+        switchMap(result => this.saveMesocosms(result)),
+        switchMap(() => this.deleteMesocosms()))
       .subscribe(() => this.close());
   }
 
   private saveMesocosms(result: { variables: Variable[], partner: Partner }): Observable<Mesocosm[]> {
     this.mesocosms.forEach(mesocosm => {
       mesocosm.partnerId = result.partner.id!
-      result.variables.forEach(variable => {
-        mesocosm.dataMapping[ variable.id! ] = mesocosm.dataMapping[ variable.name ];
-      });
+      result.variables
+        .filter(variable => !!mesocosm.dataMapping[variable.name])
+        .forEach(variable => {
+          mesocosm.dataMapping[variable.id!] = mesocosm.dataMapping[variable.name];
+        });
     });
+    console.log(this.mesocosms);
     return combineLatest(this.mesocosms.map(mesocosm => this.addOrUpdateMesocosm(mesocosm)));
   }
 
   private addOrUpdateMesocosm(mesocosm: Mesocosm): Observable<Mesocosm> {
     return !mesocosm.id ? this.mesocosmService.add(mesocosm) : this.mesocosmService.update(mesocosm);
+  }
+
+  private deleteMesocosms(): Observable<void[] | string> {
+    return this.deletedMesocosms.length > 0 ?
+      combineLatest(this.deletedMesocosms.map(mesocosm => this.mesocosmService.delete(mesocosm))) :
+      of('empty');
   }
 
   private saveVariables(partner: Partner): Observable<{ variables: Variable[], partner: Partner }> {
@@ -166,6 +180,13 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
 
   private addOrUpdateVariable(variable: Variable): Observable<Variable> {
     return !variable.id ? this.variableService.add(variable) : this.variableService.update(variable);
+  }
+
+  private deleteVariables(partner: Partner): Observable<Partner> {
+    return this.deletedVariables.length > 0 ?
+      combineLatest(this.deletedVariables.map(variable => this.variableService.delete(variable)))
+      .pipe(map(() => partner)) :
+      of(partner);
   }
 
   private savePartner(): Observable<Partner> {

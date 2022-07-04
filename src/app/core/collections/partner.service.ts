@@ -15,15 +15,9 @@ export class PartnerService  extends FirebaseCollectionService<Partner> {
   }
 
   public getPartnerByName(name: string): Observable<Partner> {
-    return this.db.collection<Partner>('partner', ref => this.getQueryRef(ref, name))
+    return this.db.collection<Partner>('partner', ref => ref
+      .where('name', '==', name))
       .snapshotChanges()
       .pipe(map(list => this.convertDocToItem(list[ 0 ].payload.doc as DocumentSnapshot<Partner>)));
-  }
-
-  private getQueryRef(ref: CollectionReference, name?: string): CollectionReference | Query {
-    if (name) {
-      ref.where('name', '==', name);
-    }
-    return ref.limit(1);
   }
 }
