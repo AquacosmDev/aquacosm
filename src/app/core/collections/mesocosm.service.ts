@@ -26,4 +26,20 @@ export class MesocosmService extends FirebaseCollectionService<Mesocosm> {
     return this.getMesocosmByPartnerId(partnerId)
       .pipe(map(mesocosms => mesocosms.length));
   }
+
+  public getMesocosmsByPartnerIdSortedByName(partnerId: string): Observable<Mesocosm[]> {
+    return this.getMesocosmByPartnerId(partnerId)
+      .pipe(map((mesocosms: Mesocosm[]) => {
+        mesocosms.sort((a: Mesocosm, b: Mesocosm) => {
+          if (a.name < b.name) {
+            return -1;
+          }
+          if (b.name > a.name) {
+            return 1;
+          }
+          return 0;
+        });
+        return mesocosms;
+      }));
+  }
 }

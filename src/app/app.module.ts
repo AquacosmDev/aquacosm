@@ -15,6 +15,7 @@ import { CoreModule } from '@core/core.module';
 import { environment } from '@env/environment';
 import { AdminModule } from '@app/admin/admin.module';
 import { defaultSimpleModalOptions, SimpleModalModule } from 'ngx-simple-modal';
+import { NgxPopperjsModule } from 'ngx-popperjs';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { defaultSimpleModalOptions, SimpleModalModule } from 'ngx-simple-modal';
     SimpleModalModule.forRoot({container:document.body}, {...defaultSimpleModalOptions, ...{
         closeOnEscape: true,
         closeOnClickOutside: true,
-      }})
+      }}),
+    NgxPopperjsModule
   ],
   providers: [
     // { provide: USE_FIRESTORE_EMULATOR, useValue: !environment.production ? ['localhost', 8080] : undefined },

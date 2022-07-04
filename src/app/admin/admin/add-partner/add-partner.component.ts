@@ -7,6 +7,7 @@ import { PartnerService } from '@core/collections/partner.service';
 import { Observable, combineLatest, switchMap, map, take, of } from 'rxjs';
 import { VariableService } from '@core/collections/variable.service';
 import { MesocosmService } from '@core/collections/mesocosm.service';
+import { NgxPopperjsPlacements, NgxPopperjsTriggers } from 'ngx-popperjs';
 
 @Component({
   selector: 'aqc-add-partner',
@@ -14,6 +15,8 @@ import { MesocosmService } from '@core/collections/mesocosm.service';
   styleUrls: ['./add-partner.component.scss']
 })
 export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implements OnInit {
+  public NgxPopperjsTriggers = NgxPopperjsTriggers;
+  public NgxPopperjsPlacements = NgxPopperjsPlacements;
 
   public partner!: Partner;
   public isNew = false;
@@ -51,7 +54,7 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
         .pipe(take(1))
         .subscribe(variables => this.variables = variables);
 
-      this.mesocosmService.getMesocosmByPartnerId(this.partner.id!)
+      this.mesocosmService.getMesocosmsByPartnerIdSortedByName(this.partner.id!)
         .pipe(take(1))
         .subscribe(mesocosms => this.mesocosms = mesocosms);
     }

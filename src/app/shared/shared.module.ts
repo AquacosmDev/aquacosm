@@ -10,6 +10,7 @@ import { AngularMyDatePickerModule } from 'angular-mydatepicker';
 import { StepperComponent } from './components/stepper/stepper.component';
 import { ListItemComponent } from './components/list-item/list-item.component';
 import { DecodeHtmlStringPipe } from './pipes/decode-html-string.pipe';
+import { NgxPopperjsModule } from 'ngx-popperjs';
 
 
 @NgModule({
@@ -22,21 +23,23 @@ import { DecodeHtmlStringPipe } from './pipes/decode-html-string.pipe';
     ListItemComponent,
     DecodeHtmlStringPipe
   ],
-    exports: [
-        ChartComponent,
-        CommonModule,
-        ChecklistComponent,
-        DateRangeInputComponent,
-        FormsModule,
-        StepperComponent,
-        ListItemComponent,
-        DecodeHtmlStringPipe
-    ],
+  exports: [
+    ChartComponent,
+    CommonModule,
+    ChecklistComponent,
+    DateRangeInputComponent,
+    FormsModule,
+    StepperComponent,
+    ListItemComponent,
+    DecodeHtmlStringPipe,
+    NgxPopperjsModule
+  ],
   imports: [
     CommonModule,
     NgChartsModule,
     FormsModule,
-    AngularMyDatePickerModule
+    AngularMyDatePickerModule,
+    NgxPopperjsModule
   ]
 })
 export class SharedModule {

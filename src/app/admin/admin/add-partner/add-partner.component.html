@@ -1,4 +1,28 @@
+<popper-content #popper1Content>
+  <div *ngIf="selectedStep === 1">
+    <p>{{ isNew ? 'Add ' : 'Edit ' }} the name and logo url of the partner. The logo url should lead to an existing image of the partner's logo and should be a valid url.</p>
+  </div>
+  <div *ngIf="selectedStep === 2">
+    <p>Add or edit the variables used by the partner. A variable should exist of a variable name and the unit used. These will be used for the y-axis of the chart: Name(unit).</p>
+    <p>After adding a variable it will be added to the variable list on the right side. A variable can be edited (<i class="fa-solid fa-pen"></i>) or <br>deleted (<i class="fa-solid fa-trash-can"></i>).</p>
+  </div>
+  <div *ngIf="selectedStep === 3">
+    <p>Add or edit the mesocosms used by the partner. Adding a mesocosm consists of two steps. First you need to add a unique name for the mesocosm.</p>
+    <p>Second you need to map the incomming data to the variables used in the platform. If correct all variables added in the previous step should be visible.</p>
+    <p>You can map the data to a variable by adding the corresponding csv-header in the input field behind the variable. For example a partner has a variable called 'Light'. The mesocosm you want to add generates a csv-file with the following headers: "Time", "K1-Light". In this case you add "K1-Light" in the input behind the Light-variable.</p>
+    <p>A mesocosm can be <br>edited (<i class="fa-solid fa-pen"></i>) or deleted (<i class="fa-solid fa-trash-can"></i>).</p>
+  </div>
+</popper-content>
+
 <div class="modal-content">
+  <div class="help flex justify-center align-center cursor-pointer">
+    <i [popper]="popper1Content"
+       [popperTrigger]="NgxPopperjsTriggers.click"
+       [popperHideOnClickOutside]="true"
+       [popperHideOnScroll]="true"
+       [popperPlacement]="NgxPopperjsPlacements.LEFT"
+      class="fa-solid fa-question fa-2x"></i>
+  </div>
   <div class="text-center">
     <h1>{{ isNew ? 'New ' : 'Edit '}}Partner</h1>
   </div>

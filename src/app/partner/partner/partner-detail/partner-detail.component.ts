@@ -53,21 +53,9 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
 
   private getMesocosms() {
     console.log(this.partner.id);
-    this.mesocosmService.getMesocosmByPartnerId(this.partner.id!)
+    this.mesocosmService.getMesocosmsByPartnerIdSortedByName(this.partner.id!)
       .pipe(
         takeUntil(this.destroyed$),
-        map((mesocosms: Mesocosm[]) => {
-          mesocosms.sort((a: Mesocosm, b: Mesocosm) => {
-            if (a.name < b.name) {
-              return -1;
-            }
-            if (b.name > a.name) {
-              return 1;
-            }
-            return 0;
-          });
-          return mesocosms;
-        }),
         tap(mesocosms => this.selectedMesocosms = mesocosms),
         map(mesocosms => this.convertToChecklistItem(mesocosms)))
       .subscribe(mesocosms => {
