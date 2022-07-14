@@ -11,14 +11,6 @@ const app = firebaseHelper.initializeApp(serviceAccount);
 const db = app.firestore;
 db.settings({ timestampsInSnapshots: true });
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
 exports.dataWebhook = functions.https.onRequest((req: express.Request, res: express.Response) => {
   (async () => {
     if (req.method === 'OPTIONS') {
@@ -27,7 +19,6 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
       });
     } else {
       try {
-        console.log(req.body);
         if (!req.body.partnerName) {
           throw Error('No partner name submitted');
         }
@@ -41,66 +32,59 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
 
         partner = FBOtoObject<Partner>(partner)[ 0 ];
 
-        const data: DataObject[] = JSON.parse(req.body.data);
+        const data: { [name: string]: string }[] = JSON.parse(req.body.data);
 
-        const queryArray = [['projectId', '==', partner.id ], [ 'month', '==', getMonthStringFromDataObject(data[ 0 ]) ]];
-        const rawDataPerMonthsObject = await firestoreHelper.queryData(db, 'rawdata', queryArray);
-
-        let rawDataPerMonth: RawDataPerMonth;
-
-        if (typeof rawDataPerMonthsObject === 'string') {
-          rawDataPerMonth = {
-            partnerId: partner.id,
-            month: getMonthStringFromDataObject(data[ 0 ]),
-            data: data
-          }
-          await firestoreHelper.createNewDocument(db, 'rawdata', rawDataPerMonth);
-        } else {
-          const rawDataPerMonthList = FBOtoObject<RawDataPerMonth>(rawDataPerMonthsObject);
-          rawDataPerMonth = addNewRawData(rawDataPerMonthList[ 0 ], data);
-
-          await firestoreHelper.updateDocument(db, 'rawdata', rawDataPerMonth.id, rawDataPerMonth);
-        }
-
-        const queryArrayVariables = [['partnerId', '==', partner.id ]];
-        const variablesFBO = await firestoreHelper.queryData(db, 'variable', queryArrayVariables);
+        const queryArray = [['partnerId', '==', partner.id ]];
+        const variablesFBO = await firestoreHelper.queryData(db, 'variable', queryArray);
         const variables = FBOtoObject<Variable>(variablesFBO);
 
-        const queryArrayMesocosm = [['partnerId', '==', partner.id ]];
-        const mesocosmsFBO = await firestoreHelper.queryData(db, 'mesocosm', queryArrayMesocosm);
+        const mesocosmsFBO = await firestoreHelper.queryData(db, 'mesocosm', queryArray);
         const mesocosms = FBOtoObject<Mesocosm>(mesocosmsFBO);
 
         for (const mesocosm of mesocosms) {
           for (const variable of variables) {
-            const queryArrayMesocosmData = [['variableId', '==', variable.id ], ['mesocosmId', '==', mesocosm.id ]];
-            let mesocosmsDataFBO = await firestoreHelper.queryData(db, 'mesocosmData', queryArrayMesocosmData);
-            let mesocosmData: MesocosmData;
+            const days = data.map(dataMeasurement => getDayNumber(getDateDataObject(dataMeasurement)))
+              .filter((v, i, a) => a.indexOf(v) === i);
 
-            if (typeof mesocosmsDataFBO === 'string') {
-              mesocosmsDataFBO = {
-                variableId: variable.id!,
-                mesocosmId: mesocosm.id!,
-                data: data.map(dataMeasurement => {
-                  // @ts-ignore
-                  const value = +(dataMeasurement[ mesocosm.dataMapping[ variable.id! ] ].replace(/,/g, '.'));
-                  return { time: getDateDataObject(dataMeasurement), value: value }
-                })
-              }
-              await firestoreHelper.createNewDocument(db, 'mesocosmData', mesocosmsDataFBO);
-            } else {
-              mesocosmData = FBOtoObject<MesocosmData>(mesocosmsDataFBO)[ 0 ];
-              for (const dataMeasurement of data) {
-                const oldTimePoints = mesocosmData.data;
-                if (!oldTimePoints.some(timePoint => !!timePoint && (timePoint.time instanceof firestore.Timestamp) &&
-                  isSameDate(dataMeasurement, (timePoint.time as any).toDate()))) {
-                  // @ts-ignore
-                  const value = +(dataMeasurement[ mesocosm.dataMapping[ variable.id! ] ].replace(/,/g, '.'));
+            for (const day of days) {
+              const dayData = data.filter(dataMeasurement => getDayNumber(getDateDataObject(dataMeasurement)) === day)
+              const queryArrayMesocosmData = [
+                ['variableId', '==', variable.id],
+                ['mesocosmId', '==', mesocosm.id],
+                ['day', '==', day]];
+              let mesocosmsDataFBO = await firestoreHelper.queryData(db, 'mesocosmData', queryArrayMesocosmData);
+              let mesocosmData: MesocosmData;
 
-                  mesocosmData.data.push({
-                    time: getDateDataObject(dataMeasurement),
-                    value: value
-                  });
-                  await firestoreHelper.updateDocument(db, 'mesocosmData', mesocosmData.id, mesocosmData);
+
+              if (typeof mesocosmsDataFBO === 'string') {
+                mesocosmsDataFBO = {
+                  variableId: variable.id!,
+                  mesocosmId: mesocosm.id!,
+                  day: day,
+                  data: dayData.map(dataMeasurement => {
+                    const value = dataMeasurement[mesocosm.dataMapping[variable.id!]] ?
+                      +(dataMeasurement[mesocosm.dataMapping[variable.id!]].replace(/,/g, '.')) :
+                      null;
+                    return {time: getDateDataObject(dataMeasurement), value: value}
+                  })
+                }
+                await firestoreHelper.createNewDocument(db, 'mesocosmData', mesocosmsDataFBO);
+              } else {
+                mesocosmData = FBOtoObject<MesocosmData>(mesocosmsDataFBO)[0];
+                for (const dataMeasurement of dayData) {
+                  const oldTimePoints = mesocosmData.data;
+                  if (!oldTimePoints.some(timePoint => !!timePoint && (timePoint.time instanceof firestore.Timestamp) &&
+                    isSameDate(dataMeasurement, (timePoint.time as any).toDate()))) {
+                    const value = dataMeasurement[mesocosm.dataMapping[variable.id!]] ?
+                      +(dataMeasurement[mesocosm.dataMapping[variable.id!]].replace(/,/g, '.')) :
+                      null;
+
+                    mesocosmData.data.push({
+                      time: getDateDataObject(dataMeasurement),
+                      value: value
+                    });
+                    await firestoreHelper.updateDocument(db, 'mesocosmData', mesocosmData.id, mesocosmData);
+                  }
                 }
               }
             }
@@ -120,25 +104,15 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
   })();
 });
 
-function addNewRawData(rawDataPerMonth: RawDataPerMonth, newData: DataObject[]): RawDataPerMonth {
-  newData.forEach(data => {
-    if (!rawDataPerMonth.data.some(dataObject => dataObject.Time === data.Time)) {
-      rawDataPerMonth.data.push(data);
-    }
-  })
-
-  return rawDataPerMonth;
+function getDayNumber(date: Date): number {
+  return parseInt(moment(date).format('YYYYMMDD'), 0);
 }
 
-function getMonthStringFromDataObject(dataObject: DataObject): string {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').format('MM-YYYY');
-}
-
-function getDateDataObject(dataObject: DataObject): Date {
+function getDateDataObject(dataObject: any): Date {
   return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').toDate();
 }
 
-function isSameDate(dataObject: DataObject, newDate: Date): boolean {
+function isSameDate(dataObject: any, newDate: Date): boolean {
   return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').isSame(newDate, 'minute');
 }
 
@@ -148,23 +122,6 @@ function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
     (object as any).id = id;
     return object;
   });
-}
-
-interface RawDataPerMonth {
-  id?: string;
-  partnerId: string;
-  month: string;
-  data: DataObject[];
-}
-
-interface DataObject {
-  Time: string;
-  'K1-D.Measured Value': string;
-  'K1-O2T.Measured Value': string;
-  'K1-L.Measured Value': string;
-  'K1-O2.Measured Value': string;
-  'Light 1': string;
-  'Oxygen 1': string;
 }
 
 interface Partner {
@@ -192,9 +149,10 @@ interface MesocosmData {
   variableId: string;
   mesocosmId: string;
   data: TimePoint[];
+  day: number
 }
 
 interface TimePoint {
   time: Date;
-  value: number;
+  value: number | null;
 }
