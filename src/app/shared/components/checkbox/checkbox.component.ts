@@ -17,7 +17,6 @@ export class CheckboxComponent {
   constructor() { }
 
   public toggleItem() {
-    console.log(this.multiselect, this.item.checked);
     if (this.multiselect || !this.item.checked) {
       this.item.checked = !this.item.checked;
       this.itemChange.emit(this.item);

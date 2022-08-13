@@ -36,18 +36,15 @@ export class DateRangeInputComponent implements OnInit {
   }
 
   public startDateChanged(event: IMyDateModel): void {
-    console.log(event);
     this.endDpOptions = {
       dateRange: false,
       dateFormat: 'yyyy-mm-dd',
       disableSince: { year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate() + 1 },
       disableUntil: event.singleDate?.date
     };
-    console.log(this.endDpOptions);
   }
 
   public endDateChanged(event: IMyDateModel): void {
-    console.log(event);
   }
 
   public emitDateRange() {

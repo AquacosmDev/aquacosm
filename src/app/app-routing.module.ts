@@ -7,6 +7,7 @@ import { LoginComponent } from '@app/admin/login/login.component';
 import { AdminComponent } from '@app/admin/admin/admin.component';
 import { AngularFireAuthGuard } from '@angular/fire/compat/auth-guard';
 import { redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
+import { ErrorComponent } from '@app/admin/error/error.component';
 
 const redirectLoggedInToItems = () => redirectLoggedInTo(['admin']);
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'home', component: PartnerComponent },
   { path: 'login', component: LoginComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToItems } },
   { path: 'admin', component: AdminComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }  },
+  { path: 'error', component: ErrorComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }  },
   { path: 'partner/:name', component: PartnerDetailComponent },
 ];
 

@@ -26,7 +26,6 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    InlineSVGModule.forRoot(),
     SharedModule,
     CoreModule,
     AngularFireModule.initializeApp(environment.firebase),
@@ -37,7 +36,8 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
         closeOnEscape: true,
         closeOnClickOutside: true,
       }}),
-    NgxPopperjsModule
+    NgxPopperjsModule,
+    SharedModule
   ],
   providers: [
     // { provide: USE_FIRESTORE_EMULATOR, useValue: !environment.production ? ['localhost', 8080] : undefined },

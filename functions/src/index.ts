@@ -1,17 +1,27 @@
 import * as functions from "firebase-functions";
 import * as moment from 'moment-timezone';
 import * as express from 'express';
+import { sum, std } from 'mathjs'
 
 const cors = require('cors')({ origin: true });
 const { firebaseHelper, firestoreHelper } = require('firebase-functions-helper');
 
 import * as serviceAccount from './aquacosm-data-firebase-adminsdk-z49ge-7b576d58d6.json';
-import { firestore } from 'firebase-admin';
 const app = firebaseHelper.initializeApp(serviceAccount);
 const db = app.firestore;
 db.settings({ timestampsInSnapshots: true });
+moment.tz.setDefault('Europe/Amsterdam');
 
-exports.dataWebhook = functions.https.onRequest((req: express.Request, res: express.Response) => {
+const _WINDOW = 30;
+
+exports.dataWebhook = functions
+  .runWith({
+    // Ensure the function has enough memory and time
+    // to process large files
+    timeoutSeconds: 500,
+    memory: "1GB",
+  })
+  .https.onRequest((req: express.Request, res: express.Response) => {
   (async () => {
     if (req.method === 'OPTIONS') {
       cors(req, res, () => {
@@ -57,35 +67,26 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
 
 
               if (typeof mesocosmsDataFBO === 'string') {
-                mesocosmsDataFBO = {
-                  variableId: variable.id!,
-                  mesocosmId: mesocosm.id!,
-                  day: day,
-                  data: dayData.map(dataMeasurement => {
-                    const value = dataMeasurement[mesocosm.dataMapping[variable.id!]] ?
-                      +(dataMeasurement[mesocosm.dataMapping[variable.id!]].replace(/,/g, '.')) :
-                      null;
-                    return {time: getDateDataObject(dataMeasurement), value: value}
-                  })
-                }
-                await firestoreHelper.createNewDocument(db, 'mesocosmData', mesocosmsDataFBO);
+                mesocosmData = createNewDay(variable.id!, mesocosm.id!, day)
               } else {
                 mesocosmData = FBOtoObject<MesocosmData>(mesocosmsDataFBO)[0];
-                for (const dataMeasurement of dayData) {
-                  const oldTimePoints = mesocosmData.data;
-                  if (!oldTimePoints.some(timePoint => !!timePoint && (timePoint.time instanceof firestore.Timestamp) &&
-                    isSameDate(dataMeasurement, (timePoint.time as any).toDate()))) {
-                    const value = dataMeasurement[mesocosm.dataMapping[variable.id!]] ?
-                      +(dataMeasurement[mesocosm.dataMapping[variable.id!]].replace(/,/g, '.')) :
-                      null;
+              }
+              for (const dataMeasurement of dayData) {
+                let timePoint = mesocosmData.data[ getMinuteOfDay(getDateDataObject(dataMeasurement)) ];
 
-                    mesocosmData.data.push({
-                      time: getDateDataObject(dataMeasurement),
-                      value: value
-                    });
-                    await firestoreHelper.updateDocument(db, 'mesocosmData', mesocosmData.id, mesocosmData);
-                  }
+                if (!timePoint.value) {
+                  timePoint.value = dataMeasurement[mesocosm.dataMapping[variable.id!]] ?
+                    +(dataMeasurement[mesocosm.dataMapping[variable.id!]].replace(/,/g, '.')) :
+                    null;
+
+                  timePoint = await getMetrics(timePoint, mesocosmData);
+                  mesocosmData.data[ timePoint.minuteOfDay! ] = timePoint;
                 }
+              }
+              if (typeof mesocosmsDataFBO === 'string') {
+                await firestoreHelper.createNewDocument(db, 'mesocosmData', mesocosmData);
+              } else {
+                await firestoreHelper.updateDocument(db, 'mesocosmData', mesocosmData.id, mesocosmData);
               }
             }
           }
@@ -94,8 +95,14 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
         cors(req, res, () => {
           res.status(200).send();
         });
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        console.error(error);
+        // const errorFBO: FBOError = {
+        //   error: error,
+        //   partner: req.body.partner,
+        //   object: req.body.data
+        // }
+        // await firestoreHelper.createNewDocument(db, 'error', errorFBO);
         cors(req, res, () => {
           res.status(400).send({data: {error: error}});
         });
@@ -104,16 +111,79 @@ exports.dataWebhook = functions.https.onRequest((req: express.Request, res: expr
   })();
 });
 
+// exports.deleteData = functions
+//   .https.onRequest((req: express.Request, res: express.Response) => {
+//     (async () => {
+//       if (req.method === 'OPTIONS') {
+//         cors(req, res, () => {
+//           res.status(200).send();
+//         });
+//       } else {
+//         try {
+//           const batch = db.batch()
+//
+//           await db.collection('mesocosmData').listDocuments().then((val: any[]) => {
+//             val = val.slice(0, 100);
+//             val.map((val) => {
+//               batch.delete(val)
+//             });
+//           });
+//
+//           await batch.commit();
+//
+//           cors(req, res, () => {
+//             res.status(200).send();
+//           });
+//         } catch (error: any) {
+//           console.error(error);
+//           cors(req, res, () => {
+//             res.status(400).send({data: {error: error}});
+//           });
+//         }
+//       }
+//     })();
+//   });
+
+function createNewDay(variableId: string, mesocosmId: string, day: number): MesocosmData {
+  return {
+    variableId: variableId,
+    mesocosmId: mesocosmId,
+    day: day,
+    data: createTimePointsForDay(day)
+  };
+}
+
+function createTimePointsForDay(day: number): TimePoint[] {
+  let startDate = moment(moment(day, 'YYYYMMDD')).startOf('day');
+  const endDate = moment(moment(day, 'YYYYMMDD')).endOf('day');
+
+  const timePoints: TimePoint[] = [];
+  while (moment(startDate).isSameOrBefore(endDate)) {
+    timePoints.push({
+      minuteOfDay: getMinuteOfDay(startDate.toDate()),
+      time: startDate.toDate(),
+      value: null
+    });
+    startDate = startDate.add(1, 'minute');
+  }
+
+  return timePoints;
+}
+
+function getMinuteOfDay(date: Date): number {
+  return moment(date).hour() * 60 + moment(date).minute();
+}
+
 function getDayNumber(date: Date): number {
   return parseInt(moment(date).format('YYYYMMDD'), 0);
 }
 
 function getDateDataObject(dataObject: any): Date {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').toDate();
+  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').toDate();
 }
 
-function isSameDate(dataObject: any, newDate: Date): boolean {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').tz('Europe/Amsterdam').isSame(newDate, 'minute');
+function getDayNumberFromYesterday(day: number): number {
+  return getDayNumber(moment(day, 'YYYYMMDD').add(-1, 'day').toDate());
 }
 
 function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
@@ -123,6 +193,63 @@ function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
     return object;
   });
 }
+
+async function getMetrics(timePoint: TimePoint, mesocosmData: MesocosmData) {
+  if((mesocosmData.data.length + 1) < _WINDOW) {
+
+    const yesterday = getDayNumberFromYesterday(mesocosmData.day);
+    const queryArrayMesocosmDataYesterday = [
+      ['variableId', '==', mesocosmData.variableId],
+      ['mesocosmId', '==', mesocosmData.mesocosmId],
+      ['day', '==', yesterday]];
+    let yesterdayMesocosmDataFBO = await firestoreHelper.queryData(db, 'mesocosmData', queryArrayMesocosmDataYesterday);
+    let yesterdayMesocosmData: MesocosmData;
+
+    if (typeof yesterdayMesocosmDataFBO === 'string') {
+      timePoint.rollingAverage = timePoint.value;
+      timePoint.standardDeviation = 0;
+    } else {
+      yesterdayMesocosmData = FBOtoObject<MesocosmData>(yesterdayMesocosmDataFBO)[0];
+      timePoint = getMetricsForTodayAndYesterday(mesocosmData, yesterdayMesocosmData, timePoint);
+    }
+  } else {
+    timePoint = getMetricsForToday(mesocosmData, timePoint);
+  }
+  return timePoint;
+}
+
+function getMetricsForToday(today: MesocosmData, timePoint: TimePoint): TimePoint {
+  const windowSlice = today.data.slice(timePoint.minuteOfDay! - _WINDOW, timePoint.minuteOfDay!);
+  return setMetrics(timePoint, windowSlice);
+}
+
+function getMetricsForTodayAndYesterday(today: MesocosmData, yesterday: MesocosmData, timePoint: TimePoint): TimePoint {
+  const timePointsNeededFromYesterday = _WINDOW - timePoint.minuteOfDay!;
+  const windowSliceYesterday = yesterday.data.slice(yesterday.data.length - timePointsNeededFromYesterday);
+  const windowSliceToday = today.data.slice(0, timePoint.minuteOfDay!);
+  const windowSlice = windowSliceToday.concat(windowSliceYesterday);
+  return setMetrics(timePoint, windowSlice);
+}
+
+function calculateRollingAverage(slice: TimePoint[]): number | null {
+  const sumOfData = slice.length > 0 ? sum(slice.map(timePoint => timePoint.value!)) : null ;
+  return sumOfData !== null ? sumOfData / slice.length : sumOfData;
+}
+
+function setMetrics(timePoint: TimePoint, slice: TimePoint[]): TimePoint {
+  slice = slice.filter(timePoint => timePoint.value !== null);
+  timePoint.rollingAverage = calculateRollingAverage(slice);
+  // @ts-ignore
+  timePoint.standardDeviation = slice.length > 0 ? std(slice.map(timePoint => timePoint.value!)) : null;
+  return timePoint;
+}
+
+// interface FBOError {
+//   id?: string;
+//   error: string;
+//   partner: string;
+//   object: any;
+// }
 
 interface Partner {
   id?: string;
@@ -153,6 +280,9 @@ interface MesocosmData {
 }
 
 interface TimePoint {
+  minuteOfDay?: number;
   time: Date;
   value: number | null;
+  rollingAverage?: number | null;
+  standardDeviation?: number | null;
 }

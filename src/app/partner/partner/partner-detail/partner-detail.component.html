@@ -6,7 +6,7 @@
     </div>
   </div>
   <div class="panel m-t-30 p-20" *ngIf="mesocosms">
-    <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="this.selectedMesocosms=$event"></aqc-checklist>
+    <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="setMesocosms($event)"></aqc-checklist>
   </div>
 </div>
 <div class="flex-1 flex flex-column right-bar overflow-hidden" *ngIf="variables">
@@ -15,20 +15,20 @@
                    iconClass="fa-solid fa-chart-line"
                    [row]="true"
                    [checklistItems]="variables"
-                   (selectedItems)="this.selectedVariables=$event">
+                   (selectedItems)="setVariables($event)">
     </aqc-checklist>
   </div>
-<!--  <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">-->
-<!--    <aqc-time-range-selector (dateRange)="dateRange=$event"></aqc-time-range-selector>-->
-<!--  </div>-->
+  <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">
+    <aqc-time-range-selector (dateRange)="setDateRange($event)"></aqc-time-range-selector>
+  </div>
   <div class="charts flex flex-1 flex-wrap p-t-20 overflow-auto p-l-10">
     <div class="chart flex flex-column" *ngFor="let variable of selectedVariables"
-         [ngClass]="selectedVariables!.length === 1 ?
-       'flex-100 h-100 mw-100' : selectedVariables!.length === 2 ?
+         [ngClass]="selectedVariables.length === 1 ?
+       'flex-100 h-100 mw-100' : selectedVariables.length === 2 ?
        'flex-100 h-50 mw-100' :
        'flex-50 h-50 mw-50'">
-      <div class="panel flex-1 p-20" *ngIf="!!selectedMesocosms && selectedMesocosms.length > 0">
-        <aqc-variable-chart [variable]="variable!" [mesocosms]="selectedMesocosms!"></aqc-variable-chart>
+      <div class="panel flex-1 p-20 position-relative">
+        <aqc-variable-chart [variableId]="variable"></aqc-variable-chart>
       </div>
     </div>
   </div>

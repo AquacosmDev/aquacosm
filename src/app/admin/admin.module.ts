@@ -5,6 +5,7 @@ import { LoginComponent } from '@app/admin/login/login.component';
 import { AdminComponent } from '@app/admin/admin/admin.component';
 import { AddPartnerComponent } from './admin/add-partner/add-partner.component';
 import { LinkVariablesComponent } from './admin/add-partner/link-variables/link-variables.component';
+import { ErrorComponent } from './error/error.component';
 
 
 
@@ -13,7 +14,8 @@ import { LinkVariablesComponent } from './admin/add-partner/link-variables/link-
     LoginComponent,
     AdminComponent,
     AddPartnerComponent,
-    LinkVariablesComponent
+    LinkVariablesComponent,
+    ErrorComponent
   ],
   imports: [
     CommonModule,

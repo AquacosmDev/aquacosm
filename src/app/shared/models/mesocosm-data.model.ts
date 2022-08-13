@@ -3,9 +3,13 @@ export interface MesocosmData {
   variableId: string;
   mesocosmId: string;
   data: TimePoint[];
+  day: number;
 }
 
 export interface TimePoint {
+  minuteOfDay?: number;
   time: Date;
-  value: number;
+  value: number | null;
+  rollingAverage?: number | null;
+  standardDeviation?: number | null;
 }

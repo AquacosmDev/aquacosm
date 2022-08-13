@@ -1,9 +1,12 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ChartDataService } from '@core/chart-data.service';
 import { ChartData } from '@shr//models/chart-data.model';
-import { Mesocosm } from '@shr//models/mesocosm.model';
 import { Variable } from '@shr//models/variable.model';
-import { ReplaySubject, takeUntil } from 'rxjs';
+import { ReplaySubject, take, takeUntil } from 'rxjs';
+import { VariableService } from '@core/collections/variable.service';
+import { IsSelectedService } from '@core/is-selected.service';
+import { DateRange } from '@shr/models/date-range.model';
+import { LoadingService } from '@core/loading.service';
 
 @Component({
   selector: 'aqc-variable-chart',
@@ -12,26 +15,33 @@ import { ReplaySubject, takeUntil } from 'rxjs';
 })
 export class VariableChartComponent implements OnInit, OnDestroy {
 
-  @Input() variable!: Variable;
-  @Input() mesocosms!: Mesocosm[];
+  @Input() variableId!: string;
 
   public yAxisNames: { [variableName: string]: string } = {
-    'light': 'Light (PAR &#181;Mol m&#178; s&#185;)',
-    'oxygen': 'Oxygen (mg/L)',
-    'depth': 'Depth (mm)',
-    'temperature': 'Temperature (&#176;C)'
+    'Light': 'Light (PAR &#181;Mol m&#178; s&#185;)',
+    'Oxygen': 'Oxygen (mg/L)',
+    'Depth': 'Depth (mm)',
+    'Temperature': 'Temperature (&#176;C)'
   }
+  public variable!: Variable;
   public yAxisName!: string;
+
+  public dateRange!: DateRange;
 
   public chartData!: ChartData[];
 
+  public loading = true;
+
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private chartDataService: ChartDataService) { }
+  constructor(private variableService: VariableService, private chartDataService: ChartDataService,
+              private loadingService: LoadingService, private isSelectedService: IsSelectedService) { }
 
   ngOnInit(): void {
+    this.startLoading();
+    this.getVariable();
     this.getChartData();
-    this.yAxisName = this.yAxisNames[ this.variable.name ];
+    this.getDateRange();
   }
 
   ngOnDestroy() {
@@ -40,9 +50,33 @@ export class VariableChartComponent implements OnInit, OnDestroy {
   }
 
   private getChartData() {
-    this.chartDataService.getChartData(this.variable.id!, this.mesocosms)
+    this.chartDataService.getChartData(this.variableId)
       .pipe(takeUntil(this.destroyed$))
-      .subscribe(chartData => this.chartData = chartData);
+      .subscribe(chartData => {
+        this.chartData = chartData
+        this.loading = false;
+      });
+  }
+
+  private getDateRange() {
+    this.isSelectedService.getDateRange()
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(dateRange => this.dateRange = dateRange)
+  }
+
+  private startLoading() {
+    this.loadingService.startLoading()
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(() => this.loading = true);
+  }
+
+  private getVariable() {
+    this.variableService.get(this.variableId)
+      .pipe(take(1))
+      .subscribe(variable => {
+        this.variable = variable;
+        this.yAxisName = this.yAxisNames[ this.variable.name ];
+      });
   }
 
 }

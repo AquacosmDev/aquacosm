@@ -1,13 +1,13 @@
 .svg {
   svg {
     #half {
-      animation: appear-half 4s infinite ease-in-out;
+      animation: appear-half 2s infinite ease-in-out;
     }
     #three-quarters {
-      animation: appear-three-quarters 4s infinite ease-in-out;
+      animation: appear-three-quarters 2s infinite ease-in-out;
     }
     #full {
-      animation: appear-full 4s infinite ease-in-out;
+      animation: appear-full 2s infinite ease-in-out;
     }
     #full, #three-quarters, #half {
       opacity: 0;

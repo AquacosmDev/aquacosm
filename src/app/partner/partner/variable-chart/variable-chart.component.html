@@ -1,2 +1,3 @@
 <p class="font-weight-bold capitalize-first m-0">{{ variable.name }}</p>
-<aqc-chart *ngIf="chartData" [dataSets]="chartData" [yAxisTitle]="yAxisName | decodeHtmlString"></aqc-chart>
+<aqc-chart *ngIf="chartData && dateRange" [dateRange]="dateRange" [dataSets]="chartData" [yAxisTitle]="yAxisName | decodeHtmlString"></aqc-chart>
+<aqc-loading *ngIf="loading" [variableId]="variableId"></aqc-loading>

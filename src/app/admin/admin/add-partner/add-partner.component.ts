@@ -161,7 +161,6 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
           mesocosm.dataMapping[variable.id!] = mesocosm.dataMapping[variable.name];
         });
     });
-    console.log(this.mesocosms);
     return combineLatest(this.mesocosms.map(mesocosm => this.addOrUpdateMesocosm(mesocosm)));
   }
 

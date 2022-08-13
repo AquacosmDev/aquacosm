@@ -25,12 +25,10 @@ export class LinkVariablesComponent implements OnInit, OnChanges {
   constructor(private cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    console.log(this.dataMap, this.variables);
     this.cdRef.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
 
   }
 

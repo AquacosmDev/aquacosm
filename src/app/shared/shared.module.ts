@@ -11,6 +11,8 @@ import { StepperComponent } from './components/stepper/stepper.component';
 import { ListItemComponent } from './components/list-item/list-item.component';
 import { DecodeHtmlStringPipe } from './pipes/decode-html-string.pipe';
 import { NgxPopperjsModule } from 'ngx-popperjs';
+import { LoadingComponent } from './components/loading/loading.component';
+import { InlineSVGModule } from 'ng-inline-svg';
 
 
 @NgModule({
@@ -21,7 +23,8 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     DateRangeInputComponent,
     StepperComponent,
     ListItemComponent,
-    DecodeHtmlStringPipe
+    DecodeHtmlStringPipe,
+    LoadingComponent
   ],
   exports: [
     ChartComponent,
@@ -32,14 +35,17 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     StepperComponent,
     ListItemComponent,
     DecodeHtmlStringPipe,
-    NgxPopperjsModule
+    NgxPopperjsModule,
+    LoadingComponent,
+    InlineSVGModule
   ],
   imports: [
     CommonModule,
     NgChartsModule,
     FormsModule,
     AngularMyDatePickerModule,
-    NgxPopperjsModule
+    NgxPopperjsModule,
+    InlineSVGModule.forRoot(),
   ]
 })
 export class SharedModule {

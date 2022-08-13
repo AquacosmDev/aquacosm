@@ -14,17 +14,40 @@ export class DateService {
   }
 
   public createWeekDateRange(): DateRange {
+    const end = this.getTimeOfLastTimePointWithData();
     return {
-      start: moment().add(-1, 'week').startOf('day').toDate(),
-      end: new Date()
+      start: moment(end).add(-1, 'week').startOf('day').toDate(),
+      end: end
+    }
+  }
+
+  public createDayDateRange(): DateRange {
+    const end = this.getTimeOfLastTimePointWithData();
+    return {
+      start: moment(end).add(-1, 'day').toDate(),
+      end: end
+    }
+  }
+
+  public createHourDateRange(): DateRange {
+    const end = this.getTimeOfLastTimePointWithData();
+    return {
+      start: moment(end).add(-1, 'hour').add(-1, 'minute').toDate(),
+      end: end
     }
   }
 
   public createMonthDateRange(): DateRange {
+    const end = this.getTimeOfLastTimePointWithData();
     return {
-      start: moment().add(-1, 'month').startOf('day').toDate(),
-      end: new Date()
+      start: moment(end).add(-1, 'month').startOf('day').toDate(),
+      end: end
     }
+  }
+
+  public isNewMonth(date: Date): boolean {
+    const previousMinute = moment(date).add(-1, 'minute');
+    return !moment(date).isSame(previousMinute, 'month');
   }
 
   public isNewDay(date: Date): boolean {
@@ -32,8 +55,21 @@ export class DateService {
     return !moment(date).isSame(previousMinute, 'day');
   }
 
+  public isNewHour(date: Date): boolean {
+    const previousMinute = moment(date).add(-1, 'minute');
+    return !moment(date).isSame(previousMinute, 'hour');
+  }
+
   public isSame(date: Date, comparedDate: Date): boolean {
     return moment(date).isSame(comparedDate, 'minute');
+  }
+
+  public isSameOrAfter(date: Date, comparedDate: Date): boolean {
+    return moment(date).isSameOrAfter(comparedDate, 'minute');
+  }
+
+  public isSameHour(date: Date, comparedDate: Date): boolean {
+    return moment(date).isSame(comparedDate, 'hour');
   }
 
   public addHours(date: Date, hours: number): Date {
@@ -46,5 +82,79 @@ export class DateService {
 
   public isOnTheHour(date: Date): boolean {
     return moment(date).format('mm') === '00';
+  }
+
+  public getDayArrayFromDateRange(dateRange: DateRange): number[] {
+    const start = moment(dateRange.start);
+    const end = moment(dateRange.end);
+    const days = [];
+    while (!start.isAfter(end, 'day')) {
+      days.push(this.dateToDay(start.toDate()));
+      start.add(1, 'day');
+    }
+    return days;
+  }
+
+  public dateToDay(date: Date): number {
+    return parseInt(moment(date).format('YYYYMMDD'), 0);
+  }
+
+  public getTimePointsForDay(day: number): Date[] {
+    let startDate = moment(day, 'YYYYMMDD').startOf('day');
+    const end = moment(day, 'YYYYMMDD').endOf('day').toDate();
+    const dates = [];
+    while (startDate.isSameOrBefore(this.getEndTimeForNow(end))) {
+      dates.push(startDate.toDate());
+      startDate = startDate.add(1, 'minute');
+    }
+
+    return dates;
+  }
+
+  public getTimePointsForDateRange(dateRange: DateRange): Date[] {
+    const difference = this.getDifferenceInMinutes(dateRange);
+    const dates = [];
+    if (difference < 180) {
+      let startDate = moment(dateRange.start);
+      while (startDate.isSameOrBefore(this.getEndTimeForNow(dateRange.end))) {
+        dates.push(startDate.toDate());
+        startDate = startDate.add(1, 'minute');
+      }
+    } else {
+      let startDate = moment(dateRange.start).set('minute', 0);
+      while (startDate.isSameOrBefore(this.getEndTimeForNow(dateRange.end))) {
+        dates.push(startDate.toDate());
+        startDate = startDate.add(1, 'hour');
+      }
+    }
+    return dates;
+  }
+
+  public getDifferenceInMinutes(dateRange: DateRange): number {
+    return moment(dateRange.end).diff(dateRange.start, 'minutes');
+  }
+
+  public isInRange(date: Date, dateRange: DateRange): boolean {
+    return moment(date).isSameOrAfter(dateRange.start) && moment(date).isSameOrBefore(dateRange.end);
+  }
+
+  public getEndTimeForNow(end: Date): Date {
+    const endMoment = moment(end);
+    if (endMoment.isSame(new Date(), 'minutes')) {
+      while (endMoment.minute() % 5 != 0) {
+        endMoment.add(-1, 'minutes');
+      }
+      return endMoment.toDate();
+    } else {
+      return end;
+    }
+  }
+
+  public getTimeOfLastTimePointWithData(): Date {
+    const endMoment = moment(new Date());
+    while (endMoment.minute() % 5 != 0) {
+      endMoment.add(-1, 'minutes');
+    }
+    return endMoment.toDate();
   }
 }
