@@ -2,8 +2,8 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { ChartData } from '@shr//models/chart-data.model';
 import { MesocosmDataService } from '@core/collections/mesocosm-data.service';
 import {
-  BehaviorSubject, buffer,
-  combineLatest,
+  BehaviorSubject,
+  buffer,
   filter,
   forkJoin,
   map,
@@ -55,6 +55,14 @@ export class ChartDataService implements OnDestroy {
       .pipe(map(mesocosmData => this.updateStore(mesocosmData)))
   }
 
+  public downloadData(variableId: string, mesocosms: Mesocosm[], days: number[]): Observable<MesocosmData[]> {
+    return this.getChartDataForVariableMesocosmsAndDays(variableId, mesocosms, days)
+      .pipe(
+        tap(mesocosmData => mesocosmData.forEach(data => this.addMescosmsDataToStore(data))),
+        map(() => this.getRawMesocosmDataFromStore(variableId, mesocosms, days)));
+
+  }
+
   private initChartData(variableId: string): Observable<ChartData[]> {
     this.charts$[ variableId ] = new BehaviorSubject<ChartData[]>([]);
     this.getChartDataForVariable(variableId)
@@ -66,20 +74,26 @@ export class ChartDataService implements OnDestroy {
   }
 
   public getChartDataForVariable(variableId: string): Observable<ChartData[]> {
-    return this.isSelectedService.getMesocosmsAndDays()
+    return this.getChartDataForVariableMesocosmsAndDays(variableId)
       .pipe(
-        tap(is => console.log(is)),
+        tap(mesocosmData => mesocosmData.forEach(data => this.addMescosmsDataToStore(data))),
+        switchMap(() => this.mesocosmDataFromStoreToChartData(variableId)));
+  }
+
+  private getChartDataForVariableMesocosmsAndDays(variableId: string, mesocosms?: Mesocosm[], days?: number[]): Observable<MesocosmData[]> {
+    const getMesocosmAndDays = !mesocosms ?
+      this.isSelectedService.getMesocosmsAndDays() :
+      of({ mesocosmIds: mesocosms.map(mesocosm => mesocosm.id), days: days });
+
+    return getMesocosmAndDays
+      .pipe(
         takeUntil(this.destroyed$),
         tap(() => this.inQueue(variableId)),
         buffer(this.isOpen(variableId)),
-        switchMap(() => this.isSelectedService.getMesocosmsAndDays().pipe(take(1))),
-        switchMap(isSelected => {
-          console.log(isSelected);
-          return this.getMesocosmsData(variableId, isSelected.mesocosmIds, isSelected.days)
-        }),
+        switchMap(() => getMesocosmAndDays.pipe(take(1))),
+        switchMap(isSelected => this.getMesocosmsData(variableId, isSelected.mesocosmIds, isSelected.days)),
         tap(() => this.next()),
-        tap(mesocosmData => mesocosmData.forEach(data => this.addMescosmsDataToStore(data))),
-        switchMap(() => this.mesocosmDataFromStoreToChartData(variableId)));
+      );
   }
 
   private mesocosmDataFromStoreToChartData(variableId: string): Observable<ChartData[]> {
@@ -209,7 +223,6 @@ export class ChartDataService implements OnDestroy {
 
   private inQueue(variableId: string) {
     this.queue.push(variableId);
-    console.log(this.queue, this.alreadyRequesting$.getValue());
     if (this.alreadyRequesting$.getValue() === '' && this.queue.length === 1) {
       this.alreadyRequesting$.next(this.queue.shift());
     }
@@ -217,5 +230,16 @@ export class ChartDataService implements OnDestroy {
 
   private next() {
     this.alreadyRequesting$.next(this.queue.length > 0 ? this.queue.shift() : '');
+  }
+
+  private getRawMesocosmDataFromStore(variableId: string, mesocosms: Mesocosm[], days: number[]): MesocosmData[] {
+    const mesocosmData: MesocosmData[] = [];
+    mesocosms.forEach(mesocosm => {
+      days.forEach(day => {
+        const id = this.createDataId(variableId, mesocosm.id, day);
+        mesocosmData.push(this.data[ id ]);
+      });
+    });
+    return mesocosmData;
   }
 }

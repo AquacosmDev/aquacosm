@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ChartDataService } from '@core/chart-data.service';
 import { ChartData } from '@shr//models/chart-data.model';
 import { Variable } from '@shr//models/variable.model';
@@ -13,7 +13,7 @@ import { LoadingService } from '@core/loading.service';
   templateUrl: './variable-chart.component.html',
   styleUrls: ['./variable-chart.component.scss']
 })
-export class VariableChartComponent implements OnInit, OnDestroy {
+export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() variableId!: string;
 
@@ -38,15 +38,25 @@ export class VariableChartComponent implements OnInit, OnDestroy {
               private loadingService: LoadingService, private isSelectedService: IsSelectedService) { }
 
   ngOnInit(): void {
-    this.startLoading();
-    this.getVariable();
-    this.getChartData();
-    this.getDateRange();
+    this.onChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if(!changes['variableId'].firstChange) {
+      this.onChange();
+    }
   }
 
   ngOnDestroy() {
     this.destroyed$.next(true);
     this.destroyed$.complete();
+  }
+
+  private onChange() {
+    this.startLoading();
+    this.getVariable();
+    this.getChartData();
+    this.getDateRange();
   }
 
   private getChartData() {
@@ -77,6 +87,10 @@ export class VariableChartComponent implements OnInit, OnDestroy {
         this.variable = variable;
         this.yAxisName = this.yAxisNames[ this.variable.name ];
       });
+  }
+
+  private showAveragedOrRawData() {
+
   }
 
 }

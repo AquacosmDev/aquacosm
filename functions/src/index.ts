@@ -195,7 +195,7 @@ function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
 }
 
 async function getMetrics(timePoint: TimePoint, mesocosmData: MesocosmData) {
-  if((mesocosmData.data.length + 1) < _WINDOW) {
+  if(timePoint.minuteOfDay! < _WINDOW) {
 
     const yesterday = getDayNumberFromYesterday(mesocosmData.day);
     const queryArrayMesocosmDataYesterday = [

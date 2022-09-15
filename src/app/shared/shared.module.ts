@@ -13,6 +13,7 @@ import { DecodeHtmlStringPipe } from './pipes/decode-html-string.pipe';
 import { NgxPopperjsModule } from 'ngx-popperjs';
 import { LoadingComponent } from './components/loading/loading.component';
 import { InlineSVGModule } from 'ng-inline-svg';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { InlineSVGModule } from 'ng-inline-svg';
     DecodeHtmlStringPipe,
     NgxPopperjsModule,
     LoadingComponent,
-    InlineSVGModule
+    InlineSVGModule,
+    NgSelectModule
   ],
   imports: [
     CommonModule,
@@ -46,6 +48,7 @@ import { InlineSVGModule } from 'ng-inline-svg';
     AngularMyDatePickerModule,
     NgxPopperjsModule,
     InlineSVGModule.forRoot(),
+    NgSelectModule
   ]
 })
 export class SharedModule {

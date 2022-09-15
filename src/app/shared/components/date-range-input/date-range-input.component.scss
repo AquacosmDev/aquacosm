@@ -3,6 +3,7 @@
 :host {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   .input-box-container {
     position: relative;
@@ -15,13 +16,18 @@
     }
   }
 
+  .from-till {
+    flex: 0 0 40px;
+  }
+
   input {
     flex: 0 0 45px;
     border: none;
     outline: none;
     font-size: 16px;
-    padding-top: 2px;
+    padding: 5px 10px;
     text-align: center;
+    justify-content: center;
 
     &::placeholder {
       color: $color-placeholder;

@@ -17,4 +17,14 @@
   display: flex;
   flex-direction: column;
   border-radius: 30px;
+
+  &.overflow-auto {
+    overflow: visible;
+  }
+}
+
+.panel-mobile {
+  background-color: $color-background;
+  box-shadow: $shadow;
+  overflow: auto;
 }

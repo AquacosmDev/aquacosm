@@ -157,4 +157,12 @@ export class DateService {
     }
     return endMoment.toDate();
   }
+
+  public getDayNumber(date: Date): number {
+    return parseInt(moment(date).format('YYYYMMDD'), 0);
+  }
+
+  public getDayNumberFromYesterday(day: number): number {
+    return this.getDayNumber(moment(day, 'YYYYMMDD').add(-1, 'day').toDate());
+  }
 }

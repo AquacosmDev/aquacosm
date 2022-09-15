@@ -7,7 +7,7 @@ import { LoadingService } from '@core/loading.service';
   styleUrls: ['./loading.component.scss']
 })
 export class LoadingComponent implements OnInit {
-  @Input() variableId!: string;
+  @Input() variableIds!: string[];
 
   public percentage!: string;
 
@@ -18,8 +18,11 @@ export class LoadingComponent implements OnInit {
   }
 
   private getLoadingInformation() {
-    this.loadingService.getLoadingStatus(this.variableId)
-      .subscribe(percentage => this.percentage = percentage.toFixed(0));
+    const observable = this.variableIds.length === 1 ?
+      this.loadingService.getLoadingStatus(this.variableIds[ 0 ]) :
+      this.loadingService.getLoadingStatusForMultipleVariables(this.variableIds);
+
+    observable.subscribe(percentage => this.percentage = percentage.toFixed(0));
   }
 
 }

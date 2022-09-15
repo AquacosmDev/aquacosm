@@ -1,0 +1,45 @@
+<popper-content #popper1Content>
+  <p>the name and logo url of the partner. The logo url should lead to an existing image of the partner's logo and should be a valid url.</p>
+</popper-content>
+
+<div class="modal-content">
+  <div class="help flex justify-center align-center cursor-pointer">
+    <i [popper]="popper1Content"
+       [popperTrigger]="NgxPopperjsTriggers.click"
+       [popperHideOnClickOutside]="true"
+       [popperHideOnScroll]="true"
+       [popperPlacement]="NgxPopperjsPlacements.LEFT"
+       class="fa-solid fa-question fa-2x"></i>
+  </div>
+  <div class="text-center">
+    <h1>Download data</h1>
+  </div>
+  <div class="flex m-b-30 justify-center flex-1">
+    <div class="panel p-20 flex-1" *ngIf="mesocosms">
+      <aqc-checklist class="flex-column"
+                     [checklistItems]="mesocosms"
+                     iconClass="fa-solid fa-prescription-bottle"
+                     (selectedItems)="setMesocosms($event)"></aqc-checklist>
+    </div>
+    <div class="panel  p-20 flex-1 m-l-10">
+      <aqc-checklist class="flex-column"
+                     iconClass="fa-solid fa-chart-line"
+                     [checklistItems]="variables"
+                     (selectedItems)="setVariables($event)">
+      </aqc-checklist>
+    </div>
+    <div class="panel  p-20 flex-1 m-l-10 overflow-auto">
+      <aqc-date-range-input (customDateRange)="setCustomDateRange($event)" [column]="true" [date]="true"></aqc-date-range-input>
+    </div>
+  </div>
+  <div class="flex justify-between p-b-30 p-l-100 p-r-100">
+    <button type="button" class="btn btn-outline-danger" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary"
+            (click)="next()"
+            [disabled]="disabled">
+      Download data<i class="fa-solid fa-check m-l-5"></i>
+    </button>
+  </div>
+</div>
+
+<aqc-loading *ngIf="loading" [variableIds]="selectedVariablIds"></aqc-loading>

@@ -5,6 +5,7 @@ import { PartnerComponent } from '@ptn/partner/partner.component';
 import { PartnerDetailComponent } from '@ptn/partner/partner-detail/partner-detail.component';
 import { VariableChartComponent } from '@ptn/partner/variable-chart/variable-chart.component';
 import { TimeRangeSelectorComponent } from '@ptn/partner/time-range-selector/time-range-selector.component';
+import { DownloadDataModalComponent } from './partner/download-data-modal/download-data-modal.component';
 
 
 
@@ -13,7 +14,8 @@ import { TimeRangeSelectorComponent } from '@ptn/partner/time-range-selector/tim
     PartnerComponent,
     PartnerDetailComponent,
     VariableChartComponent,
-    TimeRangeSelectorComponent
+    TimeRangeSelectorComponent,
+    DownloadDataModalComponent
   ],
   imports: [
     CommonModule,

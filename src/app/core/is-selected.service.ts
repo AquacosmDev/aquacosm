@@ -1,9 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, ReplaySubject, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, tap } from 'rxjs';
 import { DateRange } from '@shr/models/date-range.model';
-import { Mesocosm } from '@shr/models/mesocosm.model';
 import { DateService } from '@core/date.service';
-import { Variable } from '@shr/models/variable.model';
+import { DataType } from '@shr/models/data-type.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +11,7 @@ export class IsSelectedService implements OnDestroy {
   private mesocosms = new BehaviorSubject<string[]>([]);
   private variables = new BehaviorSubject<string[]>([]);
   private dateRange = new BehaviorSubject<DateRange>({} as DateRange);
+  private dataType = new BehaviorSubject<DataType>(DataType.averaged);
 
   constructor(private dateService: DateService) {
     this.setIsSelectedFromLocalStore();
@@ -24,10 +24,11 @@ export class IsSelectedService implements OnDestroy {
     this.variables = null;
     this.dateRange.complete();
     this.dateRange = null;
+    this.dataType.complete();
+    this.dataType = null;
   }
 
-  public setMesocosms(mesocosms: Mesocosm[], isInit = false) {
-    const mesocosmIds = mesocosms.map(mesocosm => mesocosm.id);
+  public setMesocosms(mesocosmIds: string[], isInit = false) {
     localStorage.setItem('mesocosms',JSON.stringify(mesocosmIds));
     if(!isInit) {
       this.mesocosms.next(mesocosmIds);
@@ -38,8 +39,7 @@ export class IsSelectedService implements OnDestroy {
     return this.mesocosms.asObservable();
   }
 
-  public setVariables(variables: Variable[], isInit = false) {
-    const variableIds = variables.map(variable => variable.id);
+  public setVariables(variableIds: string[], isInit = false) {
     localStorage.setItem('variables',JSON.stringify(variableIds));
     if(!isInit) {
       this.variables.next(variableIds);
@@ -53,6 +53,15 @@ export class IsSelectedService implements OnDestroy {
   public setDateRange(dateRange: DateRange) {
     localStorage.setItem('dateRange',JSON.stringify(dateRange));
     this.dateRange.next(dateRange);
+  }
+
+  public getDataType(): Observable<DataType> {
+    return this.dataType.asObservable();
+  }
+
+  public setDataType(dataType: DataType) {
+    localStorage.setItem('dataType', dataType);
+    this.dataType.next(dataType);
   }
 
   public getDateRange(): Observable<DateRange> {
@@ -74,11 +83,18 @@ export class IsSelectedService implements OnDestroy {
     if (!!mesocosms) {
       this.mesocosms.next(mesocosms);
     }
+
     const variables = JSON.parse(localStorage.getItem('variables'));
     if (!!variables) {
       this.variables.next(variables)
     }
+
     const dateRange = JSON.parse(localStorage.getItem('dateRange'));
     this.setDateRange(!!dateRange ? dateRange : this.dateService.createHourDateRange());
+
+    const dataType = localStorage.getItem('dataType');
+    if (!!dataType) {
+      this.dataType.next(dataType as DataType);
+    }
   }
 }

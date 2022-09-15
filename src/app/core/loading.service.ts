@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, filter, map, Observable, ReplaySubject, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, ReplaySubject, take, takeUntil, tap } from 'rxjs';
 import { IsSelectedService } from '@core/is-selected.service';
 
 @Injectable({
@@ -45,6 +45,20 @@ export class LoadingService implements OnDestroy {
       .pipe(map(numberOfReq => this.getPercentageDone(variableId, numberOfReq)));
   }
 
+
+
+  public getLoadingStatusForMultipleVariables(variableIds: string[]): Observable<number> {
+    variableIds.forEach(variableId => {
+      if(!this.requestNumbers[ variableId ]) {
+        this.requestNumbers[ variableId ] = new BehaviorSubject<number>(0);
+      }
+      this.clearCounter(variableId);
+    });
+
+    return combineLatest(variableIds.map(variableId => this.getPercentageDoneForVariable(variableId)))
+      .pipe(map(percentagePerRequest => percentagePerRequest.reduce((pV, cV, index) => pV + cV, 0) / percentagePerRequest.length));
+  }
+
   public setNumberOfRequests(variableId: string, requests: number) {
     this.totalRequests[ variableId ] = requests;
   }
@@ -69,5 +83,10 @@ export class LoadingService implements OnDestroy {
         this.requestNumbers[ variableId ].complete();
         this.requestNumbers[ variableId ] = null;
       })
+  }
+
+  private getPercentageDoneForVariable(variableId: string): Observable<number> {
+    return this.requestNumbers[ variableId ].asObservable()
+      .pipe(map(numberOfReq => this.getPercentageDone(variableId, numberOfReq)));
   }
 }

@@ -1,21 +1,13 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  OnChanges, OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { ChartData } from '@shr//models/chart-data.model';
 import { DateService } from '@core/date.service';
-import { TimePoint } from '@shr/models/mesocosm-data.model';
 import { BaseChartDirective } from 'ng2-charts';
 import { DateRange } from '@shr/models/date-range.model';
 import { ChartDataService } from '@core/chart-data.service';
 import { ReplaySubject, skip, takeUntil } from 'rxjs';
+import { IsSelectedService } from '@core/is-selected.service';
+import { DataType } from '@shr/models/data-type.enum';
 
 @Component({
   selector: 'aqc-chart',
@@ -110,15 +102,21 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private timeDifference!: number;
   private times!: Date[];
+  private dataType!: DataType;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private destroyedOnDestroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private dateService: DateService, private chartDataService: ChartDataService) { }
+  private chartColors = [ '#000000', '#e69f00', '#56b5e9', '#029f73', '#f0e341', '#0072b2', '#d55e00', '#d55e00', '#d55e00' ]
+
+  constructor(private dateService: DateService, private chartDataService: ChartDataService,
+              private isSelectedService: IsSelectedService) { }
 
   ngOnInit(): void {
     this.timeDifference = this.dateService.getDifferenceInMinutes(this.dateRange);
     this.setLineChartData();
     this.setLineChartOptions();
+    this.setDataType();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -134,6 +132,8 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {
     this.destroyed$.next(true);
     this.destroyed$.complete();
+    this.destroyedOnDestroy$.next(true);
+    this.destroyedOnDestroy$.complete();
   }
 
   private setLineChartData() {
@@ -141,49 +141,70 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
     this.destroyed$.complete();
     this.times = this.dateService.getTimePointsForDateRange(this.dateRange);
     if (this.dataSets.length === 1) {
-      this.lineChartData = {
-        datasets: [
-          {
-            data: this.dataSets[ 0 ].data
-              .sort((a, b) => a.time.getTime() - b.time.getTime())
-              .map(timepoint => {
-                const value = this.timeDifference < 180 ? timepoint.value : timepoint.rollingAverage;
-                return !!value ? value - timepoint.standardDeviation : null;
-              })
-              .slice(0, this.times.length),
-            backgroundColor: 'rgba(201, 203, 207, 0.5)',
-            fill: +2,
-            borderColor: 'rgba(255, 255, 255, 0)'
-          },
-          {
-            data: this.dataSets[ 0 ].data
-              .sort((a, b) => a.time.getTime() - b.time.getTime())
-              .map(timepoint => this.timeDifference < 180 ? timepoint.value : timepoint.value)
-              .slice(0, this.times.length),
-            label: this.dataSets[ 0 ].label
-          },
-          {
-            data: this.dataSets[ 0 ].data
-              .sort((a, b) => a.time.getTime() - b.time.getTime())
-              .map(timepoint => {
-                const value = this.timeDifference < 180 ? timepoint.value : timepoint.rollingAverage;
-                return !!value ? value + timepoint.standardDeviation : null;
-              })
-              .slice(0, this.times.length),
-            borderColor: 'rgba(255, 255, 255, 0)'
-          },
-        ],
-        labels: this.getChartLabels()
-      };
+      if(this.dataType === DataType.averaged) {
+        this.lineChartData = {
+          datasets: [
+            {
+              data: this.dataSets[0].data
+                .sort((a, b) => a.time.getTime() - b.time.getTime())
+                .map(timepoint => {
+                  const value = this.dataType === DataType.raw ? timepoint.value : timepoint.rollingAverage;
+                  return !!value ? value - timepoint.standardDeviation : null;
+                })
+                .slice(0, this.times.length),
+              backgroundColor: 'rgba(201, 203, 207, 0.5)',
+              fill: +2,
+              borderColor: 'rgba(255, 255, 255, 0)'
+            },
+            {
+              data: this.dataSets[0].data
+                .sort((a, b) => a.time.getTime() - b.time.getTime())
+                .map(timepoint => this.dataType === DataType.raw ? timepoint.value : timepoint.rollingAverage)
+                .slice(0, this.times.length),
+              label: this.dataSets[0].label,
+              borderColor: this.chartColors[ 0 ],
+              backgroundColor: this.chartColors[ 0 ]
+            },
+            {
+              data: this.dataSets[0].data
+                .sort((a, b) => a.time.getTime() - b.time.getTime())
+                .map(timepoint => {
+                  const value = this.dataType === DataType.raw ? timepoint.value : timepoint.rollingAverage;
+                  return !!value ? value + timepoint.standardDeviation : null;
+                })
+                .slice(0, this.times.length),
+              borderColor: 'rgba(255, 255, 255, 0)'
+            },
+          ],
+          labels: this.getChartLabels()
+        };
+      } else {
+        this.lineChartData = {
+          datasets: [
+            {
+              data: this.dataSets[0].data
+                .sort((a, b) => a.time.getTime() - b.time.getTime())
+                .map(timepoint => timepoint.value)
+                .slice(0, this.times.length),
+              label: this.dataSets[0].label,
+              borderColor: this.chartColors[ 0 ],
+              backgroundColor: this.chartColors[ 0 ]
+            }
+          ],
+          labels: this.getChartLabels()
+        };
+      }
     } else if (this.dataSets[ 0 ].data && this.dataSets[ 0 ].data.length > 0) {
       this.lineChartData = {
-        datasets: this.dataSets.map(dataSet => {
+        datasets: this.dataSets.map((dataSet, index) => {
           return {
             data: dataSet.data
               .sort((a, b) => a.time.getTime() - b.time.getTime())
-              .map(timepoint => timepoint.rollingAverage)
+              .map(timepoint => this.dataType === DataType.averaged ? timepoint.rollingAverage : timepoint.value)
               .slice(0, this.times.length),
-            label: dataSet.label
+            label: dataSet.label,
+            borderColor: this.chartColors[ index ],
+            backgroundColor: this.chartColors[ index ],
           }
         }),
         labels: this.getChartLabels()
@@ -198,37 +219,35 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
           .subscribe(timePoints => {
             timePoints.forEach(point => {
               if (this.dataSets.length === 1) {
-                this.lineChartData.datasets[ 0 ].data.shift();
-                this.lineChartData.datasets[ 1 ].data.shift();
-                this.lineChartData.datasets[ 2 ].data.shift();
+                this.lineChartData.datasets[0].data.shift();
+                this.lineChartData.datasets[1].data.shift();
+                this.lineChartData.datasets[2].data.shift();
                 this.lineChartData.labels.shift();
                 this.times.shift();
-                const value = this.timeDifference < 180 ? point.value : point.rollingAverage;
-                this.lineChartData.datasets[ 0 ].data.push(!!value ? value - point.standardDeviation : null);
-                this.lineChartData.datasets[ 1 ].data.push(value);
-                this.lineChartData.datasets[ 2 ].data.push(!!value ? value + point.standardDeviation : null);
-                this.lineChartData.labels[ 0 ] = this.getChartLabel(this.times[ 0 ], 0);
+                const value = this.dataType === DataType.raw ? point.value : point.rollingAverage;
+                this.lineChartData.datasets[0].data.push(!!value ? value - point.standardDeviation : null);
+                this.lineChartData.datasets[1].data.push(value);
+                this.lineChartData.datasets[2].data.push(!!value ? value + point.standardDeviation : null);
+                this.lineChartData.labels[0] = this.getChartLabel(this.times[0], 0);
                 this.lineChartData.labels.push(this.getChartLabelForHour(point.time, 1));
                 this.times.push(point.time);
               } else {
                 this.lineChartData.datasets[index].data.shift();
-                const value = this.timeDifference < 180 ? point.value : point.rollingAverage;
+                const value = this.dataType === DataType.raw ? point.value : point.rollingAverage;
                 this.lineChartData.datasets[index].data.push(value);
-                if(index === 0) {
+                if (index === 0) {
                   this.times.shift();
                   this.lineChartData.labels.shift();
-                  this.lineChartData.labels[ 0 ] = this.getChartLabel(this.times[ 0 ], 0);
+                  this.lineChartData.labels[0] = this.getChartLabel(this.times[0], 0);
                   this.lineChartData.labels.push(this.getChartLabelForHour(point.time, 1));
                   this.times.push(point.time);
                 }
               }
             });
-            this.lineChartData = { ...this.lineChartData };
+            this.lineChartData = {...this.lineChartData};
             this.setLineChartOptions();
-          },
-            error => {},
-            () => console.log('complete ' + index ))
-      })
+          });
+      });
     }
   }
 
@@ -332,5 +351,14 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
     this.lineChartOptions = { ...this.lineChartOptions };
+  }
+
+  private setDataType() {
+    this.isSelectedService.getDataType()
+      .pipe(takeUntil(this.destroyedOnDestroy$))
+      .subscribe(dataType => {
+        this.dataType = dataType;
+        this.setLineChartData();
+      });
   }
 }

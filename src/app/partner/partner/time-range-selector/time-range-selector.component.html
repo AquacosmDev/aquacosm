@@ -1,5 +1,5 @@
 <div class="flex flex-1">
-  <aqc-checklist [class.m-b-10]="selectedItem === 'custom'" *ngIf="checkListItems"
+  <aqc-checklist [class.m-b-10]="selectedItem === 'custom' && !closeCustomDateRange" *ngIf="checkListItems"
                  [checklistItems]="checkListItems"
                  [multiselect]="false"
                  [row]="true"

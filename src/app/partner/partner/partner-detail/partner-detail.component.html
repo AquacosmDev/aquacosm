@@ -1,35 +1,81 @@
-<div class="left-sidebar">
-  <div class="panel align-center partner" *ngIf="partner">
-    <p class="font-weight-bold">{{ partner.displayName }}</p>
-    <div class="flex-1 overflow-hidden p-b-20">
-      <img class="mh-100" [src]="partner.logo">
+<ng-container *ngIf="!isMobile">
+  <div class="left-sidebar">
+    <div class="panel align-center partner" *ngIf="partner">
+      <p class="font-weight-bold">{{ partner.displayName }}</p>
+      <div class="flex-1 overflow-hidden p-b-20">
+        <img class="mh-100" [src]="partner.logo">
+      </div>
     </div>
-  </div>
-  <div class="panel m-t-30 p-20" *ngIf="mesocosms">
-    <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="setMesocosms($event)"></aqc-checklist>
-  </div>
-</div>
-<div class="flex-1 flex flex-column right-bar overflow-hidden" *ngIf="variables">
-  <div class="panel top-bar m-b-20 flex-row p-l-20 p-r-20 m-l-10">
-    <aqc-checklist class="flex-1"
-                   iconClass="fa-solid fa-chart-line"
-                   [row]="true"
-                   [checklistItems]="variables"
-                   (selectedItems)="setVariables($event)">
-    </aqc-checklist>
-  </div>
-  <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">
-    <aqc-time-range-selector (dateRange)="setDateRange($event)"></aqc-time-range-selector>
-  </div>
-  <div class="charts flex flex-1 flex-wrap p-t-20 overflow-auto p-l-10">
-    <div class="chart flex flex-column" *ngFor="let variable of selectedVariables"
-         [ngClass]="selectedVariables.length === 1 ?
-       'flex-100 h-100 mw-100' : selectedVariables.length === 2 ?
-       'flex-100 h-50 mw-100' :
-       'flex-50 h-50 mw-50'">
-      <div class="panel flex-1 p-20 position-relative">
-        <aqc-variable-chart [variableId]="variable"></aqc-variable-chart>
+    <div class="flex flex-column justify-between flex-1">
+      <div class="flex flex-column">
+        <div class="panel m-t-20 p-20" *ngIf="mesocosms">
+          <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="setMesocosms($event)"></aqc-checklist>
+        </div>
+        <div class="panel m-t-20 p-20" *ngIf="dataType">
+          <aqc-checklist class="flex-column"
+                         [checklistItems]="dataType"
+                         [multiselect]="false"
+                         (selectedItems)="setDataType($event)"
+                         iconClass="fa-solid fa-chart-line"></aqc-checklist>
+        </div>
+      </div>
+      <div class="panel m-t-20 m-b-10 p-20" *ngIf="mesocosms">
+        <button (click)="downloadData()">
+          <i class="fa-solid fa-database m-r-5"></i>Download data
+        </button>
       </div>
     </div>
   </div>
-</div>
+  <div class="flex-1 flex flex-column right-bar overflow-hidden" *ngIf="variables">
+    <div class="panel top-bar m-b-20 flex-row p-l-20 p-r-20 m-l-10">
+      <aqc-checklist class="flex-1"
+                     iconClass="fa-solid fa-chart-line"
+                     [row]="true"
+                     [checklistItems]="variables"
+                     (selectedItems)="setVariables($event)">
+      </aqc-checklist>
+    </div>
+    <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">
+      <aqc-time-range-selector (dateRange)="setDateRange($event)"></aqc-time-range-selector>
+    </div>
+    <div class="charts flex flex-1 flex-wrap p-t-20 overflow-auto p-l-10">
+      <div class="chart flex flex-column" *ngFor="let variable of selectedVariables"
+           [ngClass]="selectedVariables.length === 1 ?
+         'flex-100 h-100 mw-100' : selectedVariables.length === 2 ?
+         'flex-100 h-50 mw-100' :
+         'flex-50 h-50 mw-50'">
+        <div class="panel flex-1 p-20 position-relative">
+          <aqc-variable-chart [variableId]="variable"></aqc-variable-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-container *ngIf="isMobile">
+  <div class="flex flex-column flex-1 mw-100 container">
+    <div class="flex flex-column panel-mobile overflow-hidden" *ngIf="partner" [class.open]="menu">
+      <div class="flex align-center">
+        <div class="overflow-hidden">
+          <img class="mh-100" [src]="partner.logo">
+        </div>
+        <p class="flex-1 font-weight-bold m-0 text-center">{{ partner.displayName }}</p>
+        <div class="menu m-r-10 flex justify-center align-center" (click)="toggleMenu()">
+          <i class="fa-solid fa-bars fa-2x" *ngIf="!menu"></i>
+          <i class="fa-solid fa-x fa-2x" *ngIf="menu"></i>
+        </div>
+      </div>
+      <ng-select class="p-10" [(ngModel)]="selectedVariable" (ngModelChange)="setVariable($event)" appendTo=".container">
+        <ng-option *ngFor="let variable of variables" [value]="variable.item.id">{{variable.item.name!}}</ng-option>
+      </ng-select>
+      <ng-select class="p-10" [(ngModel)]="selectedMesocosm" (ngModelChange)="setMesocosm($event)" appendTo=".container">
+        <ng-option *ngFor="let mesocosm of mesocosms" [value]="mesocosm.item.id">{{mesocosm.item.name!}}</ng-option>
+      </ng-select>
+      <ng-select class="p-10" [(ngModel)]="selectedDateRange" (ngModelChange)="setDateRangeMobile($event)" appendTo=".container">
+        <ng-option *ngFor="let range of dateRanges" [value]="range.item.name">{{range.item.name!}}</ng-option>
+      </ng-select>
+    </div>
+    <div class="panel flex-1 m-20 m-t-60 p-20"*ngIf="selectedVariable">
+      <aqc-variable-chart [variableId]="selectedVariables[ 0 ]"></aqc-variable-chart>
+    </div>
+  </div>
+</ng-container>

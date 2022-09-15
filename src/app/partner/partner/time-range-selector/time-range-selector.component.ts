@@ -1,8 +1,7 @@
-import { Component, EventEmitter, HostBinding, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ChecklistItem } from '@shr//models/checklist-item.model';
 import { DateRange } from '@shr//models/date-range.model';
 import { DateService } from '@core/date.service';
-import { IsSelectedService } from '@core/is-selected.service';
 
 @Component({
   selector: 'aqc-time-range-selector',
@@ -53,7 +52,7 @@ export class TimeRangeSelectorComponent implements OnInit {
 
   private createCheckListItems() {
     let dateRange = localStorage.getItem('rangeName');
-    dateRange = dateRange !== 'null' ? dateRange : 'hour';
+    dateRange = (!!dateRange && dateRange !== 'null') ? dateRange : 'hour';
     this.checkListItems = [
       {
         checked: dateRange === 'hour',

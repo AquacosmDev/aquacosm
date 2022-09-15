@@ -1,12 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ChecklistItem } from '@shr//models/checklist-item.model';
+import { debounceTime, Subject } from 'rxjs';
 
 @Component({
   selector: 'aqc-checklist',
   templateUrl: './checklist.component.html',
   styleUrls: ['./checklist.component.scss']
 })
-export class ChecklistComponent {
+export class ChecklistComponent implements OnInit, OnDestroy {
 
   @Input() checklistItems!: ChecklistItem<any>[];
   @Input() row = false;
@@ -14,9 +15,31 @@ export class ChecklistComponent {
   @Input() multiselect = true;
   @Output() selectedItems = new EventEmitter<any[] | any>();
 
-  constructor() { }
+  private buttonClicked = new Subject<string>();
 
-  public emitSelectedItems(selectedItem?: any) {
+  constructor() {
+
+  }
+
+  ngOnInit() {
+    this.buttonClicked.pipe(debounceTime(1000))
+      .subscribe(selectedItem => this.emitSelectedItems(selectedItem));
+  }
+
+  ngOnDestroy() {
+    this.buttonClicked.complete();
+    this.buttonClicked = null;
+  }
+
+  public click(selectedItem?: any) {
+    if(this.multiselect) {
+      this.buttonClicked.next(selectedItem);
+    } else {
+      this.emitSelectedItems(selectedItem);
+    }
+  }
+
+  private emitSelectedItems(selectedItem?: any) {
     if (this.multiselect) {
       this.selectedItems.emit(this.checklistItems.filter(item => item.checked).map(item => item.item));
     } else {

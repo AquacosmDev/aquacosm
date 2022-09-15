@@ -1,4 +1,4 @@
-<aqc-checkbox (itemChange)="emitSelectedItems($event)"
+<aqc-checkbox (itemChange)="click($event)"
               *ngFor="let item of checklistItems; let i = index"
               [item]="checklistItems[ i ]"
               [class.flex-150px]="row"
