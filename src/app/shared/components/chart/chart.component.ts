@@ -107,7 +107,7 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
   private destroyedOnDestroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  private chartColors = [ '#000000', '#e69f00', '#56b5e9', '#029f73', '#f0e341', '#0072b2', '#d55e00', '#d55e00', '#d55e00' ]
+  private chartColors = [ '#000000', '#e69f00', '#56b5e9', '#029f73', '#f0e341', '#0072b2', '#d55e00', '#cc79a7', '#332388' ]
 
   constructor(private dateService: DateService, private chartDataService: ChartDataService,
               private isSelectedService: IsSelectedService) { }
