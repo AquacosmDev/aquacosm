@@ -1,48 +1,58 @@
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { DateRange } from '@shr//models/date-range.model';
+import { LastUploadTimeService } from '@core/collections/last-upload-time.service';
+import { map, Observable, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DateService {
 
-  constructor() { }
+  constructor(private lastUploadTimeService: LastUploadTimeService) { }
 
   public format(date: Date, formatString = 'HH:mm'): string {
     return moment(date).format(formatString);
   }
 
-  public createWeekDateRange(): DateRange {
-    const end = this.getTimeOfLastTimePointWithData();
-    return {
-      start: moment(end).add(-1, 'week').startOf('day').toDate(),
-      end: end
-    }
+  public createWeekDateRange(): Observable<DateRange> {
+    return this.getTimeOfLastTimePointWithData()
+      .pipe(map(date => {
+        return {
+          start: moment(date).add(-1, 'week').startOf('day').toDate(),
+          end: date
+        }
+      }));
   }
 
-  public createDayDateRange(): DateRange {
-    const end = this.getTimeOfLastTimePointWithData();
-    return {
-      start: moment(end).add(-1, 'day').toDate(),
-      end: end
-    }
+  public createDayDateRange(): Observable<DateRange> {
+    return this.getTimeOfLastTimePointWithData()
+      .pipe(map(date => {
+        return {
+          start: moment(date).add(-1, 'day').toDate(),
+          end: date
+        }
+      }));
   }
 
-  public createHourDateRange(): DateRange {
-    const end = this.getTimeOfLastTimePointWithData();
-    return {
-      start: moment(end).add(-1, 'hour').add(-1, 'minute').toDate(),
-      end: end
-    }
+  public createHourDateRange(): Observable<DateRange> {
+    return this.getTimeOfLastTimePointWithData()
+      .pipe(map(date => {
+        return {
+          start: moment(date).add(-1, 'hour').toDate(),
+          end: date
+        }
+      }));
   }
 
-  public createMonthDateRange(): DateRange {
-    const end = this.getTimeOfLastTimePointWithData();
-    return {
-      start: moment(end).add(-1, 'month').startOf('day').toDate(),
-      end: end
-    }
+  public createMonthDateRange(): Observable<DateRange> {
+    return this.getTimeOfLastTimePointWithData()
+      .pipe(map(date => {
+        return {
+          start: moment(date).add(-1, 'month').startOf('day').toDate(),
+          end: date
+        }
+      }));
   }
 
   public isNewMonth(date: Date): boolean {
@@ -62,6 +72,10 @@ export class DateService {
 
   public isSame(date: Date, comparedDate: Date): boolean {
     return moment(date).isSame(comparedDate, 'minute');
+  }
+
+  public isDateRangeSame(dateRange: DateRange, comparedDateRange: DateRange): boolean {
+    return this.isSame(dateRange.start, comparedDateRange.start) && this.isSame(dateRange.end, comparedDateRange.end);
   }
 
   public isSameOrAfter(date: Date, comparedDate: Date): boolean {
@@ -150,19 +164,10 @@ export class DateService {
     }
   }
 
-  public getTimeOfLastTimePointWithData(): Date {
-    const endMoment = moment(new Date());
-    while (endMoment.minute() % 5 != 0) {
-      endMoment.add(-1, 'minutes');
-    }
-    return endMoment.toDate();
-  }
-
-  public getDayNumber(date: Date): number {
-    return parseInt(moment(date).format('YYYYMMDD'), 0);
-  }
-
-  public getDayNumberFromYesterday(day: number): number {
-    return this.getDayNumber(moment(day, 'YYYYMMDD').add(-1, 'day').toDate());
+  public getTimeOfLastTimePointWithData(): Observable<Date> {
+    return this.lastUploadTimeService.getLastUploadDate()
+      .pipe(
+        take(1),
+        map(date => moment(date).toDate()));
   }
 }

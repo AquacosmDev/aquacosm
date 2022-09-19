@@ -15,6 +15,7 @@ import { SimpleModalService } from 'ngx-simple-modal';
 import { DownloadDataModalComponent } from '@ptn/partner/download-data-modal/download-data-modal.component';
 import { DeviceService } from '@core/device.service';
 import { DateService } from '@core/date.service';
+import { LastUploadTimeService } from '@core/collections/last-upload-time.service';
 
 @Component({
   selector: 'aqc-partner-detail',
@@ -38,13 +39,15 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
 
   public isMobile = false;
   public menu = false;
+  public lastUpload!: Date;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private partnerService: PartnerService, private route: ActivatedRoute,
               private mesocosmService: MesocosmService, private variableService: VariableService,
               private isSelectedService: IsSelectedService, private simpleModalService: SimpleModalService,
-              private deviceService: DeviceService, private dateService: DateService) {
+              private deviceService: DeviceService, private dateService: DateService,
+              private lastUploadTimeService: LastUploadTimeService) {
   }
 
   ngOnInit(): void {
@@ -92,7 +95,7 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
     } else if (selectedItem === 'hour') {
       dateRange = this.dateService.createHourDateRange();
     }
-    this.isSelectedService.setDateRange(dateRange);
+    dateRange.subscribe(dateRange =>  this.isSelectedService.setDateRange(dateRange));
   }
 
   public downloadData() {
@@ -116,6 +119,7 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
         this.partner = partner;
         this.getMesocosms();
         this.getVariables();
+        this.getUploadDate();
       });
   }
 
@@ -227,5 +231,10 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
     this.deviceService.isMobile()
       .pipe(takeUntil(this.destroyed$))
       .subscribe(isMobile => this.isMobile = isMobile);
+  }
+
+  private getUploadDate() {
+    this.lastUploadTimeService.getLastUploadDateByPartnerId(this.partner.id)
+      .subscribe(date => this.lastUpload = date);
   }
 }

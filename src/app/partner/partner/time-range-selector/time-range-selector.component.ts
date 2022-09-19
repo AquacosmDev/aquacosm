@@ -28,13 +28,17 @@ export class TimeRangeSelectorComponent implements OnInit {
     this.selectedItem = selectedItem.name;
     localStorage.setItem('rangeName', selectedItem.name);
     if (this.selectedItem === 'month') {
-      this.dateRange.emit(this.dateService.createMonthDateRange())
+      this.dateService.createMonthDateRange()
+        .subscribe(dateRange => this.dateRange.emit(dateRange));
     } else if (this.selectedItem === 'week') {
-      this.dateRange.emit(this.dateService.createWeekDateRange())
+      this.dateService.createWeekDateRange()
+        .subscribe(dateRange => this.dateRange.emit(dateRange));
     } else if (this.selectedItem === 'day') {
-      this.dateRange.emit(this.dateService.createDayDateRange())
+      this.dateService.createDayDateRange()
+        .subscribe(dateRange => this.dateRange.emit(dateRange));
     } else if (this.selectedItem === 'hour') {
-      this.dateRange.emit(this.dateService.createHourDateRange())
+      this.dateService.createHourDateRange()
+        .subscribe(dateRange => this.dateRange.emit(dateRange));
     } else {
       this.closeCustomDateRange = false;
     }

@@ -88,6 +88,11 @@ exports.dataWebhook = functions
               } else {
                 await firestoreHelper.updateDocument(db, 'mesocosmData', mesocosmData.id, mesocosmData);
               }
+
+              const lastUploadFBO = await firestoreHelper.queryData(db, 'lastUpload', queryArray);
+              let lastUpload = FBOtoObject<LastUpload>(lastUploadFBO)[0];
+              lastUpload.date = getLastHour();
+              await firestoreHelper.updateDocument(db, 'lastUpload', lastUpload.id, lastUpload);
             }
           }
         }
@@ -184,6 +189,10 @@ function getDateDataObject(dataObject: any): Date {
 
 function getDayNumberFromYesterday(day: number): number {
   return getDayNumber(moment(day, 'YYYYMMDD').add(-1, 'day').toDate());
+}
+
+function getLastHour(): Date {
+  return moment(new Date()).set({ minutes: 0, seconds: 0, milliseconds: 0 }).toDate();
 }
 
 function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
@@ -285,4 +294,10 @@ interface TimePoint {
   value: number | null;
   rollingAverage?: number | null;
   standardDeviation?: number | null;
+}
+
+interface LastUpload {
+  id: string;
+  partnerId: string;
+  date: Date;
 }

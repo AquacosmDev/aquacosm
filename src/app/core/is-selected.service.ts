@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, tap } from 'rxjs';
 import { DateRange } from '@shr/models/date-range.model';
 import { DateService } from '@core/date.service';
 import { DataType } from '@shr/models/data-type.enum';
@@ -51,8 +51,10 @@ export class IsSelectedService implements OnDestroy {
   }
 
   public setDateRange(dateRange: DateRange) {
-    localStorage.setItem('dateRange',JSON.stringify(dateRange));
-    this.dateRange.next(dateRange);
+    if (!this.dateService.isDateRangeSame(dateRange, this.dateRange.getValue())) {
+      localStorage.setItem('dateRange', JSON.stringify(dateRange));
+      this.dateRange.next(dateRange);
+    }
   }
 
   public getDataType(): Observable<DataType> {
@@ -65,7 +67,7 @@ export class IsSelectedService implements OnDestroy {
   }
 
   public getDateRange(): Observable<DateRange> {
-    return this.dateRange.asObservable();
+    return this.dateRange.asObservable().pipe(filter(dateRange => !!dateRange.end));
   }
 
   public getMesocosmsAndDays():Observable<{ mesocosmIds: string[], days: number[] }> {
@@ -90,7 +92,12 @@ export class IsSelectedService implements OnDestroy {
     }
 
     const dateRange = JSON.parse(localStorage.getItem('dateRange'));
-    this.setDateRange(!!dateRange ? dateRange : this.dateService.createHourDateRange());
+    if(!!dateRange) {
+      this.setDateRange(dateRange);
+    } else {
+      this.dateService.createHourDateRange()
+        .subscribe(dateRange => this.setDateRange(dateRange))
+    }
 
     const dataType = localStorage.getItem('dataType');
     if (!!dataType) {

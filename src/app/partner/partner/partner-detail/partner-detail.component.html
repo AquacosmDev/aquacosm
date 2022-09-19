@@ -19,6 +19,10 @@
                          iconClass="fa-solid fa-chart-line"></aqc-checklist>
         </div>
       </div>
+      <div class="panel m-t-20 m-b-10 p-20 text-center" *ngIf="mesocosms">
+        Last upload of data:<br>
+        <span class="font-weight-bold font-size-medium">{{ lastUpload | date: 'dd-MM HH:mm' }}</span>
+      </div>
       <div class="panel m-t-20 m-b-10 p-20" *ngIf="mesocosms">
         <button (click)="downloadData()">
           <i class="fa-solid fa-database m-r-5"></i>Download data
