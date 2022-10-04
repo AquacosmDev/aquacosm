@@ -1,0 +1,68 @@
+<div class="modal-content overflow-hidden p-30">
+  <div class="flex flex-column flex-1 overflow-auto">
+    <div class="text-center">
+      <h1>How to connect a new partner?</h1>
+    </div>
+    <p>To connect a new partner start with adding all the information needed in the portal by adding a new partner on this page. Adding a new partner consists of three steps. First add the basic information of the partner: name and a link to a logo that can be used in the portal. Second add the variables that are monitored and need to be visible on the portal. Third add the mesocosms for the partner.</p>
+    <p>The last step is of  great importance for the next step of connecting a new partner. For each mesocosm it is necessary to link the variables specified at step 2 with unique variables used to send the data to this portal.</p>
+    <p>For example a partner has a variable called 'Light'. The mesocosm you want to add generates a data-object with the following headers: "Time", "K1-Light". In this case you add "K1-Light" in the input behind the Light-variable for the first mesocosm.</p>
+    <p>You can use any naming you want as long as you make sure every vincomming variable is unique for each mesocosm-variable pair. So in the example "K1" defines the mesocosm and "Light" defines the variable.</p>
+    <p>After adding all the mesocosms you can add the partner to the portal. If you go to https://aquacosm-data.web.app it should be visible in the partner list and you should be able to select it and go to its subsequent partner-page showing empty graphs.</p>
+    <p>Next step consists of a more technical part: you need to send your local data to this portal. For this we have an endpoint available (more information below). Use your own preferred method to send the data to this endpoint and make sure it meets the requirements below:</p>
+    <div class="link flex">
+      <div class="flex flex-column">
+        <p class="post">POST https://us-central1-aquacosm-data.cloudfunctions.net/dataWebhook</p>
+        <h2>POST</h2>
+        <p>POST operations support the following data structure:</p>
+        <table>
+          <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Comment</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>partnerName</td>
+            <td>string</td>
+            <td>partnerName to use is visible on the admin partner page</td>
+          </tr>
+          <tr>
+            <td>data</td>
+            <td>Data[]</td>
+            <td>array of data per time-unit</td>
+          </tr>
+          </tbody>
+        </table>
+
+        <h3>Data object</h3>
+        <p>This object contains the mesocosms data per time-unit. The object contains a "Time" field that contains a time-string formatted as 'DD/MM/YYYY HH:mm:ss' and a variable for every mesocosm-variable combination you want to send data for. For example if you want to send the light data for mesocosms 1 and 2 this object contains the time "Time": "01/01/2022 14:44", "K1-Light": 44, "K2-Light": 32. If you want to add an temperature variable us e for example "K1-Temperature" or anything else that is unique for the mesocosm-variable combination.</p>
+        <table>
+          <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Comment</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Time</td>
+            <td>string</td>
+            <td>formatted: 'DD/MM/YYYY HH:mm:ss'</td>
+          </tr>
+          <tr>
+            <td>[ mesocosm_variable ]</td>
+            <td>number</td>
+            <td>add any number of mesocosm-variable data in this object</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="flex justify-center align-center">
+    <button (click)="close()">Close</button>
+  </div>
+</div>

@@ -16,6 +16,7 @@ import { DownloadDataModalComponent } from '@ptn/partner/download-data-modal/dow
 import { DeviceService } from '@core/device.service';
 import { DateService } from '@core/date.service';
 import { LastUploadTimeService } from '@core/collections/last-upload-time.service';
+import { NgxPopperjsPlacements, NgxPopperjsTriggers } from 'ngx-popperjs';
 
 @Component({
   selector: 'aqc-partner-detail',
@@ -23,6 +24,8 @@ import { LastUploadTimeService } from '@core/collections/last-upload-time.servic
   styleUrls: ['./partner-detail.component.scss']
 })
 export class PartnerDetailComponent implements OnInit, OnDestroy {
+  public NgxPopperjsTriggers = NgxPopperjsTriggers;
+  public NgxPopperjsPlacements = NgxPopperjsPlacements;
 
   public partner!: Partner;
   public mesocosms!: ChecklistItem<Mesocosm>[];

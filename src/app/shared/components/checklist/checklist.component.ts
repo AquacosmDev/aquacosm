@@ -39,6 +39,11 @@ export class ChecklistComponent implements OnInit, OnDestroy {
     }
   }
 
+  public selectAll() {
+    this.checklistItems.forEach(item => item.checked = true);
+    this.selectedItems.emit(this.checklistItems.map(item => item.item));
+  }
+
   private emitSelectedItems(selectedItem?: any) {
     if (this.multiselect) {
       this.selectedItems.emit(this.checklistItems.filter(item => item.checked).map(item => item.item));

@@ -14,14 +14,14 @@
   </div>
 </popper-content>
 
-<div class="modal-content">
+<div class="modal-content overflow-hidden">
   <div class="help flex justify-center align-center cursor-pointer">
     <i [popper]="popper1Content"
        [popperTrigger]="NgxPopperjsTriggers.click"
        [popperHideOnClickOutside]="true"
        [popperHideOnScroll]="true"
        [popperPlacement]="NgxPopperjsPlacements.LEFT"
-      class="fa-solid fa-question fa-2x"></i>
+      class="fa-solid fa-info"></i>
   </div>
   <div class="text-center">
     <h1>{{ isNew ? 'New ' : 'Edit '}}Partner</h1>
@@ -95,7 +95,9 @@
     </div>
   </div>
   <div class="flex justify-between p-b-30 p-l-100 p-r-100">
-    <button type="button" class="btn btn-outline-danger" [disabled]="selectedStep === 1" (click)="previous()">Previous</button>
+    <button type="button"
+            class="btn btn-outline-danger"
+            (click)="previous()">{{ selectedStep === 1 ? 'Close' : 'Previous' }}</button>
     <aqc-stepper [steps]="steps" [selectedStep]="selectedStep"></aqc-stepper>
     <button type="button" class="btn btn-primary"
             (click)="next()"

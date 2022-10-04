@@ -1,15 +1,15 @@
 <popper-content #popper1Content>
-  <p>the name and logo url of the partner. The logo url should lead to an existing image of the partner's logo and should be a valid url.</p>
+  <p class="max-popper-width">To download data select the mesocosms, variables and timerange and press download data.</p>
 </popper-content>
 
-<div class="modal-content">
-  <div class="help flex justify-center align-center cursor-pointer">
-    <i [popper]="popper1Content"
+<div class="modal-content overflow-hidden">
+  <div class="help flex justify-center align-center cursor-pointer"
+       [popper]="popper1Content"
        [popperTrigger]="NgxPopperjsTriggers.click"
        [popperHideOnClickOutside]="true"
        [popperHideOnScroll]="true"
-       [popperPlacement]="NgxPopperjsPlacements.LEFT"
-       class="fa-solid fa-question fa-2x"></i>
+       [popperPlacement]="NgxPopperjsPlacements.LEFT">
+    <i class="fa-solid fa-info"></i>
   </div>
   <div class="text-center">
     <h1>Download data</h1>

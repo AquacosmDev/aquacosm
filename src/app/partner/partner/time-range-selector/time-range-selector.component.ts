@@ -25,22 +25,35 @@ export class TimeRangeSelectorComponent implements OnInit {
   }
 
   public setSelectedItem(selectedItem: { name: string }) {
+    console.log(selectedItem);
     this.selectedItem = selectedItem.name;
     localStorage.setItem('rangeName', selectedItem.name);
     if (this.selectedItem === 'month') {
       this.dateService.createMonthDateRange()
-        .subscribe(dateRange => this.dateRange.emit(dateRange));
+        .subscribe(dateRange => {
+          this.customDateRange = dateRange;
+          this.dateRange.emit(dateRange);
+        });
     } else if (this.selectedItem === 'week') {
       this.dateService.createWeekDateRange()
-        .subscribe(dateRange => this.dateRange.emit(dateRange));
+        .subscribe(dateRange => {
+          this.customDateRange = dateRange;
+          this.dateRange.emit(dateRange);
+        });
     } else if (this.selectedItem === 'day') {
       this.dateService.createDayDateRange()
-        .subscribe(dateRange => this.dateRange.emit(dateRange));
+        .subscribe(dateRange => {
+          this.customDateRange = dateRange;
+          this.dateRange.emit(dateRange);
+        });
     } else if (this.selectedItem === 'hour') {
       this.dateService.createHourDateRange()
-        .subscribe(dateRange => this.dateRange.emit(dateRange));
+        .subscribe(dateRange => {
+          this.customDateRange = dateRange;
+          this.dateRange.emit(dateRange);
+        });
     } else {
-      this.closeCustomDateRange = false;
+      this.closeCustomDateRange = !this.closeCustomDateRange;
     }
   }
 
@@ -86,7 +99,8 @@ export class TimeRangeSelectorComponent implements OnInit {
         checked: dateRange === 'custom',
         item: {
           name:'custom'
-        }
+        },
+        reselect: true
       },
     ];
     this.setSelectedItem({name: dateRange});

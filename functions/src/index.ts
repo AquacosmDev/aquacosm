@@ -42,6 +42,8 @@ exports.dataWebhook = functions
 
         partner = FBOtoObject<Partner>(partner)[ 0 ];
 
+        functions.logger.log("Function initialized with: ", req.body);
+
         const data: { [name: string]: string }[] = JSON.parse(req.body.data);
 
         const queryArray = [['partnerId', '==', partner.id ]];
@@ -95,19 +97,14 @@ exports.dataWebhook = functions
               await firestoreHelper.updateDocument(db, 'lastUpload', lastUpload.id, lastUpload);
             }
           }
+          functions.logger.log("Completed mesocosm: ", mesocosm.name);
         }
 
         cors(req, res, () => {
           res.status(200).send();
         });
       } catch (error: any) {
-        console.error(error);
-        // const errorFBO: FBOError = {
-        //   error: error,
-        //   partner: req.body.partner,
-        //   object: req.body.data
-        // }
-        // await firestoreHelper.createNewDocument(db, 'error', errorFBO);
+        functions.logger.error(error.stackTrace, error);
         cors(req, res, () => {
           res.status(400).send({data: {error: error}});
         });

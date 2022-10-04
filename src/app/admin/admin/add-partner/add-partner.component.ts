@@ -72,6 +72,9 @@ export class AddPartnerComponent extends SimpleModalComponent<{ }, any> implemen
   }
 
   public previous() {
+    if (this.selectedStep === 1) {
+      this.close();
+    }
     this.selectedStep--;
     if (this.selectedStep === 2) {
       this.variable = {} as Variable;

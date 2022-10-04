@@ -8,10 +8,22 @@
     </div>
     <div class="flex flex-column justify-between flex-1">
       <div class="flex flex-column">
-        <div class="panel m-t-20 p-20" *ngIf="mesocosms">
+        <div class="panel m-t-20 p-b-20 p-l-20 p-r-20 p-t-30" *ngIf="mesocosms">
+          <i [popper]="mesocosmContent"
+             [popperTrigger]="NgxPopperjsTriggers.click"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-info help"></i>
           <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="setMesocosms($event)"></aqc-checklist>
         </div>
-        <div class="panel m-t-20 p-20" *ngIf="dataType">
+        <div class="panel m-t-20 p-b-20 p-l-20 p-r-20 p-t-30" *ngIf="dataType">
+          <i [popper]="dataTypeContent"
+             [popperTrigger]="NgxPopperjsTriggers.click"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-info help"></i>
           <aqc-checklist class="flex-column"
                          [checklistItems]="dataType"
                          [multiselect]="false"
@@ -20,10 +32,22 @@
         </div>
       </div>
       <div class="panel m-t-20 m-b-10 p-20 text-center" *ngIf="mesocosms">
+        <i [popper]="lastUploadContent"
+           [popperTrigger]="NgxPopperjsTriggers.click"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-info help"></i>
         Last upload of data:<br>
         <span class="font-weight-bold font-size-medium">{{ lastUpload | date: 'dd-MM HH:mm' }}</span>
       </div>
       <div class="panel m-t-20 m-b-10 p-20" *ngIf="mesocosms">
+        <i [popper]="downloadContent"
+           [popperTrigger]="NgxPopperjsTriggers.click"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-info help"></i>
         <button (click)="downloadData()">
           <i class="fa-solid fa-database m-r-5"></i>Download data
         </button>
@@ -31,7 +55,13 @@
     </div>
   </div>
   <div class="flex-1 flex flex-column right-bar overflow-hidden" *ngIf="variables">
-    <div class="panel top-bar m-b-20 flex-row p-l-20 p-r-20 m-l-10">
+    <div class="panel m-b-20 m-l-10 top-bar flex-row p-l-20 p-r-30">
+      <i [popper]="variableContent"
+         [popperTrigger]="NgxPopperjsTriggers.click"
+         [popperHideOnClickOutside]="true"
+         [popperHideOnScroll]="true"
+         [popperPlacement]="NgxPopperjsPlacements.LEFT"
+         class="fa-solid fa-info help"></i>
       <aqc-checklist class="flex-1"
                      iconClass="fa-solid fa-chart-line"
                      [row]="true"
@@ -39,7 +69,13 @@
                      (selectedItems)="setVariables($event)">
       </aqc-checklist>
     </div>
-    <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-20 m-l-10 overflow-visible">
+    <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-30 m-l-10">
+      <i [popper]="dateRangeContent"
+         [popperTrigger]="NgxPopperjsTriggers.click"
+         [popperHideOnClickOutside]="true"
+         [popperHideOnScroll]="true"
+         [popperPlacement]="NgxPopperjsPlacements.LEFT"
+         class="fa-solid fa-info help"></i>
       <aqc-time-range-selector (dateRange)="setDateRange($event)"></aqc-time-range-selector>
     </div>
     <div class="charts flex flex-1 flex-wrap p-t-20 overflow-auto p-l-10">
@@ -49,6 +85,12 @@
          'flex-100 h-50 mw-100' :
          'flex-50 h-50 mw-50'">
         <div class="panel flex-1 p-20 position-relative">
+          <i [popper]="graphContent"
+             [popperTrigger]="NgxPopperjsTriggers.click"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-info help"></i>
           <aqc-variable-chart [variableId]="variable"></aqc-variable-chart>
         </div>
       </div>
@@ -78,8 +120,36 @@
         <ng-option *ngFor="let range of dateRanges" [value]="range.item.name">{{range.item.name!}}</ng-option>
       </ng-select>
     </div>
-    <div class="panel flex-1 m-20 m-t-60 p-20"*ngIf="selectedVariable">
+    <div class="panel flex-1 m-20 m-t-60 p-20" *ngIf="selectedVariable">
       <aqc-variable-chart [variableId]="selectedVariables[ 0 ]"></aqc-variable-chart>
     </div>
   </div>
 </ng-container>
+
+<popper-content #mesocosmContent>
+  <p class="max-popper-width">Use this panel to select the mesocosms visible in the graphs. Changes made will be saved in your local browser.</p>
+</popper-content>
+
+<popper-content #dataTypeContent>
+  <p class="max-popper-width">The data in the graphs can be given in two ways: "raw" and "averaged". The raw option shows the data as it is. The averaged option uses the average of the last 30 minutes as data point using the following formula: (V1 + V2 ... + V30) / 30.</p>
+</popper-content>
+
+<popper-content #lastUploadContent>
+  <p class="max-popper-width">The data from the mesocosms is uploaded in near real time. The last time data was uploaded from the mesocosms is shown here.</p>
+</popper-content>
+
+<popper-content #downloadContent>
+  <p class="max-popper-width">Select this button to open the "download data" window.</p>
+</popper-content>
+
+<popper-content #variableContent>
+  <p class="max-popper-width">Use this panel to select the variables visible in the dashboard. Changes made will be saved in your local browser.</p>
+</popper-content>
+
+<popper-content #dateRangeContent>
+  <p class="max-popper-width">Use this panel to select the date range for the shown data. Select one of the presets (hour, day, week or month) to show the data from now till the end of the selected date range. Select "Custom" to select a custom date range. Changes made will be saved in your local browser.</p>
+</popper-content>
+
+<popper-content #graphContent>
+  <p class="max-popper-width">This graph shows the data for the selected variables, mesocosoms and timerange. Each variable had its own graph showing the data of the selected mesocosms and timerange. The x-axis shows the timerange in days or hours. The y-axis shows the unit of the selected variable.</p>
+</popper-content>

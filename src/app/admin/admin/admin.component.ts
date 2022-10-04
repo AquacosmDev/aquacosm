@@ -6,6 +6,7 @@ import { Partner } from '@shr/models/partner-model';
 import { ReplaySubject, take, takeUntil } from 'rxjs';
 import { VariableService } from '@core/collections/variable.service';
 import { MesocosmService } from '@core/collections/mesocosm.service';
+import { ConnectPartnerComponent } from '@app/admin/admin/connect-partner/connect-partner.component';
 
 @Component({
   selector: 'aqc-admin',
@@ -24,6 +25,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getPartners();
+    this.connectPartner();
   }
 
   ngOnDestroy() {
@@ -37,6 +39,10 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   public editPartner(partner: Partner) {
     this.simpleModalService.addModal(AddPartnerComponent, { partner: partner });
+  }
+
+  public connectPartner() {
+    this.simpleModalService.addModal(ConnectPartnerComponent, {});
   }
 
   private getPartners() {

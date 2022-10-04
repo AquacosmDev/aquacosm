@@ -16,7 +16,7 @@
     <i class="fa-regular fa-calendar m-l-5"></i>
   </div>
 
-  <div class="flex align-center">
+  <div class="flex align-center m-l-10">
     <span [class.from-till]="column">till</span>
     <div class="input-box-container m-l-5">
       <div #dp2="angular-mydatepicker"
@@ -33,9 +33,8 @@
     <i class="fa-regular fa-calendar m-l-5 m-r-5"></i>
   </div>
 </div>
-<div class="flex flex-1 justify-end p-r-15" *ngIf="!date">
-  <i  class="fa-solid fa-check cursor-pointer"
-      [class.disabled]="!startDate || !endDate"
-      (click)="emitDateRange()">
+<div class="flex justify-end p-r-15 align-center m-l-20 cursor-pointer" [class.disabled]="!startDate || !endDate" *ngIf="!date">
+  <u>Set</u>
+  <i  class="fa-solid fa-check" (click)="emitDateRange()">
   </i>
 </div>

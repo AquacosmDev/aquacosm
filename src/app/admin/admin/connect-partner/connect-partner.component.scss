@@ -1,0 +1,51 @@
+:host {
+
+  .modal-content {
+    max-width: 80%;
+    min-height: 600px;
+    max-height: 90%;
+
+    .link {
+      div {
+        padding: 20px;
+        background-color: lightgray;
+        font-weight: bold;
+        border-radius: 20px;
+
+        .post {
+          background-color: #95b6db;
+          color: white;
+          border-radius: 20px;
+          padding: 10px;
+          text-align: center;
+        }
+      }
+
+      table {
+        thead {
+          background-color: white;
+
+          th {
+            padding-left: 10px;
+          }
+        }
+
+        tbody {
+          tr {
+            &:nth-child(odd) {
+              background-color: #fafafa;
+            }
+            &:nth-child(even) {
+              background-color: white;
+            }
+
+            td {
+              padding-right: 10px;
+              padding-left: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
