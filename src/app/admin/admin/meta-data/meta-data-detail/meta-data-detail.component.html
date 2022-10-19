@@ -1,0 +1,65 @@
+<div class="flex flex-1 justify-center align-center">
+  <div class="sidebar p-20"></div>
+  <div class="flex flex-column panel meta-data p-30" *ngIf="!!metaData">
+    <h2 class="text-center m-0">Meta-data entry:</h2>
+    <div class="input-group m-t-15">
+      <label>Contact</label>
+      <input type="text" name="contact" [(ngModel)]="metaData.contact" placeholder="Add contact details...">
+    </div>
+    <div class="input-group m-t-15">
+      <label>Link</label>
+      <input type="text" name="contact" [(ngModel)]="metaData.url" placeholder="Add link to aquacosm metadata catalogue...">
+    </div>
+    <div class="input-group m-t-15">
+      <label class="m-r-10">Duration</label>
+      <aqc-date-range-input [column]="true" [date]="true"></aqc-date-range-input>
+    </div>
+    <div class="input-group m-t-15">
+      <label>Aim</label>
+      <textarea type="text" name="contact" [(ngModel)]="metaData.description" placeholder="Add aim of research..."></textarea>
+    </div>
+  </div>
+  <div class="sidebar p-20 overflow-hidden">
+    <div class="panel align-center partner" *ngIf="partner">
+      <p class="font-weight-bold">{{ partner.displayName }}</p>
+      <div class="flex-1 overflow-hidden p-b-20">
+        <img class="mh-100" [src]="partner.logo">
+      </div>
+    </div>
+    <div class="panel m-t-30 p-30">
+      <h3 class="text-center m-0">Access</h3>
+      <div>Admin</div>
+      <div *ngFor="let ed of editors" class="flex align-center">
+        <span class="ellipsis">{{ ed.email }}</span>
+        <i class="fa-solid fa-user-minus flex justify-center align-center"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="position-absolute flex flex-column align-center justify-center h-100 background" *ngIf="false">
+  <div class="flex logo-container">
+    <img class="logo" src="assets/img/logo_aquacosm.png">
+    <img class="m-l-30" src="assets/img/logo_aquacosm_plus.png">
+  </div>
+
+  <form class="panel m-t-50 p-20">
+    <h1 class="m-t-0 text-center">Login</h1>
+    <div class="form-group">
+      <label>Name:</label>
+      <input type="email" name="name" [(ngModel)]="credentials.name" placeholder="username">
+    </div>
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" name="password" [(ngModel)]="credentials.password" placeholder="password">
+    </div>
+    <div class="error-message" *ngIf="!!error">
+      {{error}}
+    </div>
+    <div class="flex justify-end">
+      <button (click)="login()" >
+        Login<i class="fa-solid fa-check m-l-5"></i>
+      </button>
+    </div>
+  </form>
+</div>

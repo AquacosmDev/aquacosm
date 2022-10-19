@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '@shr/shared.module';
 import { LoginComponent } from '@app/admin/login/login.component';
 import { AdminComponent } from '@app/admin/admin/admin.component';
-import { AddPartnerComponent } from './admin/add-partner/add-partner.component';
-import { LinkVariablesComponent } from './admin/add-partner/link-variables/link-variables.component';
-import { ErrorComponent } from './error/error.component';
-import { ConnectPartnerComponent } from './admin/connect-partner/connect-partner.component';
+import { AddPartnerComponent } from '@app/admin/admin/add-partner/add-partner.component';
+import { LinkVariablesComponent } from '@app/admin/admin/add-partner/link-variables/link-variables.component';
+import { ErrorComponent } from '@app/admin/error/error.component';
+import { ConnectPartnerComponent } from '@app/admin/admin/connect-partner/connect-partner.component';
+import { MetaDataDetailComponent } from '@app/admin/admin/meta-data/meta-data-detail/meta-data-detail.component';
+import { MetaDataComponent } from '@app/admin/admin/meta-data/meta-data.component';
 
 
 
@@ -17,7 +19,9 @@ import { ConnectPartnerComponent } from './admin/connect-partner/connect-partner
     AddPartnerComponent,
     LinkVariablesComponent,
     ErrorComponent,
-    ConnectPartnerComponent
+    ConnectPartnerComponent,
+    MetaDataDetailComponent,
+    MetaDataComponent
   ],
   imports: [
     CommonModule,

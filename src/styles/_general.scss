@@ -110,6 +110,10 @@ $percentiles: (5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100);
   position: relative;
 }
 
+.position-absolute {
+  position: absolute;
+}
+
 .font-size-medium {
   font-size: 20px;
 }
@@ -122,4 +126,8 @@ $percentiles: (5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100);
 
 .text-underline {
   text-decoration: underline;
+}
+
+.margin-auto {
+  margin: auto;
 }

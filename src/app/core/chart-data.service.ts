@@ -140,7 +140,9 @@ export class ChartDataService implements OnDestroy {
     const mesocosmData = this.getMesocosmDataFromStore(variableId, mesocosmId, days);
 
     mesocosmData.forEach(data => {
-      data.data = this.filterTimePoints(data.data, dateRange);
+      if (!!data.data) {
+        data.data = this.filterTimePoints(data.data, dateRange);
+      }
     });
     const initialValue = this.createEmptyMesocosmData(mesocosmData[ 0 ]);
     return mesocosmData.reduce(

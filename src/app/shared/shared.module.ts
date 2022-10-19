@@ -14,6 +14,7 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
 import { LoadingComponent } from './components/loading/loading.component';
 import { InlineSVGModule } from 'ng-inline-svg';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { TimeRangeSelectorComponent } from '@shr/components/time-range-selector/time-range-selector.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     StepperComponent,
     ListItemComponent,
     DecodeHtmlStringPipe,
-    LoadingComponent
+    LoadingComponent,
+    TimeRangeSelectorComponent
   ],
   exports: [
     ChartComponent,
@@ -39,7 +41,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     NgxPopperjsModule,
     LoadingComponent,
     InlineSVGModule,
-    NgSelectModule
+    NgSelectModule,
+    TimeRangeSelectorComponent
   ],
   imports: [
     CommonModule,

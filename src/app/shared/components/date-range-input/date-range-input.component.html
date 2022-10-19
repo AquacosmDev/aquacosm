@@ -16,7 +16,7 @@
     <i class="fa-regular fa-calendar m-l-5"></i>
   </div>
 
-  <div class="flex align-center m-l-10">
+  <div class="flex align-center" [class.m-l-10]="!column">
     <span [class.from-till]="column">till</span>
     <div class="input-box-container m-l-5">
       <div #dp2="angular-mydatepicker"

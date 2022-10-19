@@ -1,17 +1,29 @@
-<div class="panel-container flex flex-column justify-center">
-  <div class="panel align-center">
-    <h1 class="text-center">Aquacosm data portal</h1>
-    <div class="logo-container flex overflow-hidden justify-center">
-      <img src="/assets/img/logo_aquacosm.png" alt="Logo Aquacosm" class="p-r-20 mh-100">
-      <img src="/assets/img/logo_aquacosm_plus.png" alt="Logo Aquacosm Plus" class="mh-100">
-    </div>
-    <p class="text-center intro p-l-20 p-r-20">Spicy jalapeno bacon ipsum dolor amet boudin short ribs beef burgdoggen andouille pork swine cow porchetta cupim salami. Tenderloin swine venison, buffalo rump hamburger jerky. Pastrami short ribs beef ribs hamburger. Pancetta ground round meatball, fatback swine tail turducken sirloin chicken brisket short loin biltong burgdoggen.</p>
-    <h2>Partners</h2>
-    <div class="flex flex-wrap m-b-50 cursor-pointer">
-      <div class="panel flex-row partner align-center" *ngFor="let partner of partners" (click)="navigateToPartner(partner.name)">
-        <img class="m-r-10" [src]="partner.logo"/>
-        <p class="m-0 font-weight-bold">{{ partner.displayName }}
+<div class="flex flex-column flex-1">
+  <div class="panel-container flex flex-column justify-center">
+    <div class="panel align-center">
+      <h1 class="text-center">Aquacosm data portal</h1>
+      <div class="logo-container flex overflow-hidden justify-center">
+        <img src="/assets/img/logo_aquacosm.png" alt="Logo Aquacosm" class="p-r-20 mh-100">
+        <img src="/assets/img/logo_aquacosm_plus.png" alt="Logo Aquacosm Plus" class="mh-100">
+      </div>
+      <p class="text-center intro p-l-20 p-r-20">AQUACOSM-plus advances European mesocosm-based aquatic research infrastructures by integrating the leading mesocosm infrastructures into a coherent, interdisciplinary, and interoperable network covering all ecoregions of Europe. This is the AQUACOSM-Plus virtual data portal, providing open access to near-real-time dataflows of mesocosm experiments. To further promote re-use of data, the AQUACOSM-Plus virtual data platform also allows users to access data of past experiments.</p>
+      <h2>Partners</h2>
+      <div class="flex flex-wrap m-b-50 cursor-pointer">
+        <div class="panel flex-row partner align-center" *ngFor="let partner of partners" (click)="navigateToPartner(partner.name)">
+          <img class="m-r-10" [src]="partner.logo"/>
+          <p class="m-0 font-weight-bold">{{ partner.displayName }}
+        </div>
       </div>
     </div>
+  </div>
+</div>
+<div class="footer">
+  <div class="product">
+    <p>Dit is een product van:</p>
+    <img data-cy="tern-logo" src="/assets/img/ternwebdesign.png" alt="logo TernWebdesign">
+  </div>
+  <div class="flex">
+    <p>AQUACOSM (project No 731065) and AQUACOSM-plus (Project No 871081) are funded by the European Commission EU H2020-INFRAIA. The information and views of this website lie entirely with the authors. The European Commission is not responsible for any use that may be made of the information it contains.</p>
+    <img [src]="'assets/img/flag_europe.png'">
   </div>
 </div>
