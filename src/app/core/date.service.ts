@@ -78,12 +78,24 @@ export class DateService {
     return this.isSame(dateRange.start, comparedDateRange.start) && this.isSame(dateRange.end, comparedDateRange.end);
   }
 
+  public isDateRangeWithinDateRange(dateRange: DateRange, comparedDateRange: DateRange): boolean {
+    return this.isSameOrBefore(dateRange.start, comparedDateRange.end) && this.isSameOrAfter(dateRange.end, comparedDateRange.start);
+  }
+
   public isSameOrAfter(date: Date, comparedDate: Date): boolean {
     return moment(date).isSameOrAfter(comparedDate, 'minute');
   }
 
+  public isSameOrBefore(date: Date, comparedDate: Date): boolean {
+    return moment(date).isSameOrBefore(comparedDate, 'minute');
+  }
+
   public isSameHour(date: Date, comparedDate: Date): boolean {
     return moment(date).isSame(comparedDate, 'hour');
+  }
+
+  public addDays(date: Date, hours: number): Date {
+    return moment(date).add(hours, 'days').toDate();
   }
 
   public addHours(date: Date, hours: number): Date {

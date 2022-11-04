@@ -15,6 +15,8 @@ import { LoadingComponent } from './components/loading/loading.component';
 import { InlineSVGModule } from 'ng-inline-svg';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TimeRangeSelectorComponent } from '@shr/components/time-range-selector/time-range-selector.component';
+import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.component';
+import { MetaDataSummaryComponent } from '@shr/components/meta-data-summary/meta-data-summary.component';
 
 
 @NgModule({
@@ -27,7 +29,9 @@ import { TimeRangeSelectorComponent } from '@shr/components/time-range-selector/
     ListItemComponent,
     DecodeHtmlStringPipe,
     LoadingComponent,
-    TimeRangeSelectorComponent
+    TimeRangeSelectorComponent,
+    ConfirmModalComponent,
+    MetaDataSummaryComponent
   ],
   exports: [
     ChartComponent,
@@ -42,7 +46,9 @@ import { TimeRangeSelectorComponent } from '@shr/components/time-range-selector/
     LoadingComponent,
     InlineSVGModule,
     NgSelectModule,
-    TimeRangeSelectorComponent
+    TimeRangeSelectorComponent,
+    ConfirmModalComponent,
+    MetaDataSummaryComponent
   ],
   imports: [
     CommonModule,
@@ -52,6 +58,9 @@ import { TimeRangeSelectorComponent } from '@shr/components/time-range-selector/
     NgxPopperjsModule,
     InlineSVGModule.forRoot(),
     NgSelectModule
+  ],
+  providers: [
+    DecodeHtmlStringPipe
   ]
 })
 export class SharedModule {

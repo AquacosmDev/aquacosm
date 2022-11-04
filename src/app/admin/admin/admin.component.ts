@@ -3,10 +3,12 @@ import { AddPartnerComponent } from '@app/admin/admin/add-partner/add-partner.co
 import { SimpleModalService } from 'ngx-simple-modal';
 import { PartnerService } from '@core/collections/partner.service';
 import { Partner } from '@shr/models/partner-model';
-import { ReplaySubject, take, takeUntil } from 'rxjs';
+import { from, ReplaySubject, take, takeUntil } from 'rxjs';
 import { VariableService } from '@core/collections/variable.service';
 import { MesocosmService } from '@core/collections/mesocosm.service';
 import { ConnectPartnerComponent } from '@app/admin/admin/connect-partner/connect-partner.component';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'aqc-admin',
@@ -21,11 +23,11 @@ export class AdminComponent implements OnInit, OnDestroy {
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private simpleModalService: SimpleModalService, private partnerService: PartnerService,
-              private variableService: VariableService, private mesocosmService: MesocosmService) { }
+              private variableService: VariableService, private mesocosmService: MesocosmService,
+              private afAuth: AngularFireAuth, private router: Router) { }
 
   ngOnInit(): void {
     this.getPartners();
-    this.connectPartner();
   }
 
   ngOnDestroy() {
@@ -43,6 +45,14 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   public connectPartner() {
     this.simpleModalService.addModal(ConnectPartnerComponent, {});
+  }
+
+  public logoff() {
+    from(this.afAuth.signOut()).subscribe(() => this.router.navigate([ 'login' ]));
+  }
+
+  public goToMetaDataOverview() {
+    this.router.navigate([ 'admin', 'meta-data']);
   }
 
   private getPartners() {

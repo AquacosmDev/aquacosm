@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { filter, map, Observable, ReplaySubject, switchMap, take, takeUntil, tap } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { filter, from, map, Observable, ReplaySubject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MetaDataEditorService } from '@core/collections/meta-data-editor.service';
 import { MetaDataEditor } from '@shr/models/meta-data-editor.model';
 import { MetaData } from '@shr/models/meta-data.model';
@@ -8,6 +8,11 @@ import { Partner } from '@shr/models/partner-model';
 import { MetaDataService } from '@core/collections/meta-data.service';
 import { PartnerService } from '@core/collections/partner.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { ConnectPartnerComponent } from '@app/admin/admin/connect-partner/connect-partner.component';
+import { SimpleModalService } from 'ngx-simple-modal';
+import { AddEditorComponent } from '@app/admin/admin/meta-data/meta-data-detail/add-editor/add-editor.component';
+import { ConfirmModalComponent } from '@shr/components/confirm-modal/confirm-modal.component';
+import { MetaDataHistory } from '@shr/models/meta-data-history.model';
 
 @Component({
   selector: 'aqc-meta-data-detail',
@@ -27,12 +32,14 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   public editors!: MetaDataEditor[];
 
   public error!: string | null;
+  public pristine = true;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private route: ActivatedRoute, private metaDataEditorService: MetaDataEditorService,
               private metaDataService: MetaDataService, private partnerService: PartnerService,
-              private afAuth: AngularFireAuth) { }
+              private afAuth: AngularFireAuth, private simpleModalService: SimpleModalService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.getMetaDataAndPartner();
@@ -42,6 +49,38 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroyed$.next(true);
     this.destroyed$.complete();
+  }
+
+  public onChange() {
+    this.pristine = false;
+  }
+
+  public save() {
+    if (this.loggedIn || !!this.editor) {
+      const history: MetaDataHistory = {
+        editor: this.loggedIn ? 'admin' : this.editor.email,
+        date: new Date(),
+        action: 'update'
+      }
+      if (!this.metaData.history) {
+        this.metaData.history = [];
+      }
+      this.metaData.history.push(history);
+      this.metaDataService.update(this.metaData)
+        .subscribe(() => this.pristine = true);
+    }
+  }
+
+  public addEditor() {
+    this.simpleModalService.addModal(AddEditorComponent, { metaDataId: this.metaData.id });
+  }
+
+  public deleteEditor(editor: MetaDataEditor) {
+    this.simpleModalService.addModal(ConfirmModalComponent, { title: 'Delete Editor', message: `Are you sure you want to delete editor: ${editor.email}?`})
+      .pipe(
+        filter(result => result),
+        switchMap(() => this.metaDataEditorService.delete(editor)))
+      .subscribe();
   }
 
   public login() {
@@ -55,6 +94,26 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
           this.error = 'The username and/or password are not correct.'
         }
       })
+  }
+
+  public logoff() {
+    if (this.loggedIn) {
+      from(this.afAuth.signOut()).subscribe(() => this.router.navigate(['login']));
+    }
+
+    if (this.editor) {
+      this.editor = null;
+      this.credentials = {
+        name: '',
+        password: ''
+      };
+    }
+  }
+
+  public toMetadataOverview() {
+    if (this.loggedIn) {
+      this.router.navigate(['admin', 'meta-data']);
+    }
   }
 
   private getMetaDataAndPartner() {
@@ -74,13 +133,9 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   }
 
   private getPartner(id: string) {
-    console.log('HELLO');
     this.partnerService.get(id)
       .pipe(take(1))
-      .subscribe(partner => {
-        console.log(partner);
-        this.partner = partner
-      });
+      .subscribe(partner => this.partner = partner);
   }
 
   private isLoggedIn() {
@@ -88,8 +143,9 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
       .pipe(filter(user => !!user))
       .subscribe(user => {
         console.log(user);
-        this.loggedIn = !!user
-      })
+        this.loggedIn = !!user;
+        console.log(this.loggedIn);
+      });
   }
 
   private getEditors(metaDataId: string) {

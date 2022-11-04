@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Partner } from '@shr//models/partner-model';
 import { PartnerService } from '@core/collections/partner.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map, Observable, ReplaySubject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { MesocosmService } from '@core/collections/mesocosm.service';
 import { Mesocosm } from '@shr//models/mesocosm.model';
@@ -17,6 +17,7 @@ import { DeviceService } from '@core/device.service';
 import { DateService } from '@core/date.service';
 import { LastUploadTimeService } from '@core/collections/last-upload-time.service';
 import { NgxPopperjsPlacements, NgxPopperjsTriggers } from 'ngx-popperjs';
+import { variable } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'aqc-partner-detail',
@@ -43,6 +44,7 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
   public isMobile = false;
   public menu = false;
   public lastUpload!: Date;
+  public mesocosmsOpen = true;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
@@ -50,7 +52,7 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
               private mesocosmService: MesocosmService, private variableService: VariableService,
               private isSelectedService: IsSelectedService, private simpleModalService: SimpleModalService,
               private deviceService: DeviceService, private dateService: DateService,
-              private lastUploadTimeService: LastUploadTimeService) {
+              private lastUploadTimeService: LastUploadTimeService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -104,13 +106,17 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
   public downloadData() {
     this.simpleModalService.addModal(DownloadDataModalComponent, {
       partner: this.partner,
-      mesocosms: this.mesocosms,
-      variables: this.variables
+      mesocosms: [ ...this.mesocosms.map(mesocosm => ({...mesocosm }))],
+      variables: [ ...this.variables.map(variable => ({ ...variable }))]
     });
   }
 
   public toggleMenu() {
     this.menu = !this.menu;
+  }
+
+  public openMetadata() {
+    this.router.navigate([ 'partner', this.partner.name, 'meta-data']);
   }
 
   private initComponent() {

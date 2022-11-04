@@ -1,0 +1,29 @@
+<div class="panel p-30" xmlns="http://www.w3.org/1999/html">
+  <div class="flex justify-between" [class.flex-column]="isMobile">
+    <div [class.text-center]="isMobile">
+      <span class="font-weight-bold" *ngIf="metaData.dateRange">
+        {{ metaData.dateRange.start ? (metaData.dateRange.start | date:'yyyy-MM-dd') : '?'}} - {{ metaData.dateRange.end ? (metaData.dateRange.end | date:'yyyy-MM-dd') : '?' }}
+      </span>
+      <span *ngIf="!metaData.dateRange" class="text-italic">No dates available</span>
+    </div>
+    <div class="flex" *ngIf="partner">
+      <span class="font-weight-bold">{{ partner.displayName }}</span>
+      <img [src]="partner.logo">
+    </div>
+  </div>
+  <div class="flex">
+    <span class="font-weight-bold label">Contact:</span>
+    <span *ngIf="!!metaData.contact">{{ metaData.contact }}</span>
+    <span *ngIf="!metaData.contact" class="text-italic">No contact available</span>
+  </div>
+  <div class="flex">
+    <span class="font-weight-bold label">Aim:</span>
+    <span class="flex" *ngIf="!!metaData.description">{{ metaData.description }}</span>
+    <span *ngIf="!metaData.description" class="text-italic">No description available</span>
+  </div>
+  <div class="flex justify-end m-t-15">
+    <button (click)="editMetaData()" *ngIf="editable">
+      Edit<i class="fa-solid fa-edit m-l-5"></i>
+    </button>
+  </div>
+</div>

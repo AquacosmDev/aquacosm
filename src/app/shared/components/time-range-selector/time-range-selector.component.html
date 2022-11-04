@@ -10,4 +10,4 @@
     From {{ customDateRange.start | date:'yyyy-MM-dd HH-mm' }} till {{ customDateRange.end | date:'yyyy-MM-dd HH-mm' }}
   </div>
 </div>
-<aqc-date-range-input *ngIf="selectedItem === 'custom' && !closeCustomDateRange" (customDateRange)="setCustomDateRange($event)"></aqc-date-range-input>
+<aqc-date-range-input *ngIf="selectedItem === 'custom' && !closeCustomDateRange" (dateRangeChange)="setCustomDateRange($event)"></aqc-date-range-input>

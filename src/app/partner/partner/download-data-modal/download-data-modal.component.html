@@ -29,7 +29,7 @@
       </aqc-checklist>
     </div>
     <div class="panel  p-20 flex-1 m-l-10 overflow-auto">
-      <aqc-date-range-input (customDateRange)="setCustomDateRange($event)" [column]="true" [date]="true"></aqc-date-range-input>
+      <aqc-date-range-input (dateRangeChange)="setCustomDateRange($event)" [column]="true" [date]="true"></aqc-date-range-input>
     </div>
   </div>
   <div class="flex justify-between p-b-30 p-l-100 p-r-100">

@@ -1,0 +1,14 @@
+<div class="modal-content overflow-hidden p-30">
+  <h3 class="text-center m-0">{{title || 'Confirm'}}</h3>
+  <div class="flex flex-column flex-1 overflow-auto align-center">
+    <p>{{message || 'Are you sure?'}}</p>
+  </div>
+  <div class="flex justify-center m-t-15">
+    <button (click)="close()">
+      Cancel<i class="fa-solid fa-x m-l-5"></i>
+    </button>
+    <button (click)="confirm()">
+      Delete<i class="fa-solid fa-user-minus m-l-5"></i>
+    </button>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DateRange } from '@app/shared/models/date-range.model';
 import { IAngularMyDpOptions, IMyDateModel } from 'angular-mydatepicker';
+import { DateService } from '@core/date.service';
 
 @Component({
   selector: 'aqc-date-range-input',
@@ -10,17 +11,19 @@ import { IAngularMyDpOptions, IMyDateModel } from 'angular-mydatepicker';
 export class DateRangeInputComponent implements OnInit {
   @Input() column = false;
   @Input() date = false;
+  @Input() dateRange!: DateRange;
+  @Input() disableSince = { year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate() + 1 };
 
   public startDpOptions: IAngularMyDpOptions = {
+    appendSelectorToBody: true,
     dateRange: false,
-    dateFormat: 'yyyy-mm-dd',
-    disableSince: { year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate() + 1 }
+    dateFormat: 'yyyy-mm-dd'
   };
 
   public endDpOptions: IAngularMyDpOptions = {
+    appendSelectorToBody: true,
     dateRange: false,
-    dateFormat: 'yyyy-mm-dd',
-    disableSince: { year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate() + 1 }
+    dateFormat: 'yyyy-mm-dd'
   };
 
   public startDate!: IMyDateModel;
@@ -30,12 +33,32 @@ export class DateRangeInputComponent implements OnInit {
   public endHour!: number;
   public endMinute!: number;
 
-  @Output() customDateRange = new EventEmitter<DateRange>();
+  @Output() dateRangeChange = new EventEmitter<DateRange>();
 
-  constructor() { }
+  constructor(private dateService: DateService) { }
 
   ngOnInit(): void {
-    if (this.date) {
+    if(this.disableSince) {
+      this.startDpOptions.disableSince = this.disableSince;
+      this.endDpOptions.disableSince = this.disableSince;
+    }
+    if (this.dateRange) {
+      this.startDate = {
+        isRange: false,
+        singleDate: {
+          jsDate: this.dateRange.start,
+          formatted: this.dateService.format(this.dateRange.start, 'yyyy-MM-DD')
+        }
+      };
+      this.endDate = {
+        isRange: false,
+        singleDate: {
+          jsDate: this.dateRange.end,
+          formatted: this.dateService.format(this.dateRange.end, 'yyyy-MM-DD')
+        }
+      };
+    }
+    if (this.date && !this.dateRange && this.disableSince) {
       this.endDate = {isRange: false, singleDate: {jsDate: new Date(), formatted: 'now'}};
     }
   }
@@ -44,9 +67,11 @@ export class DateRangeInputComponent implements OnInit {
     this.endDpOptions = {
       dateRange: false,
       dateFormat: 'yyyy-mm-dd',
-      disableSince: { year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate() + 1 },
       disableUntil: event.singleDate?.date
     };
+    if(this.disableSince) {
+      this.endDpOptions.disableSince = this.disableSince;
+    }
     if (this.date) {
       this.startDate = event;
       this.emitDateRange();
@@ -66,7 +91,7 @@ export class DateRangeInputComponent implements OnInit {
   }
 
   public emitDateRange() {
-    this.customDateRange.emit({
+    this.dateRangeChange.emit({
       start: !!this.startDate ? new Date(
         this.startDate.singleDate?.date?.year!,
         this.startDate.singleDate?.date?.month! - 1,

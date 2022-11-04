@@ -1,0 +1,38 @@
+<div class="modal-content overflow-hidden p-30" [class.bigger]="created">
+  <h3 class="text-center m-0">Add editor</h3>
+  <div class="flex flex-column flex-1 overflow-auto" *ngIf="!created">
+    <p>Add the editors name or email adress:</p>
+    <div class="input-group">
+      <label>Name</label>
+      <input type="text" name="name" [(ngModel)]="metaDataEditor.email" placeholder="Editor name or email...">
+    </div>
+    <div class="flex justify-end m-t-15">
+      <button (click)="createEditor()" [disabled]="!metaDataEditor.email || metaDataEditor.email.length === 0">
+        Create<i class="fa-solid fa-check m-l-5"></i>
+      </button>
+    </div>
+  </div>
+  <div class="flex flex-column flex-1 overflow-auto" *ngIf="created">
+    A new editor is created. You can <a target="_blank" href="{{ mailTo }}">email</a> this person now or give him or her the following information later:
+    <div class="flex flex-column">
+      <div class="input-group">
+        <label>Name</label>
+        <div>{{ this.metaDataEditor.email }}</div>
+      </div>
+      <div class="input-group m-t-10">
+        <label>Password</label>
+        <div>{{ this.metaDataEditor.password }}</div>
+      </div>
+      <div class="input-group m-t-10">
+        <label>Name</label>
+        <div>https://aquacosm-data.web.app/admin/meta-data/{{ this.metaDataId }}</div>
+      </div>
+    </div>
+
+    <div class="flex justify-end m-t-15">
+      <button (click)="close()">
+        Close<i class="fa-solid fa-x m-l-5"></i>
+      </button>
+    </div>
+  </div>
+</div>

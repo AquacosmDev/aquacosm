@@ -17,12 +17,6 @@ export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() variableId!: string;
 
-  public yAxisNames: { [variableName: string]: string } = {
-    'Light': 'Light (PAR &#181;Mol m&#178; s&#185;)',
-    'Oxygen': 'Oxygen (mg/L)',
-    'Depth': 'Depth (mm)',
-    'Temperature': 'Temperature (&#176;C)'
-  }
   public variable!: Variable;
   public yAxisName!: string;
 
@@ -86,12 +80,7 @@ export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(take(1))
       .subscribe(variable => {
         this.variable = variable;
-        this.yAxisName = this.yAxisNames[ this.variable.name ];
+        this.yAxisName = `${variable.name} (${variable.unit})`;
       });
   }
-
-  private showAveragedOrRawData() {
-
-  }
-
 }

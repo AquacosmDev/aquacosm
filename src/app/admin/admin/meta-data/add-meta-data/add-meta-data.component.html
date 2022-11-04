@@ -1,0 +1,21 @@
+<div class="modal-content overflow-hidden p-30">
+  <h3 class="text-center m-0">Add metadata entry</h3>
+  <p>Select a partner to add the metadata entry for:</p>
+  <div class="flex flex-column flex-1">
+    <div *ngFor="let partner of partners"
+         [class.active]="selectedPartner?.id === partner.id"
+         class="flex align-center partner p-5 cursor-pointer"
+         (click)="selectPartner(partner)">
+      <img [src]="partner.logo">
+      <span class="font-weight-bold text-center flex-1">{{ partner.displayName }}</span>
+    </div>
+  </div>
+  <div class="flex justify-end m-t-15">
+    <button (click)="close()">
+      Cancel<i class="fa-solid fa-x m-l-5"></i>
+    </button>
+    <button [disabled]="!selectedPartner" (click)="addMetadataEntry()">
+      Save<i class="fa-solid fa-check m-l-5"></i>
+    </button>
+  </div>
+</div>

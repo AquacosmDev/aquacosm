@@ -9,6 +9,8 @@ import { ErrorComponent } from '@app/admin/error/error.component';
 import { ConnectPartnerComponent } from '@app/admin/admin/connect-partner/connect-partner.component';
 import { MetaDataDetailComponent } from '@app/admin/admin/meta-data/meta-data-detail/meta-data-detail.component';
 import { MetaDataComponent } from '@app/admin/admin/meta-data/meta-data.component';
+import { AddEditorComponent } from './admin/meta-data/meta-data-detail/add-editor/add-editor.component';
+import { AddMetaDataComponent } from './admin/meta-data/add-meta-data/add-meta-data.component';
 
 
 
@@ -21,7 +23,9 @@ import { MetaDataComponent } from '@app/admin/admin/meta-data/meta-data.componen
     ErrorComponent,
     ConnectPartnerComponent,
     MetaDataDetailComponent,
-    MetaDataComponent
+    MetaDataComponent,
+    AddEditorComponent,
+    AddMetaDataComponent
   ],
   imports: [
     CommonModule,
