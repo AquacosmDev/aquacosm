@@ -40,7 +40,6 @@ export class DownloadDataModalComponent extends SimpleModalComponent<{ }, any> i
     this.selectedMesocosms = this.mesocosms.filter(item => item.checked).map(item => item.item);
     this.selectedVariables = this.variables.filter(item => item.checked).map(item => item.item);
     this.selectedVariablIds = this.variables.filter(item => item.checked).map(item => item.item.id);
-    console.log(this.selectedMesocosms);
   }
 
   public setMesocosms(mesocosms: Mesocosm[]) {

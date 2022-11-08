@@ -141,11 +141,7 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   private isLoggedIn() {
     this.afAuth.authState
       .pipe(filter(user => !!user))
-      .subscribe(user => {
-        console.log(user);
-        this.loggedIn = !!user;
-        console.log(this.loggedIn);
-      });
+      .subscribe(user => this.loggedIn = !!user);
   }
 
   private getEditors(metaDataId: string) {

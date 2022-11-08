@@ -25,7 +25,6 @@ export class TimeRangeSelectorComponent implements OnInit {
   }
 
   public setSelectedItem(selectedItem: { name: string }) {
-    console.log(selectedItem);
     this.selectedItem = selectedItem.name;
     localStorage.setItem('rangeName', selectedItem.name);
     if (this.selectedItem === 'month') {

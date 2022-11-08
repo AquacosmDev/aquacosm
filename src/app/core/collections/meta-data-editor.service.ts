@@ -32,7 +32,6 @@ export class MetaDataEditorService extends FirebaseCollectionService<MetaDataEdi
         where('metaDataId', '==', metaDataId),
         limit(1))))
       .pipe(
-        tap(query => console.log(query)),
         map(query => !!query.docs[ 0 ] ?
           this.convertDocToItem(query.docs[ 0 ] as unknown as DocumentSnapshot<MetaDataEditor>) : null));
   }

@@ -39,6 +39,10 @@ export class MetaDataSummaryComponent implements OnInit, OnDestroy {
     this.router.navigate([ 'admin', 'meta-data', this.metaData.id ]);
   }
 
+  open(url: string){
+    window.open(url, '_blank');
+  }
+
   private getPartner() {
     this.partnerService.get(this.metaData.partnerId)
       .pipe(take(1))

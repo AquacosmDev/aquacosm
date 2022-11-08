@@ -41,7 +41,6 @@ export class MetaDataService extends FirebaseCollectionService<MetaData> {
           if(range && !range.end) {
             range.end = this.dateService.addDays(new Date(), 1);
           }
-          console.log(range, metadata.dateRange, dateRange);
           return !!metadata.dateRange && this.dateService.isDateRangeWithinDateRange(dateRange, range)
         })));
   }
@@ -61,17 +60,4 @@ export class MetaDataService extends FirebaseCollectionService<MetaData> {
     }
     return item as MetaData;
   }
-
-  // public getMetaData(email: string, password: string, metaDataId: string): Observable<MetaData> {
-  //   return from(getDocs(
-  //     query(collection(this.db.firestore, 'metaDataEditor'),
-  //       where('email', '==', email),
-  //       where('password', '==', password),
-  //       where('metaDataId', '==', metaDataId),
-  //       limit(1))))
-  //     .pipe(
-  //       tap(query => console.log(query)),
-  //       map(query => !!query.docs[ 0 ] ?
-  //         this.convertDocToItem(query.docs[ 0 ] as unknown as DocumentSnapshot<MetaData>) : null));
-  // }
 }

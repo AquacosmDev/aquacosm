@@ -22,6 +22,9 @@
     <span *ngIf="!metaData.description" class="text-italic">No description available</span>
   </div>
   <div class="flex justify-end m-t-15">
+    <button (click)="open(metaData.url)" *ngIf="metaData.url">
+      Open<i class="fa-solid fa-link m-l-5"></i>
+    </button>
     <button (click)="editMetaData()" *ngIf="editable">
       Edit<i class="fa-solid fa-edit m-l-5"></i>
     </button>
