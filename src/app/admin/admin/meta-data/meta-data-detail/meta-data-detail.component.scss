@@ -3,6 +3,14 @@
   display: flex;
   flex-direction: column;
 
+  .fa-circle-exclamation, .fa-triangle-exclamation {
+    color: #c71b05;
+  }
+
+  .fa-circle-info {
+    color: #1e6fb8;
+  }
+
   .background {
     background: rgba(0,0,0,0.6);
 

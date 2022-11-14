@@ -17,7 +17,6 @@ import { DeviceService } from '@core/device.service';
 import { DateService } from '@core/date.service';
 import { LastUploadTimeService } from '@core/collections/last-upload-time.service';
 import { NgxPopperjsPlacements, NgxPopperjsTriggers } from 'ngx-popperjs';
-import { variable } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'aqc-partner-detail',

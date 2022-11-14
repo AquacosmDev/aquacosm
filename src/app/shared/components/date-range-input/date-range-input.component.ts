@@ -50,13 +50,15 @@ export class DateRangeInputComponent implements OnInit {
           formatted: this.dateService.format(this.dateRange.start, 'yyyy-MM-DD')
         }
       };
-      this.endDate = {
-        isRange: false,
-        singleDate: {
-          jsDate: this.dateRange.end,
-          formatted: this.dateService.format(this.dateRange.end, 'yyyy-MM-DD')
-        }
-      };
+      if (!!this.dateRange.end) {
+        this.endDate = {
+          isRange: false,
+          singleDate: {
+            jsDate: this.dateRange.end,
+            formatted: this.dateService.format(this.dateRange.end, 'yyyy-MM-DD')
+          }
+        };
+      }
     }
     if (this.date && !this.dateRange && this.disableSince) {
       this.endDate = {isRange: false, singleDate: {jsDate: new Date(), formatted: 'now'}};

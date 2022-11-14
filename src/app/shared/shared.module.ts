@@ -17,6 +17,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { TimeRangeSelectorComponent } from '@shr/components/time-range-selector/time-range-selector.component';
 import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.component';
 import { MetaDataSummaryComponent } from '@shr/components/meta-data-summary/meta-data-summary.component';
+import { SearchComponent } from './components/search/search.component';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { MetaDataSummaryComponent } from '@shr/components/meta-data-summary/meta
     LoadingComponent,
     TimeRangeSelectorComponent,
     ConfirmModalComponent,
-    MetaDataSummaryComponent
+    MetaDataSummaryComponent,
+    SearchComponent
   ],
   exports: [
     ChartComponent,
@@ -48,7 +50,8 @@ import { MetaDataSummaryComponent } from '@shr/components/meta-data-summary/meta
     NgSelectModule,
     TimeRangeSelectorComponent,
     ConfirmModalComponent,
-    MetaDataSummaryComponent
+    MetaDataSummaryComponent,
+    SearchComponent
   ],
   imports: [
     CommonModule,

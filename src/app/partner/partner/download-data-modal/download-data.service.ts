@@ -88,7 +88,7 @@ export class DownloadDataService {
       partner: partnerName,
       start: metaData.dateRange.start ? this.dateService.format(metaData.dateRange.start, 'yyyy-MM-DD') : '',
       end: metaData.dateRange.end ? this.dateService.format(metaData.dateRange.end, 'yyyy-MM-DD') : '',
-      description: metaData.description,
+      description: metaData.researchAim,
       contact: metaData.contact
     }
   }

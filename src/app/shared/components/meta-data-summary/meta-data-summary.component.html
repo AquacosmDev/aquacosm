@@ -11,19 +11,24 @@
       <img [src]="partner.logo">
     </div>
   </div>
-  <div class="flex">
-    <span class="font-weight-bold label">Contact:</span>
+  <div class="flex" [class.flex-column]="isMobile">
+    <span class="font-weight-bold label" [class.mobile]="isMobile">Data Contact:</span>
     <span *ngIf="!!metaData.contact">{{ metaData.contact }}</span>
     <span *ngIf="!metaData.contact" class="text-italic">No contact available</span>
   </div>
-  <div class="flex">
-    <span class="font-weight-bold label">Aim:</span>
-    <span class="flex" *ngIf="!!metaData.description">{{ metaData.description }}</span>
-    <span *ngIf="!metaData.description" class="text-italic">No description available</span>
+  <div class="flex" [class.flex-column]="isMobile">
+    <span class="font-weight-bold label" [class.mobile]="isMobile">Contact email:</span>
+    <span *ngIf="!!metaData.email">{{ metaData.email }}</span>
+    <span *ngIf="!metaData.email" class="text-italic">No email available</span>
   </div>
-  <div class="flex justify-end m-t-15">
-    <button (click)="open(metaData.url)" *ngIf="metaData.url">
-      Open<i class="fa-solid fa-link m-l-5"></i>
+  <div class="flex" [class.flex-column]="isMobile">
+    <span class="font-weight-bold label" [class.mobile]="isMobile">Research aim:</span>
+    <span class="flex" *ngIf="!!metaData.researchAim">{{ metaData.researchAim }}</span>
+    <span *ngIf="!metaData.researchAim" class="text-italic">No description available</span>
+  </div>
+  <div class="flex justify-end m-t-15" [class.flex-column]="isMobile">
+    <button (click)="open(metaData.url)" [class.p-0]="isMobile" *ngIf="metaData.url">
+      To metadata catalogue<i class="fa-solid fa-link m-l-5"></i>
     </button>
     <button (click)="editMetaData()" *ngIf="editable">
       Edit<i class="fa-solid fa-edit m-l-5"></i>

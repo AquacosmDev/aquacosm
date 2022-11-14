@@ -1,6 +1,6 @@
 {
   "name": "aquacosm",
-  "version": "1.0.0-feature-0.2",
+  "version": "1.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

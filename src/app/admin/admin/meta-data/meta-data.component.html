@@ -1,9 +1,13 @@
 <div class="panel-container flex">
   <div class="panel p-t-30 meta-data">
-    <h1 class="m-t-0 flex justify-between cursor-pointer p-l-30 p-r-30" (click)="addMetadataEntry()">Metadata<i class="fa-solid fa-plus cursor-pointer"></i></h1>
+    <div class="flex align-center p-l-30 p-r-30 ">
+      <h1 class="m-0 flex-1">Metadata</h1>
+      <aqc-search class="p-r-10 p-l-10" (search)="searchMetaData($event)"></aqc-search>
+      <i (click)="addMetadataEntry()" class="fa-solid fa-2x fa-plus cursor-pointer"></i>
+    </div>
     <div class="flex flex-column flex-1 overflow-auto p-l-30 p-r-30 p-b-30">
       <aqc-meta-data-summary class="m-t-15"
-           *ngFor="let meta of metaData"
+           *ngFor="let meta of filteredMetaData"
            [metaData]="meta"
           [editable]="true"></aqc-meta-data-summary>
     </div>
