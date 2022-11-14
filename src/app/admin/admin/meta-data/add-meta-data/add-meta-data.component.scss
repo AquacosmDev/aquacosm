@@ -1,0 +1,13 @@
+:host {
+  .partner {
+    &.active {
+      border: 2px solid #1e6fb8;
+      color: #1e6fb8;
+      padding: 3px;
+    }
+
+    &:nth-child(odd) {
+      background-color: #FAFAFA;
+    }
+  }
+}

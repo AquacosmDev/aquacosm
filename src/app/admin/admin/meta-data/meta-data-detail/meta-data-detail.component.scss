@@ -3,6 +3,14 @@
   display: flex;
   flex-direction: column;
 
+  .fa-circle-exclamation, .fa-triangle-exclamation {
+    color: #c71b05;
+  }
+
+  .fa-circle-info {
+    color: #1e6fb8;
+  }
+
   .background {
     background: rgba(0,0,0,0.6);
 
@@ -12,16 +20,6 @@
       justify-content: center;
 
     }
-
-    form {
-      width: 300px;
-
-      .error-message {
-        margin-bottom: 10px;
-        text-align: center;
-        color: red;
-      }
-    }
   }
 
   .meta-data {
@@ -30,5 +28,35 @@
 
   .sidebar {
     flex: 0 0 250px;
+
+    .editors {
+      .fa-plus {
+        top: 20px;
+        right: 20px;
+      }
+    }
+  }
+
+  table {
+    thead {
+      background-color: #1e6fb8;
+      color: white;
+      th {
+        text-align: left;
+      }
+    }
+
+    tbody {
+      tr:nth-child(even) {
+        background-color: #FAFAFA;
+      }
+    }
+  }
+
+  .logoff {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
   }
 }

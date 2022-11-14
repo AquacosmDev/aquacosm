@@ -1,22 +1,110 @@
 <div class="flex flex-1 justify-center align-center">
   <div class="sidebar p-20"></div>
-  <div class="flex flex-column panel meta-data p-30" *ngIf="!!metaData">
-    <h2 class="text-center m-0">Meta-data entry:</h2>
-    <div class="input-group m-t-15">
-      <label>Contact</label>
-      <input type="text" name="contact" [(ngModel)]="metaData.contact" placeholder="Add contact details...">
+  <div class="flex flex-column meta-data" *ngIf="!!metaData">
+    <div class="panel p-30">
+      <h2 class="text-center m-0">Meta-data entry:</h2>
+      <div class="input-group m-t-15">
+        <label>Data contact</label>
+        <input type="text" name="contact" [(ngModel)]="metaData.contact" (ngModelChange)="onChange()" placeholder="Add contact details...">
+        <i *ngIf="!metaData.contact" [popper]="mandatoryContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+        <i [popper]="dataContactContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-info p-5 flex align-center"></i>
+      </div>
+      <div class="input-group m-t-15">
+        <label>Contact email</label>
+        <input type="text" name="email" [(ngModel)]="metaData.email" (ngModelChange)="onChange(); onEmailChange($event)" placeholder="Add contact email...">
+        <i *ngIf="!metaData.email" [popper]="mandatoryContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+        <i *ngIf="metaData.email && !isEmail" [popper]="emailNotValidContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-triangle-exclamation p-5 flex align-center"></i>
+        <i [popper]="EmailContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-info p-5 flex align-center"></i>
+      </div>
+      <div class="input-group m-t-15">
+        <label>Link</label>
+        <input type="text" name="contact" [(ngModel)]="metaData.url" (ngModelChange)="onChange()" placeholder="Add link to aquacosm metadata catalogue...">
+        <i [popper]="LinkContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-info p-5 flex align-center"></i>
+      </div>
+      <div class="input-group m-t-15">
+        <label class="m-r-10">Duration</label>
+        <aqc-date-range-input class="flex-1" [column]="true" [date]="true" [disableSince]="null" [(dateRange)]="metaData.dateRange" (dateRangeChange)="onChange()"></aqc-date-range-input>
+        <i *ngIf="!metaData.dateRange || !metaData.dateRange.start" [popper]="mandatoryDateContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+        <i [popper]="DateRangeContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-info p-5 flex align-center"></i>
+      </div>
+      <div class="input-group m-t-15">
+        <label>Reserach aim</label>
+        <textarea type="text" name="contact" [(ngModel)]="metaData.researchAim" (ngModelChange)="onChange()" placeholder="Add aim of research..."></textarea>
+        <i *ngIf="!metaData.researchAim" [popper]="mandatoryContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+        <i [popper]="ResearchAimContent"
+           [popperTrigger]="NgxPopperjsTriggers.hover"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-circle-info p-5 flex align-center"></i>
+      </div>
+      <div class="flex justify-end m-t-15">
+        <button (click)="save()" [disabled]="pristine || !mandatoryFields">
+          Save<i class="fa-solid fa-check m-l-5"></i>
+        </button>
+      </div>
     </div>
-    <div class="input-group m-t-15">
-      <label>Link</label>
-      <input type="text" name="contact" [(ngModel)]="metaData.url" placeholder="Add link to aquacosm metadata catalogue...">
-    </div>
-    <div class="input-group m-t-15">
-      <label class="m-r-10">Duration</label>
-      <aqc-date-range-input [column]="true" [date]="true"></aqc-date-range-input>
-    </div>
-    <div class="input-group m-t-15">
-      <label>Aim</label>
-      <textarea type="text" name="contact" [(ngModel)]="metaData.description" placeholder="Add aim of research..."></textarea>
+    <div class="panel p-30 m-t-30" *ngIf="!!metaData.history && metaData.history.length > 0">
+      <h2 class="text-center m-0">History</h2>
+      <table>
+        <thead>
+          <th>Date</th>
+          <th>Action</th>
+          <th>Editor</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let history of metaData.history">
+            <td>{{history.date | date:'yyyy-MM-dd HH:mm'}}</td>
+            <td>{{history.action}}</td>
+            <td>{{history.editor}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <div class="sidebar p-20 overflow-hidden">
@@ -26,18 +114,19 @@
         <img class="mh-100" [src]="partner.logo">
       </div>
     </div>
-    <div class="panel m-t-30 p-30">
+    <div class="panel m-t-30 p-30 editors">
+      <i *ngIf="loggedIn" (click)="addEditor()" class="fa-solid fa-plus position-absolute cursor-pointer"></i>
       <h3 class="text-center m-0">Access</h3>
       <div>Admin</div>
       <div *ngFor="let ed of editors" class="flex align-center">
-        <span class="ellipsis">{{ ed.email }}</span>
-        <i class="fa-solid fa-user-minus flex justify-center align-center"></i>
+        <span class="ellipsis flex-1">{{ ed.email }}</span>
+        <i *ngIf="loggedIn" class="fa-solid fa-user-minus flex justify-center align-center cursor-pointer" (click)="deleteEditor(ed)"></i>
       </div>
     </div>
   </div>
 </div>
 
-<div class="position-absolute flex flex-column align-center justify-center h-100 background" *ngIf="false">
+<div class="position-absolute flex flex-column align-center justify-center h-100 w-100 background" *ngIf="!loggedIn && !editor">
   <div class="flex logo-container">
     <img class="logo" src="assets/img/logo_aquacosm.png">
     <img class="m-l-30" src="assets/img/logo_aquacosm_plus.png">
@@ -63,3 +152,46 @@
     </div>
   </form>
 </div>
+
+<div class="flex position-absolute logoff justify-between" *ngIf="loggedIn || editor">
+  <div>
+      <button (click)="toMetadataOverview()" class="m-l-10" *ngIf="loggedIn">
+        <i class="fa-solid fa-chevron-left m-l-5"></i>Metadata overview
+      </button>
+  </div>
+  <button (click)="logoff()" class="m-r-10">
+    Logout<i class="fa-solid fa-power-off m-l-5"></i>
+  </button>
+</div>
+
+<popper-content #dataContactContent>
+  <p class="max-popper-width">Fill in the person to contact if someone needs information about the data. It's preferred to use a senior member of the project.</p>
+</popper-content>
+
+<popper-content #EmailContent>
+  <p class="max-popper-width">Fill in the emailaddress of the data contact person.</p>
+</popper-content>
+
+<popper-content #LinkContent>
+  <p class="max-popper-width">Provide the link of the aquacosm metadata catalogue entry that belongs to this research project. To acquire this link go to your aquacosm metadata catalogue entry and use the "share on social sites" part in the right sidebar to copy the link.</p>
+</popper-content>
+
+<popper-content #DateRangeContent>
+  <p class="max-popper-width">Provide the start and/or the end date of the research project. The start date is mandatory.</p>
+</popper-content>
+
+<popper-content #ResearchAimContent>
+  <p class="max-popper-width">Lissete will provide the explanation for this field.</p>
+</popper-content>
+
+<popper-content #mandatoryContent>
+  <p class="max-popper-width">This field is mandatory.</p>
+</popper-content>
+
+<popper-content #mandatoryDateContent>
+  <p class="max-popper-width">It is mandatory to fill in the startdate of the project.</p>
+</popper-content>
+
+<popper-content #emailNotValidContent>
+  <p class="max-popper-width">This is not a correct emailaddress. Use the following format test@test.com</p>
+</popper-content>

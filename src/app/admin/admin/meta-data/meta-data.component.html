@@ -1,1 +1,26 @@
-<p>meta-data works!</p>
+<div class="panel-container flex">
+  <div class="panel p-t-30 meta-data">
+    <div class="flex align-center p-l-30 p-r-30 ">
+      <h1 class="m-0 flex-1">Metadata</h1>
+      <aqc-search class="p-r-10 p-l-10" (search)="searchMetaData($event)"></aqc-search>
+      <i (click)="addMetadataEntry()" class="fa-solid fa-2x fa-plus cursor-pointer"></i>
+    </div>
+    <div class="flex flex-column flex-1 overflow-auto p-l-30 p-r-30 p-b-30">
+      <aqc-meta-data-summary class="m-t-15"
+           *ngFor="let meta of filteredMetaData"
+           [metaData]="meta"
+          [editable]="true"></aqc-meta-data-summary>
+    </div>
+  </div>
+</div>
+
+<div class="flex position-absolute logoff justify-between">
+  <div>
+    <button (click)="toAdminOverview()" class="m-l-10">
+      <i class="fa-solid fa-chevron-left m-l-5"></i>Admin overview
+    </button>
+  </div>
+  <button (click)="logoff()" class="m-r-10">
+    Logout<i class="fa-solid fa-power-off m-l-5"></i>
+  </button>
+</div>

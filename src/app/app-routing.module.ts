@@ -10,6 +10,7 @@ import { redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/fire/auth-g
 import { ErrorComponent } from '@app/admin/error/error.component';
 import { MetaDataComponent } from '@app/admin/admin/meta-data/meta-data.component';
 import { MetaDataDetailComponent } from '@app/admin/admin/meta-data/meta-data-detail/meta-data-detail.component';
+import { PartnerMetadataComponent } from '@ptn/partner/partner-metadata/partner-metadata.component';
 
 const redirectLoggedInToItems = () => redirectLoggedInTo(['admin']);
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
@@ -18,10 +19,11 @@ const routes: Routes = [
   { path: '', component: PartnerComponent },
   { path: 'login', component: LoginComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToItems } },
   { path: 'admin', component: AdminComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }  },
-  // { path: 'admin/meta-data', component: MetaDataComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }  },
-  // { path: 'admin/meta-data/:id', component: MetaDataDetailComponent },
+  { path: 'admin/meta-data', component: MetaDataComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }  },
+  { path: 'admin/meta-data/:id', component: MetaDataDetailComponent },
   { path: 'error', component: ErrorComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }  },
   { path: 'partner/:name', component: PartnerDetailComponent },
+  { path: 'partner/:name/meta-data', component: PartnerMetadataComponent },
 ];
 
 @NgModule({

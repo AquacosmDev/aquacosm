@@ -1,6 +1,6 @@
 <div class="panel-container flex">
   <div class="flex flex-column p-r-20 justify-between">
-    <div class="panel p-30"><button>Meta-data</button></div>
+    <div class="panel p-30"><button (click)="goToMetaDataOverview()">Meta-data</button></div>
     <div class="panel p-20"><button (click)="connectPartner()">How to connect new partners?</button></div>
   </div>
   <div class="panel p-30 partners">
@@ -23,4 +23,10 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="flex position-absolute logoff">
+  <button (click)="logoff()">
+    Logout<i class="fa-solid fa-power-off m-l-5"></i>
+  </button>
 </div>

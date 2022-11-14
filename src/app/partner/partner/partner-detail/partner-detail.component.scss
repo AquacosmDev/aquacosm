@@ -8,12 +8,32 @@
     flex: 0 0 250px;
     display: flex;
     flex-direction: column;
-    padding: 20px 10px 20px 20px;
     overflow: hidden;
     height: 100%;
 
     .partner {
       flex: 0 0 120px;
+    }
+
+    .panel {
+      min-height: 75px;
+      transition: max-height 300ms;
+
+      &.closed {
+        max-height: 75px;
+      }
+
+      .open {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        top: 2px;
+        left: 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
   }
 
