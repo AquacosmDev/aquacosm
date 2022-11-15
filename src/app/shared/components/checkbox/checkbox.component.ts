@@ -12,16 +12,13 @@ export class CheckboxComponent {
   @Input() row = true;
   @Input() iconClass!: string;
   @Input() multiselect = true;
-  @Input() reselect = false
   @Output() itemChange = new EventEmitter<ChecklistItem<any>>();
 
   constructor() { }
 
   public toggleItem() {
-    if (this.multiselect || this.reselect || !this.item.checked) {
-      if(!this.reselect) {
-        this.item.checked = !this.item.checked;
-      }
+    if (this.multiselect || !this.item.checked) {
+      this.item.checked = !this.item.checked;
       this.itemChange.emit(this.item);
     }
   }

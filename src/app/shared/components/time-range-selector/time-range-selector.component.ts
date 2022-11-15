@@ -25,6 +25,7 @@ export class TimeRangeSelectorComponent implements OnInit {
   }
 
   public setSelectedItem(selectedItem: { name: string }) {
+    this.closeCustomDateRange = true;
     this.selectedItem = selectedItem.name;
     localStorage.setItem('rangeName', selectedItem.name);
     if (this.selectedItem === 'month') {
@@ -52,7 +53,7 @@ export class TimeRangeSelectorComponent implements OnInit {
           this.dateRange.emit(dateRange);
         });
     } else {
-      this.closeCustomDateRange = !this.closeCustomDateRange;
+      this.closeCustomDateRange = false;
     }
   }
 

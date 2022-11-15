@@ -33,8 +33,8 @@
     <i class="fa-regular fa-calendar m-l-5 m-r-5"></i>
   </div>
 </div>
-<div class="flex justify-end p-r-15 align-center m-l-20 cursor-pointer" [class.disabled]="!startDate || !endDate" *ngIf="!date">
+<div class="flex justify-end p-r-15 align-center m-l-20 cursor-pointer" [class.disabled]="!startDate || !endDate" *ngIf="!date" (click)="emitDateRange()">
   <u>Set</u>
-  <i  class="fa-solid fa-check" (click)="emitDateRange()">
+  <i  class="fa-solid fa-check">
   </i>
 </div>
