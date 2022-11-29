@@ -5,14 +5,14 @@
       <div #dp1="angular-mydatepicker"
            [class.placeholder]="!startDate"
            (click)="dp1.toggleCalendar()"
-           (dateChanged)="startDateChanged($event)"
+           (ngModelChange)="startDateChanged($event)"
            [(ngModel)]="startDate"
            [options]="startDpOptions"
            angular-mydatepicker class="input-box"
            name="fromDate">{{ !!startDate ? startDate!.singleDate!.formatted : 'yyyy-mm-dd' }}</div>
     </div>
-    <input type="number" *ngIf="!date" [(ngModel)]="startHour" placeholder="hh" min="0" max="24">
-    <input type="number" *ngIf="!date" [(ngModel)]="startMinute" placeholder="mm" min="0" max="60">
+    <input type="number" *ngIf="!date" [(ngModel)]="startHour" (ngModelChange)="onHourChange($event, 'start')" placeholder="hh" min="0" max="23">
+    <input type="number" *ngIf="!date" [(ngModel)]="startMinute" (ngModelChange)="onMinuteChange($event, 'start')" placeholder="mm" min="0" max="59">
     <i class="fa-regular fa-calendar m-l-5"></i>
   </div>
 
@@ -21,15 +21,15 @@
     <div class="input-box-container m-l-5">
       <div #dp2="angular-mydatepicker"
            (click)="dp2.toggleCalendar()"
-           (dateChanged)="endDateChanged($event)"
+           (ngModelChange)="endDateChanged($event)"
            [(ngModel)]="endDate"
            [class.placeholder]="!endDate"
            [options]="endDpOptions"
            angular-mydatepicker class="input-box"
            name="tillDate">{{ !!endDate ? endDate!.singleDate?.formatted : 'yyyy-mm-dd' }}</div>
     </div>
-    <input type="number" *ngIf="!date" [(ngModel)]="endHour" placeholder="hh" min="0" max="24">
-    <input type="number" *ngIf="!date" [(ngModel)]="endMinute" placeholder="mm" min="0" max="60">
+    <input type="number" *ngIf="!date" [(ngModel)]="endHour" (ngModelChange)="onHourChange($event, 'end')" placeholder="hh" min="0" max="23">
+    <input type="number" *ngIf="!date" [(ngModel)]="endMinute" (ngModelChange)="onMinuteChange($event, 'end')" placeholder="mm" min="0" max="59">
     <i class="fa-regular fa-calendar m-l-5 m-r-5"></i>
   </div>
 </div>

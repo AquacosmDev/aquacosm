@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, filter, map, Observable, Subject, Subscription, take } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, Subscription, take } from 'rxjs';
 import { LastUpload } from '@shr/models/last-upload.model';
 
 @Injectable({

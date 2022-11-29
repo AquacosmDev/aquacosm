@@ -57,7 +57,7 @@ export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
     this.chartDataService.getChartData(this.variableId)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(chartData => {
-        this.chartData = chartData
+        this.chartData = chartData;
         this.loading = false;
       });
   }

@@ -113,6 +113,27 @@ exports.dataWebhook = functions
   })();
 });
 
+exports.createDataBundle = functions.https.onRequest(async (request, response) => {
+  // Query the 50 latest stories
+  const latestData = await db.collection('mesocosmData')
+    .orderBy('day', 'desc')
+    .limit(288)
+    .get();
+
+  // Build the bundle from the query results
+  const bundleBuffer = db.bundle('latest-data')
+    .add('latest-data-query', latestData)
+    .build();
+
+  // Cache the response for up to 5 minutes;
+  // see
+  response.set('Cache-Control', 'public, max-age=7200, s-maxage=7200');
+
+  cors(request, response, () => {
+    response.end(bundleBuffer);
+  });
+});
+
 // exports.deleteData = functions
 //   .https.onRequest((req: express.Request, res: express.Response) => {
 //     (async () => {

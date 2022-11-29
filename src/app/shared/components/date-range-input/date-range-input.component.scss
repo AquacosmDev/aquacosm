@@ -6,12 +6,20 @@
 
   .input-box-container {
     position: relative;
-    flex: 0 0 100px;
+    flex: 0 0 120px;
     display: flex;
     justify-content: center;
 
     .placeholder {
       color: $color-placeholder;
+    }
+
+    .input-box {
+      border-radius: 30px;
+      padding: 3px 10px;
+      background-color: #F8F8F8;
+      box-shadow: inset 1px -3px 5px -3px #000000;
+      border: none;
     }
   }
 

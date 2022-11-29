@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { DateRange } from '@shr//models/date-range.model';
 import { LastUploadTimeService } from '@core/collections/last-upload-time.service';
 import { map, Observable, take } from 'rxjs';
+import { unitOfTime } from 'moment/moment';
 
 @Injectable({
   providedIn: 'root'
@@ -70,8 +71,8 @@ export class DateService {
     return !moment(date).isSame(previousMinute, 'hour');
   }
 
-  public isSame(date: Date, comparedDate: Date): boolean {
-    return moment(date).isSame(comparedDate, 'minute');
+  public isSame(date: Date, comparedDate: Date, granularity: unitOfTime.StartOf = 'minute'): boolean {
+    return moment(date).isSame(comparedDate, granularity);
   }
 
   public isDateRangeSame(dateRange: DateRange, comparedDateRange: DateRange): boolean {
@@ -94,8 +95,8 @@ export class DateService {
     return moment(date).isSame(comparedDate, 'hour');
   }
 
-  public addDays(date: Date, hours: number): Date {
-    return moment(date).add(hours, 'days').toDate();
+  public addDays(date: Date, days: number): Date {
+    return moment(date).add(days, 'days').toDate();
   }
 
   public addHours(date: Date, hours: number): Date {

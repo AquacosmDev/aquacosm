@@ -26,7 +26,9 @@ export class LoadingService implements OnDestroy {
 
   public triggerLoading() {
     this.isSelectedService.getMesocosmsAndDays()
-      .pipe(takeUntil(this.destroyed$))
+      .pipe(
+        takeUntil(this.destroyed$),
+        filter(object => object.mesocosmIds.length > 0))
       .subscribe(() => this.$loading.next(true))
   }
 
@@ -37,6 +39,8 @@ export class LoadingService implements OnDestroy {
   public getLoadingStatus(variableId: string): Observable<number> {
     if(!this.requestNumbers[ variableId ]) {
       this.requestNumbers[ variableId ] = new BehaviorSubject<number>(0);
+    } else {
+      this.requestNumbers[ variableId ].next(0);
     }
 
     this.clearCounter(variableId);

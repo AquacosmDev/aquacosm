@@ -17,10 +17,12 @@ export class CheckboxComponent {
   constructor() { }
 
   public toggleItem() {
-    if (this.multiselect || !this.item.checked) {
+    if (this.multiselect) {
       this.item.checked = !this.item.checked;
-      this.itemChange.emit(this.item);
+    } else {
+      this.item.checked = true;
     }
+    this.itemChange.emit(this.item);
   }
 
 }

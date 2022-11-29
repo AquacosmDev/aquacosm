@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentSnapshot } from '@angular/fire/compat/firestore';
 import { MesocosmData } from '@shr//models/mesocosm-data.model';
-import { FirebaseCollectionService } from '@ternwebdesign/firebase-store';
 import { BehaviorSubject, filter, forkJoin, from, map, Observable, switchMap, take, tap } from 'rxjs';
 import { collection, getDocs, query, where } from '@angular/fire/firestore';
 import { DateService } from '@core/date.service';
 import { LoadingService } from '@core/loading.service';
+import { CollectionService } from '@core/collections/collection.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MesocosmDataService extends FirebaseCollectionService<MesocosmData> {
+export class MesocosmDataService extends CollectionService<MesocosmData> {
 
   private alreadyRequesting$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private queue: number[] = [];

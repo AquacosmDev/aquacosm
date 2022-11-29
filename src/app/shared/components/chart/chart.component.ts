@@ -114,18 +114,28 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.timeDifference = this.dateService.getDifferenceInMinutes(this.dateRange);
-    this.setLineChartData();
-    this.setLineChartOptions();
+    if(this.dataSets.length > 0) {
+      this.setLineChartData();
+      this.setLineChartOptions();
+    }
     this.setDataType();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (!!changes['dataSets'] && !!changes['dataSets'].previousValue && !!changes['dataSets'].currentValue) {
-      this.setLineChartData();
-      this.setLineChartOptions();
+      if(this.dataSets.length > 0) {
+        this.setLineChartData();
+        this.setLineChartOptions();
+      } else {
+        this.lineChartData.datasets = [];
+      }
     }
     if (!!changes['dateRange'] && !!changes['dateRange'].previousValue && !!changes['dateRange'].currentValue) {
       this.timeDifference = this.dateService.getDifferenceInMinutes(this.dateRange);
+      if(this.dataSets.length > 0) {
+        this.setLineChartData();
+        this.setLineChartOptions();
+      }
     }
   }
 
@@ -339,7 +349,7 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
           display: true,
           text: this.yAxisTitle
         },
-        min: Math.floor(dataRange.min - twentyPercent) > 0 ? Math.floor(dataRange.min - twentyPercent) : 0,
+        min: Math.floor(dataRange.min - twentyPercent),
         max: Math.ceil(dataRange.max + twentyPercent)
       }
     } else {
@@ -358,7 +368,9 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(takeUntil(this.destroyedOnDestroy$))
       .subscribe(dataType => {
         this.dataType = dataType;
-        this.setLineChartData();
+        if(this.dataSets.length > 0 ) {
+          this.setLineChartData();
+        }
       });
   }
 }

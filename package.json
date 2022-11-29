@@ -1,6 +1,6 @@
 {
   "name": "aquacosm",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -24,7 +24,6 @@
     "@ng-select/ng-select": "^8.3.0",
     "@ngx-tonysamperi/dom": "^13.1.0",
     "@popperjs/core": "^2.11.5",
-    "@ternwebdesign/firebase-store": "^0.2.6",
     "angular-mydatepicker": "^0.11.5",
     "bootstrap": "^4.5.0",
     "chart.js": "^3.7.1",

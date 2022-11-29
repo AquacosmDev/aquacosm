@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { FirebaseCollectionService } from '@ternwebdesign/firebase-store';
 import { AngularFirestore, DocumentSnapshot } from '@angular/fire/compat/firestore';
 import { map, Observable, of, take, tap } from 'rxjs';
 import { Mesocosm } from '@shr//models/mesocosm.model';
+import { CollectionService } from '@core/collections/collection.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MesocosmService extends FirebaseCollectionService<Mesocosm> {
+export class MesocosmService extends CollectionService<Mesocosm> {
 
   private mesocosms: { [id: string]: Mesocosm } = {};
 

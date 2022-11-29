@@ -1,18 +1,15 @@
 import { Injectable } from '@angular/core';
-import { FirebaseCollectionService } from '@ternwebdesign/firebase-store';
-import { MetaDataEditor } from '@shr/models/meta-data-editor.model';
 import { AngularFirestore, DocumentSnapshot } from '@angular/fire/compat/firestore';
-import { from, map, Observable, tap } from 'rxjs';
-import { collection, getDocs, limit, query, where } from '@angular/fire/firestore';
+import { map, Observable } from 'rxjs';
 import { MetaData } from '@shr/models/meta-data.model';
-import { Mesocosm } from '@shr/models/mesocosm.model';
 import { DateRange } from '@shr/models/date-range.model';
 import { DateService } from '@core/date.service';
+import { CollectionService } from '@core/collections/collection.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MetaDataService extends FirebaseCollectionService<MetaData> {
+export class MetaDataService extends CollectionService<MetaData> {
 
   constructor(private db: AngularFirestore, private dateService: DateService) {
     super();
@@ -37,8 +34,8 @@ export class MetaDataService extends FirebaseCollectionService<MetaData> {
         map(list => list.map(documentChangeAction =>
           this.convertDocToItem(documentChangeAction.payload.doc as DocumentSnapshot<MetaData>))),
         map(list => list.filter(metadata => {
-          const range = { ...metadata.dateRange };
-          if(range && !range.end) {
+          const range = {...metadata.dateRange};
+          if (range && !range.end) {
             range.end = this.dateService.addDays(new Date(), 1);
           }
           return !!metadata.dateRange && this.dateService.isDateRangeWithinDateRange(dateRange, range)

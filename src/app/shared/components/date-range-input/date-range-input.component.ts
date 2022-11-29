@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DateRange } from '@app/shared/models/date-range.model';
-import { IAngularMyDpOptions, IMyDateModel } from 'angular-mydatepicker';
+import { IAngularMyDpOptions, IMyDate, IMyDateModel } from 'angular-mydatepicker';
 import { DateService } from '@core/date.service';
 
 @Component({
@@ -35,7 +35,7 @@ export class DateRangeInputComponent implements OnInit {
 
   @Output() dateRangeChange = new EventEmitter<DateRange>();
 
-  constructor(private dateService: DateService) { }
+  constructor(private dateService: DateService, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     if(this.disableSince) {
@@ -69,7 +69,7 @@ export class DateRangeInputComponent implements OnInit {
     this.endDpOptions = {
       dateRange: false,
       dateFormat: 'yyyy-mm-dd',
-      disableUntil: event.singleDate?.date
+      disableUntil: this.addDayToMyDate({ ...event.singleDate?.date }, 1)
     };
     if(this.disableSince) {
       this.endDpOptions.disableSince = this.disableSince;
@@ -78,18 +78,20 @@ export class DateRangeInputComponent implements OnInit {
       this.startDate = event;
       this.emitDateRange();
     }
+    this.onHourChange(this.endHour, 'end', this.endDate && this.dateService.isSame(event.singleDate.jsDate, this.endDate.singleDate.jsDate, 'day'));
   }
 
   public endDateChanged(event: IMyDateModel): void {
     this.startDpOptions = {
       dateRange: false,
       dateFormat: 'yyyy-mm-dd',
-      disableSince: event.singleDate?.date
+      disableSince: this.addDayToMyDate({ ...event.singleDate?.date }, -1)
     };
     if (this.date) {
       this.endDate = event;
       this.emitDateRange();
     }
+    this.onHourChange(this.startHour, 'start', this.startDate && this.dateService.isSame(this.startDate.singleDate.jsDate, event.singleDate.jsDate, 'day'));
   }
 
   public emitDateRange() {
@@ -107,5 +109,64 @@ export class DateRangeInputComponent implements OnInit {
         this.endHour || 23,
         this.endMinute || 59) : this.endDate.singleDate.jsDate : null
     })
+  }
+
+  public onHourChange(value: number, moment: 'start' | 'end', forceCheck = false) {
+    if (forceCheck || this.startDate && this.endDate && this.dateService.isSame(this.startDate.singleDate.jsDate, this.endDate.singleDate.jsDate, 'day')) {
+      if (moment === 'start' && value > this.endHour) {
+        this.changeHour(this.startHour, 'end');
+      } else if (moment === 'end' && value < this.startHour) {
+        this.changeHour(this.endHour, 'start');
+      }
+    }
+
+    if (value > 23) {
+      this.changeHour(23, moment);
+    } else if (value < 0) {
+      this.changeHour(0, moment);
+    }
+    if((forceCheck && moment !== 'start') || (!forceCheck && moment === 'start')) {
+      this.onMinuteChange(this.endMinute, 'end', forceCheck);
+    } else {
+      this.onMinuteChange(this.startMinute, 'start', forceCheck);
+    }
+  }
+
+  public onMinuteChange(value: number, moment: 'start' | 'end', forceCheck = false) {
+    if (forceCheck || this.startDate && this.endDate && this.dateService.isSame(this.startDate.singleDate.jsDate, this.endDate.singleDate.jsDate, 'day') && this.startHour === this.endHour) {
+      if (moment === 'start' && value > this.endMinute) {
+        this.changeMinute(this.startMinute, 'end');
+      } else if (moment === 'end' && value < this.startMinute) {
+        this.changeMinute(this.endMinute, 'start');
+      }
+    }
+    if (value > 59) {
+      this.changeMinute(59, moment);
+    }
+    if (value < 0) {
+      this.changeMinute(0, moment);
+    }
+  }
+
+  private changeHour(value: number, moment: 'start' | 'end') {
+    switch (moment) {
+      case 'start': this.startHour = value; break;
+      case 'end': this.endHour = value; break;
+    }
+  }
+
+  private changeMinute(value: number, moment: 'start' | 'end') {
+    console.log(value, moment);
+    switch (moment) {
+      case 'start': this.startMinute = value; break;
+      case 'end': this.endMinute = value; break;
+    }
+    this.cdRef.detectChanges();
+    console.log(this.startMinute);
+  }
+
+  private addDayToMyDate(date: IMyDate, days: number): IMyDate {
+    date.day = date.day - days;
+    return date;
   }
 }
