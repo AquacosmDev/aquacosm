@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Variable } from '@shr//models/variable.model';
-import { AngularFirestore, CollectionReference, DocumentSnapshot, Query } from '@angular/fire/compat/firestore';
+import { AngularFirestore, DocumentSnapshot } from '@angular/fire/compat/firestore';
 import { map, Observable, of, take, tap } from 'rxjs';
 import { CollectionService } from '@core/collections/collection.service';
 
@@ -11,8 +11,8 @@ export class VariableService extends CollectionService<Variable> {
 
   private variables: { [id: string]: Variable } = {};
 
-  constructor(private db: AngularFirestore) {
-    super();
+  constructor(db: AngularFirestore) {
+    super(db);
     this.setCollection(db.collection<Variable>('variable'));
   }
 

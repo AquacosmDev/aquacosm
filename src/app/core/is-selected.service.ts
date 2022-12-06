@@ -30,7 +30,7 @@ export class IsSelectedService implements OnDestroy {
 
   public setMesocosms(mesocosmIds: string[], isInit = false) {
     localStorage.setItem('mesocosms',JSON.stringify(mesocosmIds));
-    if(!isInit) {
+    if(this.mesocosms.getValue().length === 0 || !isInit) {
       this.mesocosms.next(mesocosmIds);
     }
   }
@@ -75,7 +75,7 @@ export class IsSelectedService implements OnDestroy {
       .pipe(map(([ mesocosmsIds, days ]) => { return { mesocosmIds: mesocosmsIds, days: days }}))
   }
 
-  private getDays(): Observable<number[]> {
+  public getDays(): Observable<number[]> {
     return this.getDateRange()
       .pipe(map(dateRange => this.dateService.getDayArrayFromDateRange(dateRange)))
   }

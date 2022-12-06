@@ -7,6 +7,8 @@ import { VariableService } from '@core/collections/variable.service';
 import { IsSelectedService } from '@core/is-selected.service';
 import { DateRange } from '@shr/models/date-range.model';
 import { LoadingService } from '@core/loading.service';
+import { DataType } from '@shr/models/data-type.enum';
+import { DateService } from '@core/date.service';
 
 @Component({
   selector: 'aqc-variable-chart',
@@ -21,10 +23,10 @@ export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
   public yAxisName!: string;
 
   public dateRange!: DateRange;
-
   public chartData!: ChartData[];
+  public dataType!: DataType;
 
-  public loading = true;
+  public loading = false;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
@@ -51,6 +53,7 @@ export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
     this.getVariable();
     this.getChartData();
     this.getDateRange();
+    this.setDataType();
   }
 
   private getChartData() {
@@ -65,7 +68,17 @@ export class VariableChartComponent implements OnInit, OnChanges, OnDestroy {
   private getDateRange() {
     this.isSelectedService.getDateRange()
       .pipe(takeUntil(this.destroyed$))
-      .subscribe(dateRange => this.dateRange = dateRange)
+      .subscribe(dateRange => {
+        this.dateRange = dateRange
+      })
+  }
+
+  private setDataType() {
+    this.isSelectedService.getDataType()
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(dataType => {
+        this.dataType = dataType
+      });
   }
 
   private startLoading() {

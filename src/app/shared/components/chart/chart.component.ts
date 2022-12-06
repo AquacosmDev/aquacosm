@@ -5,9 +5,10 @@ import { DateService } from '@core/date.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { DateRange } from '@shr/models/date-range.model';
 import { ChartDataService } from '@core/chart-data.service';
-import { ReplaySubject, skip, takeUntil } from 'rxjs';
+import { ReplaySubject, takeUntil } from 'rxjs';
 import { IsSelectedService } from '@core/is-selected.service';
 import { DataType } from '@shr/models/data-type.enum';
+import { skip } from 'rxjs/operators';
 
 @Component({
   selector: 'aqc-chart',
@@ -17,6 +18,7 @@ import { DataType } from '@shr/models/data-type.enum';
 export class ChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() dataSets!: ChartData[];
   @Input() dateRange!: DateRange;
+  @Input() dataType!: DataType;
   @Input() lineColor!: string;
   @Input() yAxisTitle!: string;
 
@@ -82,6 +84,11 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
               splitTime = label[1].split(':');
               return label.length === 4 ? ['' + +label[2], label[3]] :
                 splitTime[1] === '00' && show.includes(+splitTime[0]) && +label[2] % 2 === 0 ? +label[2] : null;
+            } else if (label[0] === 'bigger') {
+              const show = [0];
+              splitTime = label[1].split(':');
+              return label.length === 4 ? ['' + +label[2], label[3]] :
+                splitTime[1] === '00' && show.includes(+splitTime[0]) && +label[2] === 15 ? +label[2] : null;
             } else {
               return label;
             }
@@ -102,7 +109,6 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private timeDifference!: number;
   private times!: Date[];
-  private dataType!: DataType;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
   private destroyedOnDestroy$: ReplaySubject<boolean> = new ReplaySubject(1);
@@ -118,7 +124,6 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
       this.setLineChartData();
       this.setLineChartOptions();
     }
-    this.setDataType();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -132,6 +137,13 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
     }
     if (!!changes['dateRange'] && !!changes['dateRange'].previousValue && !!changes['dateRange'].currentValue) {
       this.timeDifference = this.dateService.getDifferenceInMinutes(this.dateRange);
+      if(this.dataSets.length > 0) {
+        this.setLineChartData();
+        this.setLineChartOptions();
+      }
+    }
+
+    if (!!changes['dataType'] && !!changes['dataType'].previousValue && !!changes['dataType'].currentValue) {
       if(this.dataSets.length > 0) {
         this.setLineChartData();
         this.setLineChartOptions();
@@ -220,24 +232,29 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
         labels: this.getChartLabels()
       };
     }
-
     if(this.timeDifference < 180) {
       this.destroyed$ = new ReplaySubject(1);
       this.dataSets.forEach((dataSet, index) => {
-        this.chartDataService.getLatestData(dataSet.variableId, dataSet.mesocosmId)
+        const numberOfTimePoints = dataSet.data.filter((point, index) => point.value !== null).length;
+        this.chartDataService.getLatestData(dataSet.variableId, dataSet.mesocosmId, numberOfTimePoints)
           .pipe(takeUntil(this.destroyed$), skip(1))
           .subscribe(timePoints => {
             timePoints.forEach(point => {
               if (this.dataSets.length === 1) {
                 this.lineChartData.datasets[0].data.shift();
-                this.lineChartData.datasets[1].data.shift();
-                this.lineChartData.datasets[2].data.shift();
+                if (this.dataType === DataType.averaged) {
+                  this.lineChartData.datasets[1].data.shift();
+                  this.lineChartData.datasets[2].data.shift();
+                }
                 this.lineChartData.labels.shift();
                 this.times.shift();
                 const value = this.dataType === DataType.raw ? point.value : point.rollingAverage;
                 this.lineChartData.datasets[0].data.push(!!value ? value - point.standardDeviation : null);
-                this.lineChartData.datasets[1].data.push(value);
-                this.lineChartData.datasets[2].data.push(!!value ? value + point.standardDeviation : null);
+
+                if (this.dataType === DataType.averaged) {
+                  this.lineChartData.datasets[1].data.push(value);
+                  this.lineChartData.datasets[2].data.push(!!value ? value + point.standardDeviation : null);
+                }
                 this.lineChartData.labels[0] = this.getChartLabel(this.times[0], 0);
                 this.lineChartData.labels.push(this.getChartLabelForHour(point.time, 1));
                 this.times.push(point.time);
@@ -279,8 +296,10 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
       label = this.getChartLabelsForDay(correctStartTime, index);
     } else if (this.timeDifference < 11520) {
       label = this.getChartLabelsForWeek(correctStartTime, index);
+    } else if (this.timeDifference < 43200) {
+      label = this.getChartLabelsForMonth(correctStartTime, index);
     } else {
-      label =this.getChartLabelsForMonth(correctStartTime, index);
+      label = this.getChartLabelsForBigger(correctStartTime, index);
     }
     return label
   }
@@ -329,11 +348,22 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  private getChartLabelsForBigger(correctStartTime: Date, index: number): string[] {
+    const timeInMinutes = this.dateService.format(correctStartTime);
+    if (this.dateService.isNewMonth(correctStartTime) || index === 0) {
+      return [ 'bigger', timeInMinutes, this.dateService.format(correctStartTime, 'DD'), this.dateService.format(correctStartTime, 'MMM')];
+    } else if (this.dateService.isNewDay(correctStartTime)) {
+      return [ 'bigger', timeInMinutes, this.dateService.format(correctStartTime, 'DD')];
+    } else {
+      return [ 'bigger', timeInMinutes ];
+    }
+  }
+
   private setLineChartOptions() {
     let mergedDataSets: number[] = [];
     this.lineChartData.datasets.forEach(dataSet => mergedDataSets = mergedDataSets.concat(dataSet.data as number[]))
     const dataSortedOnValue = mergedDataSets
-      .filter(point => !!point)
+      .filter(point => point !== null)
       .sort((a, b) => a - b);
 
     const dataRange = {
@@ -361,16 +391,5 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
     this.lineChartOptions = { ...this.lineChartOptions };
-  }
-
-  private setDataType() {
-    this.isSelectedService.getDataType()
-      .pipe(takeUntil(this.destroyedOnDestroy$))
-      .subscribe(dataType => {
-        this.dataType = dataType;
-        if(this.dataSets.length > 0 ) {
-          this.setLineChartData();
-        }
-      });
   }
 }

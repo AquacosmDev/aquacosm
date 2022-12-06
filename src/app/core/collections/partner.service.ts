@@ -12,8 +12,8 @@ export class PartnerService extends CollectionService<Partner> {
   private partners: { [name: string]: Partner } = {};
   private getAllDone = false;
 
-  constructor(private db: AngularFirestore) {
-    super();
+  constructor(db: AngularFirestore) {
+    super(db);
     this.setCollection(db.collection<Partner>('partner'));
   }
 

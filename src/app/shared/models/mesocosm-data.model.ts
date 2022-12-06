@@ -3,7 +3,8 @@ export interface MesocosmData {
   variableId: string;
   mesocosmId: string;
   data: TimePoint[];
-  day: number;
+  day?: number;
+  year?: number;
 }
 
 export interface TimePoint {

@@ -11,8 +11,8 @@ export class MesocosmService extends CollectionService<Mesocosm> {
 
   private mesocosms: { [id: string]: Mesocosm } = {};
 
-  constructor(private db: AngularFirestore) {
-    super();
+  constructor(db: AngularFirestore) {
+    super(db);
     this.setCollection(db.collection<Mesocosm>('mesocosm'));
   }
 

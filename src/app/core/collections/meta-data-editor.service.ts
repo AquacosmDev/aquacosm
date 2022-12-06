@@ -12,8 +12,8 @@ import { CollectionService } from '@core/collections/collection.service';
 export class MetaDataEditorService extends CollectionService<MetaDataEditor> {
   private library = '0123456789'
 
-  constructor(private db: AngularFirestore) {
-    super();
+  constructor(db: AngularFirestore) {
+    super(db);
     this.setCollection(db.collection<MetaDataEditor>('metaDataEditor'));
   }
 
