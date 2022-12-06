@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentSnapshot } from '@angular/fire/compat/firestore';
-import { MesocosmData } from '@shr//models/mesocosm-data.model';
-import { BehaviorSubject, filter, forkJoin, from, map, Observable, switchMap, take, tap } from 'rxjs';
-import { collection, getDocs, query, where } from '@angular/fire/firestore';
+import { MesocosmData, TimePoint } from '@shr//models/mesocosm-data.model';
+import { BehaviorSubject, filter, forkJoin, map, Observable, switchMap, take, tap } from 'rxjs';
 import { DateService } from '@core/date.service';
 import { LoadingService } from '@core/loading.service';
 import { CollectionService } from '@core/collections/collection.service';
+import { IsSelectedService } from '@core/is-selected.service';
+import { DateRange } from '@shr/models/date-range.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,15 +17,16 @@ export class MesocosmDataService extends CollectionService<MesocosmData> {
   private queue: number[] = [];
   private requestNumber: { [variableId: string ]: number } = {};
 
-  constructor(private db: AngularFirestore, private dateService: DateService,
-              private loadingService: LoadingService) {
-    super();
+  constructor(db: AngularFirestore, private dateService: DateService,
+              private loadingService: LoadingService, private isSelectedService: IsSelectedService) {
+    super(db);
+    this.path = 'mesocosmData';
     this.setCollection(db.collection<MesocosmData>('mesocosmData'));
   }
 
-  public getMesocosmsData(variableId: string, missingData: { [mesocosmIds: string]: number[] }): Observable<MesocosmData[]> {
-    this.loadingService.setNumberOfRequests(variableId, Object.keys(missingData).reduce((request, id) => request + Math.ceil(missingData[ id ].length / 10), 0))
-    return forkJoin(Object.keys(missingData).map(mesocosmId => this.getMesocosmsDataPerTen(variableId, mesocosmId, missingData[ mesocosmId ]).pipe(take(1))))
+  public getMesocosmsData(variableId: string, mesocosmIds: string[], days: number[]): Observable<MesocosmData[]> {
+    this.loadingService.setNumberOfRequests(variableId, mesocosmIds.length * (Math.ceil(days.length / 10)));
+    return forkJoin(mesocosmIds.map(mesocosmId => this.getMesocosmsDataPerTen(variableId, mesocosmId, days).pipe(take(1))))
       .pipe(map(data => {
         return data.reduce((previousValue, currentValue) => previousValue.concat(currentValue), [])
       }),
@@ -39,6 +41,7 @@ export class MesocosmDataService extends CollectionService<MesocosmData> {
       .where('day', '==', day))
       .snapshotChanges()
       .pipe(
+        filter(snapshot => !!snapshot[ 0 ] && snapshot[ 0 ].type === 'modified'),
         map(list => this.convertDocToItem(list[ 0 ].payload.doc as DocumentSnapshot<MesocosmData>)));
   }
 
@@ -53,14 +56,14 @@ export class MesocosmDataService extends CollectionService<MesocosmData> {
   private getMesocosmData(variableId: string, mesocosmId: string, days: number[]): Observable<MesocosmData[]> {
     return this.isOpen()
       .pipe(
-        switchMap(() => from(getDocs(
-          query(collection(this.db.firestore, 'mesocosmData'),
-            where('variableId', '==', variableId),
-            where('mesocosmId', '==', mesocosmId),
-            where('day', 'in', days))))),
+        switchMap(() => this.fromCache(this.db.collection<MesocosmData>('mesocosmData', ref => ref
+          .where('variableId', '==', variableId)
+          .where('mesocosmId', '==', mesocosmId)
+          .where('day', 'in', days))).pipe(take(1))),
         tap(() => this.next(variableId)),
         map(query => query.docs.map(doc => this.convertDocToItem(doc as unknown as DocumentSnapshot<MesocosmData>))),
-        map(mesocosmData => this.mapMesocosmDataToDay(days, mesocosmData, variableId, mesocosmId)));
+        map(mesocosmData => this.mapMesocosmDataToDay(days, mesocosmData, variableId, mesocosmId)),
+        switchMap(mesecosmData => this.filterTimePointsOfData(mesecosmData)));
 
   }
 
@@ -83,6 +86,41 @@ export class MesocosmDataService extends CollectionService<MesocosmData> {
       array[ arrayNumber ].push(day);
     }
     return array;
+  }
+
+  private filterTimePointsOfData(mesocosmData: MesocosmData[]): Observable<MesocosmData[]> {
+    return this.isSelectedService.getDateRange()
+      .pipe(
+        take(1),
+        map(dateRange => this.filterTimePointsForMesocosmData(mesocosmData, dateRange)));
+  }
+
+  private filterTimePointsForMesocosmData(mesocosmData: MesocosmData[], dateRange: DateRange): MesocosmData[] {
+    mesocosmData.forEach(data => {
+      data.data = this.filterTimePoints(data.data, dateRange);
+    });
+    return mesocosmData;
+  }
+
+  private filterTimePoints(data: TimePoint[], dateRange: DateRange): TimePoint[] {
+    const differenceInMinutes = this.dateService.getDifferenceInMinutes(dateRange);
+    let newData: TimePoint[] = [];
+    if(differenceInMinutes < 180) {
+      newData = data.filter(point => this.dateService.isInRange(point.time, dateRange));
+    } else if (differenceInMinutes < 43200) {
+      for (let index = 0; index < data.length; index= index + 60) {
+        if (this.dateService.isInRange(data[ index ].time, dateRange)) {
+          newData.push(data[index]);
+        }
+      }
+    } else {
+      for (let index = 0; index < data.length; index= index + 720) {
+        if (this.dateService.isInRange(data[ index ].time, dateRange)) {
+          newData.push(data[index]);
+        }
+      }
+    }
+    return newData;
   }
 
   private mapMesocosmDataToDay(days: number[], mesocosmData: MesocosmData[], variableId: string, mesocosmId: string): MesocosmData[] {

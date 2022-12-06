@@ -10,8 +10,8 @@ import { CollectionService } from '@core/collections/collection.service';
 })
 export class ErrorService extends CollectionService<Error> {
 
-  constructor(private db: AngularFirestore) {
-    super();
+  constructor(db: AngularFirestore) {
+    super(db);
     this.setCollection(db.collection<Error>('error'));
   }
 

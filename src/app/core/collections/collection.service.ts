@@ -1,23 +1,31 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, from, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, filter, from, Observable, of, tap, throwError } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
-import { AngularFirestoreCollection, DocumentSnapshot } from '@angular/fire/compat/firestore';
+import {
+  AngularFirestore,
+  AngularFirestoreCollection,
+  DocumentSnapshot,
+  Query,
+  QueryDocumentSnapshot, QuerySnapshot
+} from '@angular/fire/compat/firestore';
+import { documentId, FieldPath } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CollectionService<T> {
+  public path: string;
   private collection = new BehaviorSubject<AngularFirestoreCollection<T> | null>(null);
 
-  constructor() {
+  constructor(protected db: AngularFirestore) {
   }
 
   public get(id: string): Observable<T> {
-    return this.getCurrentCollection()
+    return this.getFrom(id, 'cache')
       .pipe(
-        switchMap(col => col.doc<T>(id).snapshotChanges()),
-        filter(snapshot => snapshot.payload.exists),
-        map(snapshot => this.convertDocToItem(snapshot.payload as DocumentSnapshot<T>)));
+        switchMap(snapshot => !!snapshot ? of(snapshot) : this.getFrom(id, 'server')),
+        filter(snapshot => snapshot.empty),
+        map(snapshot => this.convertDocToItem(snapshot.docs[ 0 ])));
   }
 
   public getAll(): Observable<T[]> {
@@ -57,11 +65,21 @@ export class CollectionService<T> {
     this.collection.next(collection as AngularFirestoreCollection<T>);
   }
 
-  protected convertDocToItem(doc: DocumentSnapshot<T>): T {
+  protected convertDocToItem(doc: DocumentSnapshot<T> | QueryDocumentSnapshot<T>): T {
     let item = doc.data() as T;
     (item as any).id = (doc as any).id;
     item = this.convertItem(item);
     return item;
+  }
+
+  protected fromCache(collection: AngularFirestoreCollection<T>): Observable<QuerySnapshot<T>> {
+    return this.fromSource(collection, 'cache')
+      .pipe(
+        switchMap(snapshot => snapshot.empty ? this.fromSource(collection, 'server') : of(snapshot)));
+  }
+
+  protected fromSource(collection: AngularFirestoreCollection<T>, source: 'cache' | 'server'): Observable<QuerySnapshot<T>> {
+    return collection.get({ source: source});
   }
 
   private getCollection$(): Observable<AngularFirestoreCollection<T> | null> {
@@ -71,5 +89,13 @@ export class CollectionService<T> {
   private getCurrentCollection(): Observable<AngularFirestoreCollection<T>> {
     return this.getCollection$()
       .pipe(take(1), switchMap(col => !!col ? of(col) : throwError(new Error('Collection does not exist'))));
+  }
+
+  private getFrom(id: string, source: 'cache' | 'server'): Observable<QuerySnapshot<T>> {
+    return this.fromSource(this.db.collection<T>(this.path, ref => {
+      let query : Query = ref;
+      query = query.where(documentId(), '==', id);
+      return query;
+    }), source);
   }
 }

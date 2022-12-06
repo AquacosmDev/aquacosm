@@ -156,13 +156,11 @@ export class DateRangeInputComponent implements OnInit {
   }
 
   private changeMinute(value: number, moment: 'start' | 'end') {
-    console.log(value, moment);
     switch (moment) {
       case 'start': this.startMinute = value; break;
       case 'end': this.endMinute = value; break;
     }
     this.cdRef.detectChanges();
-    console.log(this.startMinute);
   }
 
   private addDayToMyDate(date: IMyDate, days: number): IMyDate {

@@ -72,6 +72,9 @@ exports.dataWebhook = functions
                 mesocosmData = createNewDay(variable.id!, mesocosm.id!, day)
               } else {
                 mesocosmData = FBOtoObject<MesocosmData>(mesocosmsDataFBO)[0];
+                mesocosmData.data.forEach(timepoint => {
+                  timepoint.time = (timepoint.time as any).toDate();
+                })
               }
               for (const dataMeasurement of dayData) {
                 let timePoint = mesocosmData.data[ getMinuteOfDay(getDateDataObject(dataMeasurement)) ];
@@ -84,6 +87,11 @@ exports.dataWebhook = functions
                   timePoint = await getMetrics(timePoint, mesocosmData);
                   mesocosmData.data[ timePoint.minuteOfDay! ] = timePoint;
                 }
+
+                if (isLastMinute(timePoint.time)) {
+                  const firstValueTimePoint = mesocosmData.data.filter(timePoint => timePoint.value !== null)[ 0 ];
+                  await addToYearData(variable.id!, mesocosm.id!, firstValueTimePoint);
+                }
               }
               if (typeof mesocosmsDataFBO === 'string') {
                 await firestoreHelper.createNewDocument(db, 'mesocosmData', mesocosmData);
@@ -93,7 +101,9 @@ exports.dataWebhook = functions
 
               const lastUploadFBO = await firestoreHelper.queryData(db, 'lastUpload', queryArray);
               let lastUpload = FBOtoObject<LastUpload>(lastUploadFBO)[0];
-              lastUpload.date = getLastHour();
+              if (isBefore(lastUpload.date, getLastHour())) {
+                lastUpload.date = getLastHour();
+              }
               await firestoreHelper.updateDocument(db, 'lastUpload', lastUpload.id, lastUpload);
             }
           }
@@ -113,26 +123,118 @@ exports.dataWebhook = functions
   })();
 });
 
-exports.createDataBundle = functions.https.onRequest(async (request, response) => {
-  // Query the 50 latest stories
-  const latestData = await db.collection('mesocosmData')
-    .orderBy('day', 'desc')
-    .limit(288)
-    .get();
+exports.profileWebhook = functions
+  .runWith({
+    // Ensure the function has enough memory and time
+    // to process large files
+    timeoutSeconds: 500,
+    memory: "1GB",
+  })
+  .https.onRequest((req: express.Request, res: express.Response) => {
+    (async () => {
+      if (req.method === 'OPTIONS') {
+        cors(req, res, () => {
+          res.status(200).send();
+        });
+      } else {
+        try {
+          if (!req.body.partnerName) {
+            throw Error('No partner name submitted');
+          }
 
-  // Build the bundle from the query results
-  const bundleBuffer = db.bundle('latest-data')
-    .add('latest-data-query', latestData)
-    .build();
+          const queryArrayPartner = [['name', '==', req.body.partnerName ]];
+          let partner = await firestoreHelper.queryData(db, 'partner', queryArrayPartner);
 
-  // Cache the response for up to 5 minutes;
-  // see
-  response.set('Cache-Control', 'public, max-age=7200, s-maxage=7200');
+          if (typeof partner === 'string') {
+            throw Error('Partner does not exist');
+          }
 
-  cors(request, response, () => {
-    response.end(bundleBuffer);
+          partner = FBOtoObject<Partner>(partner)[ 0 ];
+
+          const data: { [name: string]: string }[] = JSON.parse(req.body.data);
+
+          const queryArray = [['partnerId', '==', partner.id ]];
+          const variablesFBO = await firestoreHelper.queryData(db, 'variable', queryArray);
+          const variables = FBOtoObject<Variable>(variablesFBO);
+
+          const mesocosmsFBO = await firestoreHelper.queryData(db, 'mesocosm', queryArray);
+          const mesocosms = FBOtoObject<Mesocosm>(mesocosmsFBO);
+
+          const variableMesocosms = createMesocosmVariableIds(mesocosms, variables);
+
+          const profile = createNewProfile(partner.id, getDateFromString((data[ 0 ] as any).Time));
+          profile.data = data.map(timeData => createProfileData(timeData, variableMesocosms));
+
+          await firestoreHelper.createNewDocument(db, 'profile', profile);
+          functions.logger.log("Profile completed");
+
+          cors(req, res, () => {
+            res.status(200).send();
+          });
+        } catch (error: any) {
+          functions.logger.error(error.stackTrace, error);
+          cors(req, res, () => {
+            res.status(400).send({data: {error: error}});
+          });
+        }
+      }
+    })();
   });
-});
+
+// exports.conversionWebhook = functions
+//   .runWith({
+//     // Ensure the function has enough memory and time
+//     // to process large files
+//     timeoutSeconds: 500,
+//     memory: "1GB",
+//   })
+//   .https.onRequest((req: express.Request, res: express.Response) => {
+//     (async () => {
+//       if (req.method === 'OPTIONS') {
+//         cors(req, res, () => {
+//           res.status(200).send();
+//         });
+//       } else {
+//         try {
+//           const collectionRef = dbF.collection("mesocosmData").where('day', '>', 20221132).where('day', '<', 20221232);
+//           const collection = db.collection("mesocosmData");
+//           const snapshot = await collectionRef.count().get();
+//           const count = snapshot.data().count;
+//           functions.logger.log("Count:", count);
+//           let forSnapshot;
+//           for (let i = 0; i < count; i++) {
+//             if (!!forSnapshot) {
+//               forSnapshot = (await collection.where('day', '>', 20221132).where('day', '<', 20221232).orderBy('day').limit(1).startAfter(forSnapshot).get()).docs[ 0 ];
+//             } else {
+//               forSnapshot = (await collection.where('day', '>', 20221132).where('day', '<', 20221232).limit(1).get()).docs[ 0 ];
+//             }
+//             const mesocosmData = forSnapshot.data() as MesocosmData;
+//             mesocosmData.data.forEach(timepoint => {
+//               timepoint.time = (timepoint.time as any).toDate();
+//             });
+//             const firstValueTimePoint = mesocosmData.data.filter(timePoint => {
+//               return timePoint.value !== null && isAfterMidday(timePoint.time);
+//             })[ 0 ];
+//             if(firstValueTimePoint) {
+//               await addToYearData(mesocosmData.variableId, mesocosmData.mesocosmId, firstValueTimePoint);
+//             }
+//             functions.logger.log(mesocosmData.day, count - i);
+//           }
+//
+//           functions.logger.log("Conversion completed");
+//
+//           cors(req, res, () => {
+//             res.status(200).send();
+//           });
+//         } catch (error: any) {
+//           functions.logger.error(error.stackTrace, error);
+//           cors(req, res, () => {
+//             res.status(400).send({data: {error: error}});
+//           });
+//         }
+//       }
+//     })();
+//   });
 
 // exports.deleteData = functions
 //   .https.onRequest((req: express.Request, res: express.Response) => {
@@ -176,6 +278,40 @@ function createNewDay(variableId: string, mesocosmId: string, day: number): Meso
   };
 }
 
+function createNewYear(variableId: string, mesocosmId: string, year: number): MesocosmYearData {
+  return {
+    variableId: variableId,
+    mesocosmId: mesocosmId,
+    year: year,
+    data: []
+  };
+}
+
+async function addToYearData(variableId: string, mesocosmId: string, timepoint: TimePoint) {
+  functions.logger.log('Add to year started.');
+  const year = getYear(timepoint.time);
+  const queryArray = [
+    ['variableId', '==', variableId],
+    ['mesocosmId', '==', mesocosmId],
+    ['year', '==', year]];
+  let mesocosmYearDataFBO = await firestoreHelper.queryData(db, 'mesocosmYearData', queryArray);
+  let mesocosmYearData: MesocosmYearData;
+
+  if (typeof mesocosmYearDataFBO === 'string') {
+    mesocosmYearData = createNewYear(variableId, mesocosmId, year)
+  } else {
+    mesocosmYearData = FBOtoObject<MesocosmYearData>(mesocosmYearDataFBO)[0];
+  }
+  timepoint.time = setToMidday(timepoint.time);
+  mesocosmYearData.data.push(timepoint);
+
+  if (typeof mesocosmYearDataFBO === 'string') {
+    await firestoreHelper.createNewDocument(db, 'mesocosmYearData', mesocosmYearData);
+  } else {
+    await firestoreHelper.updateDocument(db, 'mesocosmYearData', mesocosmYearData.id, mesocosmYearData);
+  }
+}
+
 function createTimePointsForDay(day: number): TimePoint[] {
   let startDate = moment(moment(day, 'YYYYMMDD')).startOf('day');
   const endDate = moment(moment(day, 'YYYYMMDD')).endOf('day');
@@ -193,6 +329,10 @@ function createTimePointsForDay(day: number): TimePoint[] {
   return timePoints;
 }
 
+function getYear(date: Date): number {
+  return moment(date).year();
+}
+
 function getMinuteOfDay(date: Date): number {
   return moment(date).hour() * 60 + moment(date).minute();
 }
@@ -202,7 +342,11 @@ function getDayNumber(date: Date): number {
 }
 
 function getDateDataObject(dataObject: any): Date {
-  return moment(dataObject.Time, 'DD/MM/YYYY HH:mm:ss').toDate();
+  return getDateFromString(dataObject.Time);
+}
+
+function getDateFromString(date: string): Date {
+  return moment(date, 'DD/MM/YYYY HH:mm:ss').toDate();
 }
 
 function getDayNumberFromYesterday(day: number): number {
@@ -211,6 +355,22 @@ function getDayNumberFromYesterday(day: number): number {
 
 function getLastHour(): Date {
   return moment(new Date()).set({ minutes: 0, seconds: 0, milliseconds: 0 }).toDate();
+}
+
+function isBefore(date: Date, newDate: Date): boolean {
+  return moment(date).isBefore(newDate, 'hour');
+}
+
+// function isAfterMidday(date: Date): boolean {
+//   return moment(date).hour() > 12;
+// }
+
+function setToMidday(date: Date): Date {
+  return moment(date).set({ hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }).toDate();
+}
+
+function isLastMinute(date: Date) : boolean {
+  return moment(date).hour() === 23 && moment(date).minute() === 59;
 }
 
 function FBOtoObject<T>(FBO: { [id: string]: T }): T[] {
@@ -271,12 +431,34 @@ function setMetrics(timePoint: TimePoint, slice: TimePoint[]): TimePoint {
   return timePoint;
 }
 
-// interface FBOError {
-//   id?: string;
-//   error: string;
-//   partner: string;
-//   object: any;
-// }
+function createNewProfile(partnerId: string, startTime: Date): Profile {
+  return {
+    partnerId: partnerId,
+    startTime: startTime,
+    data: []
+  }
+}
+
+function createMesocosmVariableIds(mesocosms: Mesocosm[], variables: Variable[]): VariableMesocosm[] {
+  const ids: VariableMesocosm[] = [];
+  mesocosms.forEach(mesocosm =>  variables.forEach(variable => ids.push({
+    id: variable.id! + mesocosm.id!,
+    mapping: mesocosm.dataMapping[variable.id!]
+  })));
+  return ids;
+}
+
+function createProfileData(data: any, variableMesocosmIds: VariableMesocosm[]): ProfileData {
+  const profileData: ProfileData = {
+    time: getDateDataObject(data)
+  };
+  variableMesocosmIds.forEach(object => {
+    profileData[ object.id ] = data[ object.mapping ] ?
+      +(data[ object.mapping ].replace(/,/g, '.')) :
+      null;
+  });
+  return profileData;
+}
 
 interface Partner {
   id?: string;
@@ -303,7 +485,15 @@ interface MesocosmData {
   variableId: string;
   mesocosmId: string;
   data: TimePoint[];
-  day: number
+  day: number;
+}
+
+interface MesocosmYearData {
+  id?: string;
+  variableId: string;
+  mesocosmId: string;
+  data: TimePoint[];
+  year: number;
 }
 
 interface TimePoint {
@@ -318,4 +508,21 @@ interface LastUpload {
   id: string;
   partnerId: string;
   date: Date;
+}
+
+interface Profile {
+  id?: string;
+  partnerId: string;
+  startTime: Date;
+  data: ProfileData[]
+}
+
+interface ProfileData {
+  time: Date;
+  [ value: string ]: number | null | Date;
+}
+
+interface VariableMesocosm {
+  id: string;
+  mapping: string;
 }

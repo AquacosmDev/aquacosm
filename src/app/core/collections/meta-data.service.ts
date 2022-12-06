@@ -11,8 +11,8 @@ import { CollectionService } from '@core/collections/collection.service';
 })
 export class MetaDataService extends CollectionService<MetaData> {
 
-  constructor(private db: AngularFirestore, private dateService: DateService) {
-    super();
+  constructor(db: AngularFirestore, private dateService: DateService) {
+    super(db);
     this.setCollection(db.collection<MetaData>('metaData'));
   }
 

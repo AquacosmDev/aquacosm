@@ -130,7 +130,7 @@ export class DateService {
     let startDate = moment(day, 'YYYYMMDD').startOf('day');
     const end = moment(day, 'YYYYMMDD').endOf('day').toDate();
     const dates = [];
-    while (startDate.isSameOrBefore(this.getEndTimeForNow(end))) {
+    while (startDate.isSameOrBefore(end)) {
       dates.push(startDate.toDate());
       startDate = startDate.add(1, 'minute');
     }
@@ -138,20 +138,30 @@ export class DateService {
     return dates;
   }
 
+  public daysToDates(days: number[]): Date[] {
+    return days.map(day => moment(day, 'YYYYMMDD').startOf('day').toDate());
+  }
+
   public getTimePointsForDateRange(dateRange: DateRange): Date[] {
     const difference = this.getDifferenceInMinutes(dateRange);
     const dates = [];
     if (difference < 180) {
       let startDate = moment(dateRange.start);
-      while (startDate.isSameOrBefore(this.getEndTimeForNow(dateRange.end))) {
+      while (startDate.isSameOrBefore(dateRange.end)) {
         dates.push(startDate.toDate());
         startDate = startDate.add(1, 'minute');
       }
-    } else {
+    } else if (difference < 43200) {
       let startDate = moment(dateRange.start).set('minute', 0);
-      while (startDate.isSameOrBefore(this.getEndTimeForNow(dateRange.end))) {
+      while (startDate.isSameOrBefore(dateRange.end)) {
         dates.push(startDate.toDate());
         startDate = startDate.add(1, 'hour');
+      }
+    } else {
+      let startDate = moment(dateRange.start).set('minute', 0);
+      while (startDate.isSameOrBefore(dateRange.end)) {
+        dates.push(startDate.toDate());
+        startDate = startDate.add(1, 'day');
       }
     }
     return dates;
@@ -165,22 +175,12 @@ export class DateService {
     return moment(date).isSameOrAfter(dateRange.start) && moment(date).isSameOrBefore(dateRange.end);
   }
 
-  public getEndTimeForNow(end: Date): Date {
-    const endMoment = moment(end);
-    if (endMoment.isSame(new Date(), 'minutes')) {
-      while (endMoment.minute() % 5 != 0) {
-        endMoment.add(-1, 'minutes');
-      }
-      return endMoment.toDate();
-    } else {
-      return end;
-    }
-  }
-
   public getTimeOfLastTimePointWithData(): Observable<Date> {
     return this.lastUploadTimeService.getLastUploadDate()
       .pipe(
         take(1),
-        map(date => moment(date).toDate()));
+        map(date => {
+          return moment(date).toDate()
+        }));
   }
 }
