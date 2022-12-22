@@ -7,7 +7,19 @@ export interface MetaData {
   email?: string;
   partnerId: string;
   dateRange?: DateRange;
-  researchAim?: string;
+  description?: string;
   url?: string;
   history?: MetaDataHistory[];
+  treatments?: Treatments;
+}
+
+export interface Treatments {
+  description?: string;
+  treatments?: Treatment[];
+}
+
+export interface Treatment {
+  id: string;
+  name?: string;
+  mesocosmIds: string[];
 }

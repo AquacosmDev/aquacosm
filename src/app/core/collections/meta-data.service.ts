@@ -13,6 +13,7 @@ export class MetaDataService extends CollectionService<MetaData> {
 
   constructor(db: AngularFirestore, private dateService: DateService) {
     super(db);
+    this.path = 'metaData';
     this.setCollection(db.collection<MetaData>('metaData'));
   }
 
@@ -54,6 +55,11 @@ export class MetaDataService extends CollectionService<MetaData> {
       item.history.forEach((history: any) => {
         history.date = history.date.toDate();
       });
+    }
+    if(!item.treatments) {
+      item.treatments = {
+        treatments: []
+      };
     }
     return item as MetaData;
   }

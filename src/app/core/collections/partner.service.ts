@@ -14,6 +14,7 @@ export class PartnerService extends CollectionService<Partner> {
 
   constructor(db: AngularFirestore) {
     super(db);
+    this.path = 'partner';
     this.setCollection(db.collection<Partner>('partner'));
   }
 

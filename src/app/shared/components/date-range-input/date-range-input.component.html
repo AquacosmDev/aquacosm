@@ -1,7 +1,7 @@
 <div class="flex" [class.flex-column]="column">
   <div class="flex m-r-15 align-center" [class.m-b-10]="column">
     <span [class.from-till]="column">From</span>
-    <div class="input-box-container m-l-5">
+    <div class="input-box-container flex-column m-l-5">
       <div #dp1="angular-mydatepicker"
            [class.placeholder]="!startDate"
            (click)="dp1.toggleCalendar()"
@@ -18,7 +18,7 @@
 
   <div class="flex align-center" [class.m-l-10]="!column">
     <span [class.from-till]="column">till</span>
-    <div class="input-box-container m-l-5">
+    <div class="input-box-container flex-column m-l-5">
       <div #dp2="angular-mydatepicker"
            (click)="dp2.toggleCalendar()"
            (ngModelChange)="endDateChanged($event)"

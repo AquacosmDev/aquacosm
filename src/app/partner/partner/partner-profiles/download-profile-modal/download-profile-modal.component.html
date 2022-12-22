@@ -1,0 +1,39 @@
+<popper-content #popper1Content>
+  <p class="max-popper-width">To download data select the mesocosms, variables and timerange and press download data.</p>
+</popper-content>
+
+<div class="modal-content overflow-hidden">
+  <div class="help flex justify-center align-center cursor-pointer"
+       [popper]="popper1Content"
+       [popperTrigger]="NgxPopperjsTriggers.click"
+       [popperHideOnClickOutside]="true"
+       [popperHideOnScroll]="true"
+       [popperPlacement]="NgxPopperjsPlacements.LEFT">
+    <i class="fa-solid fa-info"></i>
+  </div>
+  <div class="text-center">
+    <h1>Download profiles</h1>
+  </div>
+  <div class="flex m-b-30 justify-center flex-1">
+    <div class="panel  p-20 flex-1 overflow-auto">
+      <aqc-date-range-input [(dateRange)]="dateRange" (dateRangeChange)="setCustomDateRange($event)" [column]="true" [date]="true"></aqc-date-range-input>
+    </div>
+    <div class="panel p-20 m-l-10 flex-1">
+      <p *ngIf="!profiles || profiles.length === 0" class="color-secondary flex text-center">No profiles available in this date range. Select a different date range...</p>
+      <aqc-checklist *ngIf="!!profiles && profiles.length > 0" class="flex-column"
+                     [checklistItems]="profiles"
+                     iconClass="fa-solid fa-prescription-bottle"
+                     (selectedItems)="setMesocosms($event)"></aqc-checklist>
+    </div>
+  </div>
+  <div class="flex justify-between p-b-30 p-l-100 p-r-100">
+    <button type="button" class="btn btn-outline-danger" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary"
+            (click)="next()"
+            [disabled]="disabled">
+      Download data<i class="fa-solid fa-check m-l-5"></i>
+    </button>
+  </div>
+</div>
+
+<aqc-loading *ngIf="loading" [variableIds]="[]"></aqc-loading>

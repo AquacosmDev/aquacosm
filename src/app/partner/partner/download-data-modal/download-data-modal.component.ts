@@ -6,7 +6,7 @@ import { Mesocosm } from '@shr/models/mesocosm.model';
 import { ChecklistItem } from '@shr/models/checklist-item.model';
 import { Variable } from '@shr/models/variable.model';
 import { DateRange } from '@shr/models/date-range.model';
-import { DownloadDataService } from '@ptn/partner/download-data-modal/download-data.service';
+import { DownloadDataService } from '@ptn/partner/download-data.service';
 import { switchMap, take } from 'rxjs';
 
 @Component({
@@ -63,10 +63,10 @@ export class DownloadDataModalComponent extends SimpleModalComponent<{ }, any> i
     this.downloadDataService.downloadData(this.selectedVariables, this.selectedMesocosms, this.dateRange)
       .pipe(take(1),
         switchMap(data =>
-          this.downloadDataService.downloadMetaData(this.partner, this.dateRange, data)))
+          this.downloadDataService.downloadMetaDataForData(this.partner, this.dateRange, data)))
       .subscribe(data => {
         this.loading = false;
-        this.downloadDataService.exportScoresAsCsv(data, this.partner.name);
+        this.downloadDataService.exportDataAsCsv(data, this.partner.name);
         this.close();
       });
   }

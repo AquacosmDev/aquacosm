@@ -6,7 +6,6 @@ import { BaseChartDirective } from 'ng2-charts';
 import { DateRange } from '@shr/models/date-range.model';
 import { ChartDataService } from '@core/chart-data.service';
 import { ReplaySubject, takeUntil } from 'rxjs';
-import { IsSelectedService } from '@core/is-selected.service';
 import { DataType } from '@shr/models/data-type.enum';
 import { skip } from 'rxjs/operators';
 
@@ -115,8 +114,7 @@ export class ChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private chartColors = [ '#000000', '#e69f00', '#56b5e9', '#029f73', '#f0e341', '#0072b2', '#d55e00', '#cc79a7', '#332388' ]
 
-  constructor(private dateService: DateService, private chartDataService: ChartDataService,
-              private isSelectedService: IsSelectedService) { }
+  constructor(private dateService: DateService, private chartDataService: ChartDataService) { }
 
   ngOnInit(): void {
     this.timeDifference = this.dateService.getDifferenceInMinutes(this.dateRange);

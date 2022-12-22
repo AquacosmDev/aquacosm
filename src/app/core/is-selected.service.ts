@@ -75,6 +75,11 @@ export class IsSelectedService implements OnDestroy {
       .pipe(map(([ mesocosmsIds, days ]) => { return { mesocosmIds: mesocosmsIds, days: days }}))
   }
 
+  public getMesocosmsAndVariables():Observable<{ mesocosms: string[], variables: string[] }> {
+    return combineLatest([this.getMesocosms(), this.getVariables()])
+      .pipe(map(([ mesocosmsIds, variables ]) => { return { mesocosms: mesocosmsIds, variables: variables }}))
+  }
+
   public getDays(): Observable<number[]> {
     return this.getDateRange()
       .pipe(map(dateRange => this.dateService.getDayArrayFromDateRange(dateRange)))
@@ -91,8 +96,12 @@ export class IsSelectedService implements OnDestroy {
       this.variables.next(variables)
     }
 
-    const dateRange = JSON.parse(localStorage.getItem('dateRange'));
-    if(!!dateRange) {
+    const stringDateRange = JSON.parse(localStorage.getItem('dateRange'));
+    if(!!stringDateRange) {
+      const dateRange: DateRange = {
+        start: this.dateService.stringToDate(stringDateRange.start),
+        end: this.dateService.stringToDate(stringDateRange.end)
+      }
       this.setDateRange(dateRange);
     } else {
       this.dateService.createHourDateRange()

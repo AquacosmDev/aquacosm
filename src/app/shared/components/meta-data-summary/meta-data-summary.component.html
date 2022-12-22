@@ -23,8 +23,19 @@
   </div>
   <div class="flex" [class.flex-column]="isMobile">
     <span class="font-weight-bold label" [class.mobile]="isMobile">Research aim:</span>
-    <span class="flex" *ngIf="!!metaData.researchAim">{{ metaData.researchAim }}</span>
-    <span *ngIf="!metaData.researchAim" class="text-italic">No description available</span>
+    <span class="flex" *ngIf="!!metaData.description">{{ metaData.description }}</span>
+    <span *ngIf="!metaData.description" class="text-italic">No description available</span>
+  </div>
+  <div class="flex" [class.flex-column]="isMobile">
+    <span class="font-weight-bold label" [class.mobile]="isMobile">Treatments:</span>
+    <div class="flex flex-column" *ngIf="!!metaData.treatments">
+      <span class="flex" *ngIf="!!metaData.treatments">{{ metaData.treatments.description }}</span>
+      <span *ngIf="!metaData.treatments.description" class="text-italic">No treatments available</span>
+      <ng-container *ngIf="!!metaData.treatments.treatments && metaData.treatments.treatments.length > 0">
+        <span *ngFor="let mesocosm of mesocosms; let i = index">{{ mesocosm.name }}: <span [class.text-italic]="!selectedTreatments[ i ]">{{ !!selectedTreatments[ i ] ? selectedTreatments[ i ] : 'No treatment selected' }}</span></span>
+      </ng-container>
+    </div>
+    <span *ngIf="!metaData.treatments" class="text-italic">No treatments available</span>
   </div>
   <div class="flex justify-end m-t-15" [class.flex-column]="isMobile">
     <button (click)="open(metaData.url)" [class.p-0]="isMobile" *ngIf="metaData.url">

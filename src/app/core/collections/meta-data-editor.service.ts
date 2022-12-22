@@ -14,6 +14,7 @@ export class MetaDataEditorService extends CollectionService<MetaDataEditor> {
 
   constructor(db: AngularFirestore) {
     super(db);
+    this.path = 'metaDataEditor';
     this.setCollection(db.collection<MetaDataEditor>('metaDataEditor'));
   }
 

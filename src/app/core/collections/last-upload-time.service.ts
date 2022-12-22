@@ -39,7 +39,6 @@ export class LastUploadTimeService {
   }
 
   public getLastUploadDate(): Observable<Date> {
-    return this.lastUploadTime.asObservable()
-      .pipe(filter(date => !!date));
+    return this.lastUploadTime.asObservable();
   }
 }

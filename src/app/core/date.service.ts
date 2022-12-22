@@ -16,6 +16,10 @@ export class DateService {
     return moment(date).format(formatString);
   }
 
+  public stringToDate(date: string): Date {
+    return moment(date).toDate();
+  }
+
   public createWeekDateRange(): Observable<DateRange> {
     return this.getTimeOfLastTimePointWithData()
       .pipe(map(date => {
@@ -91,24 +95,12 @@ export class DateService {
     return moment(date).isSameOrBefore(comparedDate, 'minute');
   }
 
-  public isSameHour(date: Date, comparedDate: Date): boolean {
-    return moment(date).isSame(comparedDate, 'hour');
-  }
-
   public addDays(date: Date, days: number): Date {
     return moment(date).add(days, 'days').toDate();
   }
 
   public addHours(date: Date, hours: number): Date {
     return moment(date).add(hours, 'hours').toDate();
-  }
-
-  public addMinutes(date: Date, minutes: number): Date {
-    return moment(date).add(minutes, 'minutes').toDate();
-  }
-
-  public isOnTheHour(date: Date): boolean {
-    return moment(date).format('mm') === '00';
   }
 
   public getDayArrayFromDateRange(dateRange: DateRange): number[] {
@@ -180,7 +172,7 @@ export class DateService {
       .pipe(
         take(1),
         map(date => {
-          return moment(date).toDate()
+          return !!date ? moment(date).toDate() : new Date()
         }));
   }
 }

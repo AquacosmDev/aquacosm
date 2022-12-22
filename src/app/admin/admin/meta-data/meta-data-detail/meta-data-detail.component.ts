@@ -3,7 +3,7 @@ import { filter, from, map, Observable, ReplaySubject, switchMap, take, takeUnti
 import { ActivatedRoute, Router } from '@angular/router';
 import { MetaDataEditorService } from '@core/collections/meta-data-editor.service';
 import { MetaDataEditor } from '@shr/models/meta-data-editor.model';
-import { MetaData } from '@shr/models/meta-data.model';
+import { MetaData, Treatment } from '@shr/models/meta-data.model';
 import { Partner } from '@shr/models/partner-model';
 import { MetaDataService } from '@core/collections/meta-data.service';
 import { PartnerService } from '@core/collections/partner.service';
@@ -13,6 +13,8 @@ import { AddEditorComponent } from '@app/admin/admin/meta-data/meta-data-detail/
 import { ConfirmModalComponent } from '@shr/components/confirm-modal/confirm-modal.component';
 import { MetaDataHistory } from '@shr/models/meta-data-history.model';
 import { NgxPopperjsPlacements, NgxPopperjsTriggers } from 'ngx-popperjs';
+import { MesocosmService } from '@core/collections/mesocosm.service';
+import { Mesocosm } from '@shr/models/mesocosm.model';
 
 @Component({
   selector: 'aqc-meta-data-detail',
@@ -23,6 +25,8 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   public NgxPopperjsTriggers = NgxPopperjsTriggers;
   public NgxPopperjsPlacements = NgxPopperjsPlacements;
 
+  private library = '0123456789'
+
   public loggedIn = false;
   public credentials = {
     name: '',
@@ -31,7 +35,10 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   public editor: MetaDataEditor;
   public metaData!: MetaData;
   public partner!: Partner;
+  public mesocosms!: Mesocosm[];
+  public treatments: Treatment[];
   public editors!: MetaDataEditor[];
+  public selectedTreatments: string[] = [];
 
   public error!: string | null;
   public pristine = true;
@@ -44,7 +51,7 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private metaDataEditorService: MetaDataEditorService,
               private metaDataService: MetaDataService, private partnerService: PartnerService,
               private afAuth: AngularFireAuth, private simpleModalService: SimpleModalService,
-              private router: Router) { }
+              private router: Router, private mesocosmService: MesocosmService) { }
 
   ngOnInit(): void {
     this.getMetaDataAndPartner();
@@ -58,11 +65,41 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
 
   public onChange() {
     this.pristine = false;
-    this.mandatoryFields = !!this.metaData.contact && !!this.metaData.email && !!this.metaData.researchAim && !!this.metaData.dateRange && !!this.metaData.dateRange.start;
+    this.mandatoryFields = !!this.metaData.contact && !!this.metaData.email && !!this.metaData.description && !!this.metaData.dateRange && !!this.metaData.dateRange.start;
   }
 
   public onEmailChange(value: string) {
     this.isEmail = this.emailPattern.test(value);
+  }
+
+  public changeTreatment() {
+    this.treatments = this.metaData.treatments.treatments.filter(treatment => !!treatment.name);
+  }
+
+  public addTreatment() {
+    this.metaData.treatments.treatments.push({
+      id: this.generateId(),
+      mesocosmIds: []
+    });
+    this.treatments = this.metaData.treatments.treatments.filter(treatment => !!treatment.name);
+  }
+
+  public deleteTreatment(index: number) {
+    const deleted = this.metaData.treatments.treatments.splice(index, 1);
+    this.selectedTreatments = this.selectedTreatments.map(id => {
+      let newValue;
+      if (id === deleted[ 0 ].id) {
+        newValue = null
+      } else {
+        newValue = id
+      }
+      return newValue;
+    });
+    this.treatments = this.metaData.treatments.treatments.filter(treatment => !!treatment.name);
+  }
+
+  public addMesocosmIdToTreatment(mesocosmId: string, treatmentId: string) {
+    this.metaData.treatments.treatments.find(treatment => treatment.id === treatmentId).mesocosmIds.push(mesocosmId);
   }
 
   public save() {
@@ -133,8 +170,12 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
         map(params => params['id']),
         switchMap(id => this.getMetaData(id)),
         tap(metaData => this.getPartner(metaData.partnerId)),
+        tap(metaData => this.getMesocosms(metaData.partnerId)),
         tap(metaData => this.getEditors(metaData.id)))
-      .subscribe(metaData => this.metaData = metaData);
+      .subscribe(metaData => {
+        this.metaData = metaData;
+        this.treatments = this.metaData.treatments.treatments.filter(treatment => !!treatment.name);
+      });
   }
 
   private getMetaData(id: string): Observable<MetaData> {
@@ -148,6 +189,22 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
       .subscribe(partner => this.partner = partner);
   }
 
+  private getMesocosms(partnerId: string) {
+    this.mesocosmService.getMesocosmsByPartnerIdSortedByName(partnerId)
+      .pipe(take(1))
+      .subscribe(mesocosms => {
+        this.mesocosms = mesocosms;
+        this.mesocosms.forEach(mesocosm => {
+          const treatment = this.metaData.treatments.treatments.find(treatment => treatment.mesocosmIds.includes(mesocosm.id));
+          if (!!treatment) {
+            this.selectedTreatments.push(treatment.id);
+          } else {
+            this.selectedTreatments.push(null);
+          }
+        })
+      });
+  }
+
   private isLoggedIn() {
     this.afAuth.authState
       .pipe(filter(user => !!user))
@@ -158,5 +215,13 @@ export class MetaDataDetailComponent implements OnInit, OnDestroy {
     this.metaDataEditorService.getEditors(metaDataId)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(editors => this.editors = editors);
+  }
+
+  private generateId(): string {
+    let password = '';
+    for (let i = 0; i < 5; i++) {
+      password += this.library[Math.floor(Math.random() * this.library.length)];
+    }
+    return password;
   }
 }

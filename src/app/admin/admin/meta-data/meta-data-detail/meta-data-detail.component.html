@@ -1,113 +1,5 @@
-<div class="flex flex-1 justify-center align-center">
-  <div class="sidebar p-20"></div>
-  <div class="flex flex-column meta-data" *ngIf="!!metaData">
-    <div class="panel p-30">
-      <h2 class="text-center m-0">Meta-data entry:</h2>
-      <div class="input-group m-t-15">
-        <label>Data contact</label>
-        <input type="text" name="contact" [(ngModel)]="metaData.contact" (ngModelChange)="onChange()" placeholder="Add contact details...">
-        <i *ngIf="!metaData.contact" [popper]="mandatoryContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
-        <i [popper]="dataContactContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-info p-5 flex align-center"></i>
-      </div>
-      <div class="input-group m-t-15">
-        <label>Contact email</label>
-        <input type="text" name="email" [(ngModel)]="metaData.email" (ngModelChange)="onChange(); onEmailChange($event)" placeholder="Add contact email...">
-        <i *ngIf="!metaData.email" [popper]="mandatoryContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
-        <i *ngIf="metaData.email && !isEmail" [popper]="emailNotValidContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-triangle-exclamation p-5 flex align-center"></i>
-        <i [popper]="EmailContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-info p-5 flex align-center"></i>
-      </div>
-      <div class="input-group m-t-15">
-        <label>Link</label>
-        <input type="text" name="contact" [(ngModel)]="metaData.url" (ngModelChange)="onChange()" placeholder="Add link to aquacosm metadata catalogue...">
-        <i [popper]="LinkContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-info p-5 flex align-center"></i>
-      </div>
-      <div class="input-group m-t-15">
-        <label class="m-r-10">Duration</label>
-        <aqc-date-range-input class="flex-1" [column]="true" [date]="true" [disableSince]="null" [(dateRange)]="metaData.dateRange" (dateRangeChange)="onChange()"></aqc-date-range-input>
-        <i *ngIf="!metaData.dateRange || !metaData.dateRange.start" [popper]="mandatoryDateContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
-        <i [popper]="DateRangeContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-info p-5 flex align-center"></i>
-      </div>
-      <div class="input-group m-t-15">
-        <label>Reserach aim</label>
-        <textarea type="text" name="contact" [(ngModel)]="metaData.researchAim" (ngModelChange)="onChange()" placeholder="Add aim of research..."></textarea>
-        <i *ngIf="!metaData.researchAim" [popper]="mandatoryContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
-        <i [popper]="ResearchAimContent"
-           [popperTrigger]="NgxPopperjsTriggers.hover"
-           [popperHideOnClickOutside]="true"
-           [popperHideOnScroll]="true"
-           [popperPlacement]="NgxPopperjsPlacements.LEFT"
-           class="fa-solid fa-circle-info p-5 flex align-center"></i>
-      </div>
-      <div class="flex justify-end m-t-15">
-        <button (click)="save()" [disabled]="pristine || !mandatoryFields">
-          Save<i class="fa-solid fa-check m-l-5"></i>
-        </button>
-      </div>
-    </div>
-    <div class="panel p-30 m-t-30" *ngIf="!!metaData.history && metaData.history.length > 0">
-      <h2 class="text-center m-0">History</h2>
-      <table>
-        <thead>
-          <th>Date</th>
-          <th>Action</th>
-          <th>Editor</th>
-        </thead>
-        <tbody>
-          <tr *ngFor="let history of metaData.history">
-            <td>{{history.date | date:'yyyy-MM-dd HH:mm'}}</td>
-            <td>{{history.action}}</td>
-            <td>{{history.editor}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="sidebar p-20 overflow-hidden">
+<div class="flex flex-1 justify-center overflow-auto">
+  <div class="sidebar left p-20 m-t-20">
     <div class="panel align-center partner" *ngIf="partner">
       <p class="font-weight-bold">{{ partner.displayName }}</p>
       <div class="flex-1 overflow-hidden p-b-20">
@@ -122,6 +14,167 @@
         <span class="ellipsis flex-1">{{ ed.email }}</span>
         <i *ngIf="loggedIn" class="fa-solid fa-user-minus flex justify-center align-center cursor-pointer" (click)="deleteEditor(ed)"></i>
       </div>
+    </div>
+  </div>
+  <div class="flex flex-column meta-data p-t-20 p-b-20 m-t-20" *ngIf="!!metaData">
+    <div class="panel p-30 overflow-hidden">
+      <h2 class="text-center m-0">Meta-data entry:</h2>
+      <div class="flex flex-1 flex-column overflow-auto">
+        <div class="input-group m-t-15">
+          <label>Data contact</label>
+          <input type="text" name="contact" [(ngModel)]="metaData.contact" (ngModelChange)="onChange()" placeholder="Add contact details...">
+          <i *ngIf="!metaData.contact" [popper]="mandatoryContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+          <i [popper]="dataContactContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-info p-5 flex align-center"></i>
+        </div>
+        <div class="input-group m-t-15">
+          <label>Contact email</label>
+          <input type="text" name="email" [(ngModel)]="metaData.email" (ngModelChange)="onChange(); onEmailChange($event)" placeholder="Add contact email...">
+          <i *ngIf="!metaData.email" [popper]="mandatoryContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+          <i *ngIf="metaData.email && !isEmail" [popper]="emailNotValidContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-triangle-exclamation p-5 flex align-center"></i>
+          <i [popper]="EmailContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-info p-5 flex align-center"></i>
+        </div>
+        <div class="input-group m-t-15">
+          <label>Link</label>
+          <input type="text" name="contact" [(ngModel)]="metaData.url" (ngModelChange)="onChange()" placeholder="Add link to aquacosm metadata catalogue...">
+          <i [popper]="LinkContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-info p-5 flex align-center"></i>
+        </div>
+        <div class="input-group m-t-15">
+          <label class="m-r-10">Duration</label>
+          <aqc-date-range-input class="flex-1" [column]="true" [date]="true" [disableSince]="null" [(dateRange)]="metaData.dateRange" (dateRangeChange)="onChange()"></aqc-date-range-input>
+          <i *ngIf="!metaData.dateRange || !metaData.dateRange.start" [popper]="mandatoryDateContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+          <i [popper]="DateRangeContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-info p-5 flex align-center"></i>
+        </div>
+        <div class="input-group m-t-15">
+          <label>Description</label>
+          <textarea type="text" name="contact" [(ngModel)]="metaData.description" (ngModelChange)="onChange()" placeholder="Add aim of research..."></textarea>
+          <i *ngIf="!metaData.description" [popper]="mandatoryContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-exclamation p-5 flex align-center"></i>
+          <i [popper]="ResearchAimContent"
+             [popperTrigger]="NgxPopperjsTriggers.hover"
+             [popperHideOnClickOutside]="true"
+             [popperHideOnScroll]="true"
+             [popperPlacement]="NgxPopperjsPlacements.LEFT"
+             class="fa-solid fa-circle-info p-5 flex align-center"></i>
+        </div>
+        <div class="input-group m-t-15">
+          <label>Treatments</label>
+          <div class="p-l-10 flex flex-column flex-1">
+            <div class="input-sub-group">
+              <div class="flex flex-column flex-1">
+                <label>Description</label>
+                <textarea type="text" name="contact" [(ngModel)]="metaData.treatments.description" (ngModelChange)="onChange()" placeholder="Add description of treatments..."></textarea>
+              </div>
+              <i [popper]="TreatmentContent"
+                 [popperTrigger]="NgxPopperjsTriggers.hover"
+                 [popperHideOnClickOutside]="true"
+                 [popperHideOnScroll]="true"
+                 [popperPlacement]="NgxPopperjsPlacements.LEFT"
+                 class="fa-solid fa-circle-info p-5 flex align-center"></i>
+            </div>
+            <div class="input-sub-group">
+              <div class="flex flex-column flex-1">
+                <label>Treatments:</label>
+                <div class="treatment flex flex-1 m-b-5" *ngFor="let treatment of metaData.treatments.treatments; let i = index">
+                  <label>Treatment {{ i + 1 }}:</label>
+                  <input type="text" name="treatment_name" [(ngModel)]="treatment.name" (ngModelChange)="onChange()" (blur)="changeTreatment()" placeholder="Add treatment name...">
+                  <i class="fa-solid fa-delete-left p-5 flex align-center cursor-pointer" (click)="deleteTreatment(i)"></i>
+                </div>
+                <div class="flex justify-center align-center">
+                  <button (click)="addTreatment()">
+                    Add treatment<i class="fa-solid fa-circle-plus m-l-5"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="input-sub-group">
+              <div class="flex flex-column flex-1" *ngIf="!!treatments && treatments.length > 0">
+                <label class="flex-1">Connect treatment to mesocosm:</label>
+                <div class="treatment flex flex-1 m-b-5" *ngFor="let mesocosm of mesocosms; let i = index">
+                  <label>{{ mesocosm.name }}</label>
+                  <ng-select [(ngModel)]="selectedTreatments[ i ]"
+                             (ngModelChange)="addMesocosmIdToTreatment(mesocosm.id, $event)"
+                             appendTo="body"
+                             bindLabel="name"
+                             bindValue="name"
+                             [searchable]="false"
+                             [clearable]="false"
+                             [placeholder]="'Select treatment...'">
+                    <ng-option *ngFor="let treatment of treatments" [value]="treatment.id">{{treatment.name}}</ng-option>
+                  </ng-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end m-t-15">
+        <button (click)="save()" [disabled]="pristine || !mandatoryFields">
+          Save<i class="fa-solid fa-check m-l-5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar right p-20 overflow-hidden m-t-20">
+    <div class="panel p-30" *ngIf="!!metaData && !!metaData.history && metaData.history.length > 0">
+      <h2 class="text-center m-0">History</h2>
+      <table>
+        <thead>
+        <th>Date</th>
+        <th>Action</th>
+        <th>Editor</th>
+        </thead>
+        <tbody>
+        <tr *ngFor="let history of metaData.history">
+          <td>{{history.date | date:'yyyy-MM-dd HH:mm'}}</td>
+          <td>{{history.action}}</td>
+          <td>{{history.editor}}</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -181,7 +234,11 @@
 </popper-content>
 
 <popper-content #ResearchAimContent>
-  <p class="max-popper-width">Lissete will provide the explanation for this field.</p>
+  <p class="max-popper-width">Lisette will provide the explanation for this field.</p>
+</popper-content>
+
+<popper-content #TreatmentContent>
+  <p class="max-popper-width">Use this area to explain the different treatments used for the experiment. Give a clear description of the different treatments in description field and make sure the treatments description are clearly linked to the different treatments you can add by clicking "Add treatment". You can link the treatment to a mesocosm by selecting the correct treatment after the mesocosm.</p>
 </popper-content>
 
 <popper-content #mandatoryContent>

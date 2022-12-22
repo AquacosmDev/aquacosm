@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ChecklistItem } from '@shr//models/checklist-item.model';
 import { DateRange } from '@shr//models/date-range.model';
 import { DateService } from '@core/date.service';
@@ -10,7 +10,8 @@ import { DateService } from '@core/date.service';
 })
 export class TimeRangeSelectorComponent implements OnInit {
 
-  public checkListItems!: ChecklistItem<{ name: string }>[];
+  @Input() checkListItems!: ChecklistItem<{ name: string }>[];
+  @Input() storeResults = true;
   public selectedItem!: string;
 
   public customDateRange!: DateRange;
@@ -21,13 +22,20 @@ export class TimeRangeSelectorComponent implements OnInit {
   constructor(private dateService: DateService) { }
 
   ngOnInit(): void {
-    this.createCheckListItems();
+    if(!this.checkListItems) {
+      this.createCheckListItems();
+    } else {
+      const dateRange = this.checkListItems.find(item => item.checked).item;
+      this.setSelectedItem(dateRange);
+    }
   }
 
   public setSelectedItem(selectedItem: { name: string }) {
     this.closeCustomDateRange = true;
     this.selectedItem = selectedItem.name;
-    localStorage.setItem('rangeName', selectedItem.name);
+    if(this.storeResults) {
+      localStorage.setItem('rangeName', selectedItem.name);
+    }
     if (this.selectedItem === 'month') {
       this.dateService.createMonthDateRange()
         .subscribe(dateRange => {
@@ -68,8 +76,13 @@ export class TimeRangeSelectorComponent implements OnInit {
   }
 
   private createCheckListItems() {
-    let dateRange = localStorage.getItem('rangeName');
-    dateRange = (!!dateRange && dateRange !== 'null') ? dateRange : 'hour';
+    let dateRange: string;
+    if (this.storeResults) {
+      dateRange = localStorage.getItem('rangeName');
+      dateRange = (!!dateRange && dateRange !== 'null') ? dateRange : 'hour';
+    } else {
+      dateRange = 'hour';
+    }
     this.checkListItems = [
       {
         checked: dateRange === 'hour',

@@ -51,7 +51,9 @@ import { SearchComponent } from './components/search/search.component';
     TimeRangeSelectorComponent,
     ConfirmModalComponent,
     MetaDataSummaryComponent,
-    SearchComponent
+    SearchComponent,
+    CheckboxComponent,
+    NgChartsModule
   ],
   imports: [
     CommonModule,

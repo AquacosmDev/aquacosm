@@ -6,6 +6,11 @@ import { PartnerDetailComponent } from '@ptn/partner/partner-detail/partner-deta
 import { VariableChartComponent } from '@ptn/partner/variable-chart/variable-chart.component';
 import { DownloadDataModalComponent } from './partner/download-data-modal/download-data-modal.component';
 import { PartnerMetadataComponent } from './partner/partner-metadata/partner-metadata.component';
+import { PartnerProfilesComponent } from './partner/partner-profiles/partner-profiles.component';
+import { ProfileSelectorComponent } from './partner/partner-profiles/profile-selector/profile-selector.component';
+import { ProfileChartsComponent } from './partner/partner-profiles/profile-charts/profile-charts.component';
+import { ProfileChartComponent } from './partner/partner-profiles/profile-charts/profile-chart/profile-chart.component';
+import { DownloadProfileModalComponent } from './partner/partner-profiles/download-profile-modal/download-profile-modal.component';
 
 
 
@@ -15,7 +20,12 @@ import { PartnerMetadataComponent } from './partner/partner-metadata/partner-met
         PartnerDetailComponent,
         VariableChartComponent,
         DownloadDataModalComponent,
-        PartnerMetadataComponent
+        PartnerMetadataComponent,
+        PartnerProfilesComponent,
+        ProfileSelectorComponent,
+        ProfileChartsComponent,
+        ProfileChartComponent,
+        DownloadProfileModalComponent
     ],
     imports: [
         CommonModule,

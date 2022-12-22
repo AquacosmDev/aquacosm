@@ -118,6 +118,10 @@ export class PartnerDetailComponent implements OnInit, OnDestroy {
     this.router.navigate([ 'partner', this.partner.name, 'meta-data']);
   }
 
+  public openProfiles() {
+    this.router.navigate([ 'partner', this.partner.name, 'profiles']);
+  }
+
   private initComponent() {
     this.getIsMobile();
     this.createDataRangeCheckListItems();

@@ -2,6 +2,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   .fa-circle-exclamation, .fa-triangle-exclamation {
     color: #c71b05;
@@ -27,7 +28,14 @@
   }
 
   .sidebar {
-    flex: 0 0 250px;
+
+    &.left {
+      flex: 0 0 250px;
+    }
+
+    &.right {
+      flex: 0 0 350px;
+    }
 
     .editors {
       .fa-plus {
@@ -58,5 +66,15 @@
     top: 10px;
     left: 0;
     right: 0;
+  }
+
+  .treatment {
+    label {
+      font-size: 14px;
+    }
+
+    i {
+      color: #00A59B;
+    }
   }
 }
