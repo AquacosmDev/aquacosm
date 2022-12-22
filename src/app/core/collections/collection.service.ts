@@ -8,7 +8,9 @@ import {
   Query,
   QueryDocumentSnapshot, QuerySnapshot
 } from '@angular/fire/compat/firestore';
-import { documentId, FieldPath } from '@angular/fire/firestore';
+import { documentId } from '@angular/fire/firestore';
+import { Mesocosm } from '@shr/models/mesocosm.model';
+import { MetaData } from '@shr/models/meta-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +25,8 @@ export class CollectionService<T> {
   public get(id: string): Observable<T> {
     return this.getFrom(id, 'cache')
       .pipe(
-        switchMap(snapshot => !!snapshot ? of(snapshot) : this.getFrom(id, 'server')),
-        filter(snapshot => snapshot.empty),
+        switchMap(snapshot => !snapshot.empty ? of(snapshot) : this.getFrom(id, 'server')),
+        filter(snapshot => !snapshot.empty),
         map(snapshot => this.convertDocToItem(snapshot.docs[ 0 ])));
   }
 
@@ -55,6 +57,15 @@ export class CollectionService<T> {
   public delete(item: T): Observable<void> {
     return this.getCurrentCollection()
       .pipe(switchMap(col => col.doc((item as any).id).delete()));
+  }
+
+  public getByIds(ids: string[]): Observable<T[]> {
+    return this.db.collection<Mesocosm>(this.path, ref => ref
+      .where(documentId(), 'in', ids))
+      .snapshotChanges()
+      .pipe(
+        map(list => list.map(documentChangeAction =>
+          this.convertDocToItem(documentChangeAction.payload.doc as DocumentSnapshot<T>))));
   }
 
   protected convertItem(item: any): T {

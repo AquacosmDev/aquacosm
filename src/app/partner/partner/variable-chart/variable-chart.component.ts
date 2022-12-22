@@ -8,7 +8,6 @@ import { IsSelectedService } from '@core/is-selected.service';
 import { DateRange } from '@shr/models/date-range.model';
 import { LoadingService } from '@core/loading.service';
 import { DataType } from '@shr/models/data-type.enum';
-import { DateService } from '@core/date.service';
 
 @Component({
   selector: 'aqc-variable-chart',

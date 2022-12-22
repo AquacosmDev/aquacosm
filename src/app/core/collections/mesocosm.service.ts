@@ -3,6 +3,7 @@ import { AngularFirestore, DocumentSnapshot } from '@angular/fire/compat/firesto
 import { map, Observable, of, take, tap } from 'rxjs';
 import { Mesocosm } from '@shr//models/mesocosm.model';
 import { CollectionService } from '@core/collections/collection.service';
+import { documentId } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class MesocosmService extends CollectionService<Mesocosm> {
 
   constructor(db: AngularFirestore) {
     super(db);
+    this.path = 'mesocosm';
     this.setCollection(db.collection<Mesocosm>('mesocosm'));
   }
 
@@ -54,6 +56,16 @@ export class MesocosmService extends CollectionService<Mesocosm> {
         });
         return mesocosms;
       }));
+  }
+
+  public getMesocosmsByIds(ids: string[]): Observable<Mesocosm[]> {
+    return this.db.collection<Mesocosm>('mesocosm', ref => ref
+      .where(documentId(), 'in', ids))
+      .snapshotChanges()
+      .pipe(
+        map(list => list.map(documentChangeAction =>
+          this.convertDocToItem(documentChangeAction.payload.doc as DocumentSnapshot<Mesocosm>))),
+        tap(list => list.forEach(mesocosm => this.mesocosms[ mesocosm.id! ] = mesocosm)));
   }
 
   public exists(id: string): boolean {

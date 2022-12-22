@@ -1,0 +1,16 @@
+<aqc-checkbox (itemChange)="selectCheckbox($event)"
+              *ngFor="let item of checkListItems; let i = index"
+              [item]="item"
+              [row]="true"
+              class="flex-200px m-r-10"
+              iconClass="fa-solid fa-chart-line"
+              [multiselect]="false">
+</aqc-checkbox>
+<ng-select *ngIf="selectProfiles && selectProfiles.length > 0" [(ngModel)]="selectedProfile"
+           (ngModelChange)="selectProfile($event)"
+           appendTo="body"
+           [searchable]="false"
+           [clearable]="false"
+           [placeholder]="'Select older profile...'">
+  <ng-option *ngFor="let profile of selectProfiles" [value]="profile.item">{{profile.name}}</ng-option>
+</ng-select>

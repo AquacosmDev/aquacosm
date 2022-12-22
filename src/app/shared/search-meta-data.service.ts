@@ -12,7 +12,7 @@ export class SearchMetaDataService {
 
   private searchData(value: string, metaData: MetaData): boolean {
     return (metaData.email && metaData.email.includes(value)) ||
-      ( metaData.researchAim && metaData.researchAim.includes(value)) ||
+      ( metaData.description && metaData.description.includes(value)) ||
       (metaData.contact && metaData.contact.includes(value));
   }
 }

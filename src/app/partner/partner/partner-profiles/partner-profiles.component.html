@@ -1,0 +1,129 @@
+<ng-container *ngIf="!isMobile">
+  <div class="left-sidebar">
+    <div class="panel align-center partner m-l-20 m-t-20 m-r-10" *ngIf="partner">
+      <p class="font-weight-bold">{{ partner.displayName }}</p>
+      <div class="flex-1 overflow-hidden p-b-20">
+        <img class="mh-100" [src]="partner.logo">
+      </div>
+    </div>
+    <div class="flex flex-column justify-between flex-1 overflow-auto p-l-20 p-b-20 p-r-10">
+      <div class="panel m-t-20 p-b-20 p-l-20 p-r-20 p-t-30" *ngIf="mesocosms" [class.closed]="!mesocosmsOpen">
+        <i class="fa-solid fa-chevron-up open"
+           (click)="mesocosmsOpen=!mesocosmsOpen"
+           [class.fa-chevron-up]="mesocosmsOpen"
+           [class.fa-chevron-down]="!mesocosmsOpen"></i>
+        <i [popper]="mesocosmContent"
+           [popperTrigger]="NgxPopperjsTriggers.click"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-info help"></i>
+        <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="setMesocosms($event)"></aqc-checklist>
+      </div>
+      <div class="panel p-b-20 p-l-20 p-r-20 p-t-30" *ngIf="variables">
+        <i [popper]="variableContent"
+           [popperTrigger]="NgxPopperjsTriggers.click"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-info help"></i>
+        <aqc-checklist class="flex-column"
+                       iconClass="fa-solid fa-chart-line"
+                       [checklistItems]="variables"
+                       (selectedItems)="setVariables($event)">
+        </aqc-checklist>
+      </div>
+      <div class="panel m-t-20 m-b-10 justify-center align-center" *ngIf="mesocosms">
+        <i [popper]="metadataContent"
+           [popperTrigger]="NgxPopperjsTriggers.click"
+           [popperHideOnClickOutside]="true"
+           [popperHideOnScroll]="true"
+           [popperPlacement]="NgxPopperjsPlacements.LEFT"
+           class="fa-solid fa-info help"></i>
+        <button (click)="downloadData()">
+          <i class="fa-solid fa-download m-r-5"></i>Download data
+        </button>
+        <button (click)="backToDashboard()">
+          <i class="fa-solid fa-chevron-left m-r-5"></i>Back
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="flex-1 flex flex-column right-bar overflow-hidden" *ngIf="variables">
+    <div class="panel m-b-20 m-l-10 top-bar flex-row p-l-20 p-r-30">
+      <i [popper]="dateRangeContent"
+         [popperTrigger]="NgxPopperjsTriggers.click"
+         [popperHideOnClickOutside]="true"
+         [popperHideOnScroll]="true"
+         [popperPlacement]="NgxPopperjsPlacements.LEFT"
+         class="fa-solid fa-info help"></i>
+      <span class="p-r-10">Select profiles from:</span> <aqc-time-range-selector (dateRange)="setDateRange($event)" [checkListItems]="dateRanges" [storeResults]="false"></aqc-time-range-selector>
+    </div>
+    <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-30 m-l-10">
+      <i [popper]="dateRangeContent"
+         [popperTrigger]="NgxPopperjsTriggers.click"
+         [popperHideOnClickOutside]="true"
+         [popperHideOnScroll]="true"
+         [popperPlacement]="NgxPopperjsPlacements.LEFT"
+         class="fa-solid fa-info help"></i>
+      <span class="p-r-10">Select a profile:</span><aqc-profile-selector [profiles]="profiles" *ngIf="profiles && profiles.length > 0" (profile)="setProfile($event)"></aqc-profile-selector>
+      <p class="m-0 text-italic" *ngIf="!profiles || profiles.length === 0">No profiles available for this period</p>
+    </div>
+    <aqc-profile-charts *ngIf="selectedProfile" [profile]="selectedProfile"></aqc-profile-charts>
+  </div>
+</ng-container>
+<ng-container *ngIf="isMobile">
+  <div class="flex flex-column flex-1 mw-100 container">
+    <div class="flex flex-column panel-mobile overflow-hidden" *ngIf="partner" [class.open]="menu">
+      <div class="flex align-center">
+        <div class="overflow-hidden">
+          <img class="mh-100" [src]="partner.logo">
+        </div>
+        <p class="flex-1 font-weight-bold m-0 text-center">{{ partner.displayName }}</p>
+        <div class="menu m-r-10 flex justify-center align-center" (click)="toggleMenu()">
+          <i class="fa-solid fa-bars fa-2x" *ngIf="!menu"></i>
+          <i class="fa-solid fa-x fa-2x" *ngIf="menu"></i>
+        </div>
+      </div>
+      <ng-select class="p-10" [(ngModel)]="selectedVariable" (ngModelChange)="setVariable($event)"
+                 [searchable]="false"
+                 [clearable]="false"
+                 appendTo=".container">
+        <ng-option *ngFor="let variable of variables" [value]="variable.item.id">{{variable.item.name!}}</ng-option>
+      </ng-select>
+      <ng-select class="p-10" [(ngModel)]="selectedDateRange" (ngModelChange)="setDateRangeMobile($event)"
+                 [searchable]="false"
+                 [clearable]="false"
+                 appendTo=".container">
+        <ng-option *ngFor="let range of dateRanges" [value]="range.item.name">{{range.item.name!}}</ng-option>
+      </ng-select>
+      <ng-select class="p-10" [(ngModel)]="selectedProfile" (ngModelChange)="setProfile($event)"
+                 [searchable]="false"
+                 [clearable]="false"
+                 appendTo="body">
+        <ng-option *ngFor="let profile of profiles" [value]="profile" >{{profile.startTime | date: 'yyyy-MM-dd HH:mm'}}</ng-option>
+      </ng-select>
+    </div>
+    <aqc-profile-charts *ngIf="selectedProfile" [profile]="selectedProfile"></aqc-profile-charts>
+  </div>
+</ng-container>
+
+<popper-content #mesocosmContent>
+  <p class="max-popper-width">In this panel you can select the mesocosms visible in the graphs and the data type used in the graphs. The raw option shows the data as it is. The averaged option uses the average of the last 30 minutes as data point using the following formula: (V1 + V2 ... + V30) / 30. Changes made will be saved in your local browser.</p>
+</popper-content>
+
+<popper-content #metadataContent>
+  <p class="max-popper-width">This panel shows the last time the data of this partner is updated. You can use the buttons, respectively to open the metadata page of this partner or open the download page of this partner.</p>
+</popper-content>
+
+<popper-content #variableContent>
+  <p class="max-popper-width">Use this panel to select the variables visible in the dashboard. Changes made will be saved in your local browser.</p>
+</popper-content>
+
+<popper-content #dateRangeContent>
+  <p class="max-popper-width">Use this panel to select the date range for the shown data. Select one of the presets (hour, day, week or month) to show the data from now till the end of the selected date range. Select "Custom" to select a custom date range. Changes made will be saved in your local browser.</p>
+</popper-content>
+
+<popper-content #graphContent>
+  <p class="max-popper-width">This graph shows the data for the selected variables, mesocosoms and timerange. Each variable had its own graph showing the data of the selected mesocosms and timerange. The x-axis shows the timerange in days or hours. The y-axis shows the unit of the selected variable.</p>
+</popper-content>

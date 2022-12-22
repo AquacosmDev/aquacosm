@@ -13,6 +13,7 @@ export class VariableService extends CollectionService<Variable> {
 
   constructor(db: AngularFirestore) {
     super(db);
+    this.path = 'variable';
     this.setCollection(db.collection<Variable>('variable'));
   }
 

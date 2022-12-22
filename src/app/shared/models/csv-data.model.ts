@@ -6,3 +6,7 @@ export interface CsvData {
   time: string;
   value: number;
 }
+
+export interface CsvProfileData extends CsvData {
+  startTime: string;
+}

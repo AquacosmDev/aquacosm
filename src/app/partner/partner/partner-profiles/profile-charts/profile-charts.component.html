@@ -1,0 +1,12 @@
+<div class="charts flex flex-1 flex-wrap p-t-20 overflow-auto p-l-10">
+  <div class="chart flex flex-column" *ngFor="let data of chartData"
+       [ngClass]="chartData.length === 1 ?
+         'flex-100 h-100 mw-100' : chartData.length === 2 ?
+         'flex-100 h-50 mw-100' :
+         'flex-50 h-50 mw-50'">
+    <div class="panel flex-1 p-20 position-relative">
+      <p class="font-weight-bold capitalize-first m-0 text-center">{{ data.variable.name }}</p>
+      <aqc-profile-chart [chartData]="data"></aqc-profile-chart>
+    </div>
+  </div>
+</div>

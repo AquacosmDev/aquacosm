@@ -5,4 +5,6 @@ export interface CsvMetaData {
   end: string;
   description: string;
   contact: string;
+  treatmentDescription: string;
+  mesocosmTreatments: string;
 }
