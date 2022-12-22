@@ -73,10 +73,6 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
     this.isSelectedService.setMesocosms(mesocosms.map(mesocosm => mesocosm.id));
   }
 
-  public setMesocosm(mesocosm: string) {
-    this.isSelectedService.setMesocosms([mesocosm]);
-  }
-
   public setVariables(variables: Variable[]) {
     this.selectedVariables = variables.map(variable => variable.id);
     this.isSelectedService.setVariables(this.selectedVariables);
@@ -135,7 +131,6 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
     this.getPartner()
       .subscribe(partner => {
         this.partner = partner;
-        this.downloadData();
         this.getMesocosms();
         this.getVariables();
         this.getProfiles();
