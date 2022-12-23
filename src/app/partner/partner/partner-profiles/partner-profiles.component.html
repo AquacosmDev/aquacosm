@@ -60,7 +60,7 @@
       <span class="p-r-10">Select profiles from:</span> <aqc-time-range-selector (dateRange)="setDateRange($event)" [checkListItems]="dateRanges" [storeResults]="false"></aqc-time-range-selector>
     </div>
     <div class="panel top-bar m-l-10 flex-row p-l-20 p-r-30 m-l-10">
-      <i [popper]="dateRangeContent"
+      <i [popper]="profileContent"
          [popperTrigger]="NgxPopperjsTriggers.click"
          [popperHideOnClickOutside]="true"
          [popperHideOnScroll]="true"
@@ -109,11 +109,11 @@
 </ng-container>
 
 <popper-content #mesocosmContent>
-  <p class="max-popper-width">In this panel you can select the mesocosms visible in the graphs and the data type used in the graphs. The raw option shows the data as it is. The averaged option uses the average of the last 30 minutes as data point using the following formula: (V1 + V2 ... + V30) / 30. Changes made will be saved in your local browser.</p>
+  <p class="max-popper-width">In this panel you can select the mesocosms visible in the graphs. Only profiles that where used in the profile can be selected. Profiles not used will be disabled. Changes made will be saved in your local browser.</p>
 </popper-content>
 
 <popper-content #metadataContent>
-  <p class="max-popper-width">This panel shows the last time the data of this partner is updated. You can use the buttons, respectively to open the metadata page of this partner or open the download page of this partner.</p>
+  <p class="max-popper-width">Selecting "Download data" will open a modal that can be used to download profiles. Select back to return to the partner dashboard.</p>
 </popper-content>
 
 <popper-content #variableContent>
@@ -121,9 +121,9 @@
 </popper-content>
 
 <popper-content #dateRangeContent>
-  <p class="max-popper-width">Use this panel to select the date range for the shown data. Select one of the presets (hour, day, week or month) to show the data from now till the end of the selected date range. Select "Custom" to select a custom date range. Changes made will be saved in your local browser.</p>
+  <p class="max-popper-width">Use this panel to select the date range to get profiles. Select one of the presets (week or month) to show the data from now till the end of the selected date range. Select "Custom" to select a custom date range. After selection the profiles for this period will be fetched and shown below.</p>
 </popper-content>
 
-<popper-content #graphContent>
-  <p class="max-popper-width">This graph shows the data for the selected variables, mesocosoms and timerange. Each variable had its own graph showing the data of the selected mesocosms and timerange. The x-axis shows the timerange in days or hours. The y-axis shows the unit of the selected variable.</p>
+<popper-content #profileContent>
+  <p class="max-popper-width">Select a profile to show in the graphs below. The profiles will be fetched according to the date range set in the above panel. The most recent three profiles can be selected immediately. Older profiles can be selected using the select box.</p>
 </popper-content>

@@ -11,8 +11,61 @@
     <p>Next step consists of a more technical part: you need to send your local data to this portal. For this we have an endpoint available (more information below). Use your own preferred method to send the data to this endpoint and make sure it meets the requirements below:</p>
     <div class="link flex">
       <div class="flex flex-column">
+        <h2>Data:</h2>
         <p class="post">POST https://us-central1-aquacosm-data.cloudfunctions.net/dataWebhook</p>
-        <h2>POST</h2>
+        <h3>POST</h3>
+        <p>POST operations support the following data structure:</p>
+        <table>
+          <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Comment</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>partnerName</td>
+            <td>string</td>
+            <td>partnerName to use is visible on the admin partner page</td>
+          </tr>
+          <tr>
+            <td>data</td>
+            <td>Data[]</td>
+            <td>array of data per time-unit</td>
+          </tr>
+          </tbody>
+        </table>
+
+        <h3>Data object</h3>
+        <p>This object contains the mesocosms data per time-unit. The object contains a "Time" field that contains a time-string formatted as 'DD/MM/YYYY HH:mm:ss' and a variable for every mesocosm-variable combination you want to send data for. For example if you want to send the light data for mesocosms 1 and 2 this object contains the time "Time": "01/01/2022 14:44", "K1-Light": 44, "K2-Light": 32. If you want to add an temperature variable us e for example "K1-Temperature" or anything else that is unique for the mesocosm-variable combination.</p>
+        <table>
+          <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Comment</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Time</td>
+            <td>string</td>
+            <td>formatted: 'DD/MM/YYYY HH:mm:ss'</td>
+          </tr>
+          <tr>
+            <td>[ mesocosm_variable ]</td>
+            <td>number</td>
+            <td>add any number of mesocosm-variable data in this object</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex flex-column m-l-20">
+        <h2>Profiles:</h2>
+        <p class="post">POST https://us-central1-aquacosm-data.cloudfunctions.net/profileWebhook</p>
+        <h3>POST</h3>
         <p>POST operations support the following data structure:</p>
         <table>
           <thead>

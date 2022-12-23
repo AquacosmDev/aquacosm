@@ -21,7 +21,6 @@ import { DateService } from '@core/date.service';
 import { IsSelectedService } from '@core/is-selected.service';
 import { MesocosmYearDataService } from '@core/collections/mesocosm-year-data.service';
 import { MesocosmYearData } from '@shr/models/mesocosm-year-data.model';
-import { DateRange } from '@shr/models/date-range.model';
 
 @Injectable({
   providedIn: 'root'

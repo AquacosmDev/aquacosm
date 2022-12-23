@@ -5,7 +5,6 @@ import { LoginComponent } from '@app/admin/login/login.component';
 import { AdminComponent } from '@app/admin/admin/admin.component';
 import { AddPartnerComponent } from '@app/admin/admin/add-partner/add-partner.component';
 import { LinkVariablesComponent } from '@app/admin/admin/add-partner/link-variables/link-variables.component';
-import { ErrorComponent } from '@app/admin/error/error.component';
 import { ConnectPartnerComponent } from '@app/admin/admin/connect-partner/connect-partner.component';
 import { MetaDataDetailComponent } from '@app/admin/admin/meta-data/meta-data-detail/meta-data-detail.component';
 import { MetaDataComponent } from '@app/admin/admin/meta-data/meta-data.component';
@@ -20,7 +19,6 @@ import { AddMetaDataComponent } from './admin/meta-data/add-meta-data/add-meta-d
     AdminComponent,
     AddPartnerComponent,
     LinkVariablesComponent,
-    ErrorComponent,
     ConnectPartnerComponent,
     MetaDataDetailComponent,
     MetaDataComponent,
