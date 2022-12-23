@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { VariableService } from '@core/collections/variable.service';
 import { Profile, ProfileData } from '@shr/models/profile.model';
-import { forkJoin, map, Observable, switchMap, take, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { ProfileChartData, ProfileDataSet } from '@shr/models/profile-chart-data.model';
 import { IsSelectedService } from '@core/is-selected.service';
 import { Mesocosm } from '@shr/models/mesocosm.model';
@@ -16,7 +16,8 @@ export class ProfileChartService {
 
   public getChartDataForProfile(profile: Profile): Observable<ProfileChartData[]> {
     return this.getMesocosmsAndVariables()
-      .pipe(map(ids => this.variableToChartData(ids, profile)));
+      .pipe(
+        map(ids => this.variableToChartData(ids, profile)));
   }
 
   public getProfileChartDataForAllOptions(profiles: Profile[]): Observable<ProfileChartData[]> {
@@ -40,16 +41,20 @@ export class ProfileChartService {
   }
 
   private getMesocosms(ids: { mesocosms: string[], variables: string[]}): Observable<{ mesocosms: Mesocosm[], variables: string[]}> {
-    return this.mesocosmService.getByIds(ids.mesocosms)
+    const getMesocosms = ids.mesocosms.length > 0 ? this.mesocosmService.getByIds(ids.mesocosms) : of([]);
+
+    return getMesocosms
       .pipe(
         take(1),
         map(mesocosms => {
           return { mesocosms: mesocosms, variables: ids.variables };
-        }))
+        }));
   }
 
   private getVariables(ids: { mesocosms: Mesocosm[], variables: string[]}): Observable<{ mesocosms: Mesocosm[], variables: Variable[]}> {
-    return this.variableService.getByIds(ids.variables)
+    const getVariables = ids.variables.length > 0 ? this.variableService.getByIds(ids.variables) : of([]);
+
+    return getVariables
       .pipe(
         take(1),
         map(variables => {
@@ -75,7 +80,7 @@ export class ProfileChartService {
   }
 
   private mesocosmsToDataSets(mesocosms: Mesocosm[], variableId: string, profile: Profile): ProfileDataSet[] {
-    return mesocosms.map(mesocosm => {
+    return mesocosms.filter(mesocosm => !profile.mesocosms || profile.mesocosms.includes(mesocosm.id)).map(mesocosm => {
       return {
         label: mesocosm.name,
         data: profile.data.map(data => this.getDataFromProfileData(mesocosm.id, variableId, data))

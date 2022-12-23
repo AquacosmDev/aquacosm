@@ -2,7 +2,8 @@ export interface Profile {
   id?: string;
   partnerId: string;
   startTime: Date;
-  data: ProfileData[]
+  mesocosms: string[];
+  data: ProfileData[];
 }
 
 export interface ProfileData {

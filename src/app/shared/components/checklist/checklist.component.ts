@@ -17,11 +17,9 @@ export class ChecklistComponent implements OnInit, OnDestroy {
 
   public allSelected = false;
 
-  private buttonClicked = new Subject<string>();
+  private buttonClicked = new Subject<any>();
 
-  constructor() {
-
-  }
+  constructor() {}
 
   ngOnInit() {
     this.isAllSelected();
@@ -34,8 +32,8 @@ export class ChecklistComponent implements OnInit, OnDestroy {
     this.buttonClicked = null;
   }
 
-  public click(selectedItem?: any) {
-    if(this.multiselect) {
+  public click(selectedItem?: ChecklistItem<any>) {
+    if (this.multiselect) {
       this.buttonClicked.next(selectedItem);
     } else {
       this.emitSelectedItems(selectedItem);
@@ -56,7 +54,7 @@ export class ChecklistComponent implements OnInit, OnDestroy {
 
   private emitSelectedItems(selectedItem?: any) {
     if (this.multiselect) {
-      this.selectedItems.emit(this.checklistItems.filter(item => item.checked).map(item => item.item));
+      this.selectedItems.emit(this.checklistItems.filter(item => item.checked && !item.disabled).map(item => item.item));
       this.isAllSelected();
     } else {
       this.checklistItems.filter(item => item.item !== selectedItem.item).forEach(item => item.checked = false);

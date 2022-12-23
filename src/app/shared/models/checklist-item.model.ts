@@ -3,4 +3,5 @@ export interface ChecklistItem<T> {
   item: T;
   reselect?: boolean;
   name?: string;
+  disabled?: boolean;
 }

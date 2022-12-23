@@ -13,6 +13,17 @@ db.settings({ timestampsInSnapshots: true });
 moment.tz.setDefault('Europe/Amsterdam');
 
 const _WINDOW = 30;
+const _LIMNOTRONS: { [ id: string]: string } = {
+  'wqaNxEBtsZGwqeYw9viA': 'Profile run 1',
+  'wRtirZIbpTtjbn4yGjv0': 'Profile run 2',
+  'xDLIEl6DALUVuvaC0IVb': 'Profile run 3',
+  'vgjmqtVdZSPgfrSoTXyv': 'Profile run 4',
+  'aFEOqpfMet44Yqug1sVf': 'Profile run 5',
+  'd765Uy6PLJcwch2xyTxQ': 'Profile run 6',
+  'CbWXyGaVMlpB5LisQ7WO': 'Profile run 7',
+  'YJLWk2Ftb5RyOdTRGKsZ': 'Profile run 8',
+  'EqLtdrsCpAD4qFe6OgcT': 'Profile run 9',
+}
 
 exports.dataWebhook = functions
   .runWith({
@@ -163,6 +174,9 @@ exports.profileWebhook = functions
           const variableMesocosms = createMesocosmVariableIds(mesocosms, variables);
 
           const profile = createNewProfile(partner.id, getDateFromString((data[ 0 ] as any).Time));
+          if (req.body.partnerName === 'NIOOLimnotrons') {
+            profile.mesocosms = createMesocosmsRunOverview(data[ 0 ]);
+          }
           profile.data = data.map(timeData => createProfileData(timeData, variableMesocosms));
 
           await firestoreHelper.createNewDocument(db, 'profile', profile);
@@ -361,10 +375,6 @@ function isBefore(date: Date, newDate: Date): boolean {
   return moment(date).isBefore(newDate, 'hour');
 }
 
-// function isAfterMidday(date: Date): boolean {
-//   return moment(date).hour() > 12;
-// }
-
 function setToMidday(date: Date): Date {
   return moment(date).set({ hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }).toDate();
 }
@@ -460,6 +470,10 @@ function createProfileData(data: any, variableMesocosmIds: VariableMesocosm[]): 
   return profileData;
 }
 
+function createMesocosmsRunOverview(data: any): string[] {
+  return Object.keys(_LIMNOTRONS).filter(mesocosmId => data[ _LIMNOTRONS[ mesocosmId ]].toLowerCase() === 'on');
+}
+
 interface Partner {
   id?: string;
   name: string;
@@ -514,6 +528,7 @@ interface Profile {
   id?: string;
   partnerId: string;
   startTime: Date;
+  mesocosms?: string[];
   data: ProfileData[]
 }
 

@@ -18,7 +18,6 @@ import { DateRange } from '@shr/models/date-range.model';
 import { NgxPopperjsPlacements, NgxPopperjsTriggers } from 'ngx-popperjs';
 import { ProfileService } from '@core/collections/profile.service';
 import { Profile } from '@shr/models/profile.model';
-import { DownloadDataModalComponent } from '@ptn/partner/download-data-modal/download-data-modal.component';
 import {
   DownloadProfileModalComponent
 } from '@ptn/partner/partner-profiles/download-profile-modal/download-profile-modal.component';
@@ -41,7 +40,6 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
 
   public selectedVariables!: string[];
   public selectedVariable!: string;
-  public selectedMesocosm!: string;
   public selectedDateRange!: string;
   public selectedProfile!: Profile;
 
@@ -94,6 +92,10 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
 
   public setProfile(profile: Profile) {
     this.selectedProfile = profile;
+    this.mesocosms.forEach(mesocosm => {
+      mesocosm.disabled = !!this.selectedProfile.mesocosms && !this.selectedProfile.mesocosms.includes(mesocosm.item.id);
+    });
+    this.setMesocosms(this.mesocosms.filter(item => item.checked && !item.disabled).map(item => item.item));
     this.cdRef.detectChanges();
   }
 
@@ -159,7 +161,7 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
           this.isSelectedService.setVariables(variables.map(variable => variable.id), true)))
       .subscribe(selectedVariables => {
         this.selectedVariables = selectedVariables.map(variable => variable.id);
-        this.selectedVariable = selectedVariables[0].id;
+        this.selectedVariable = !!selectedVariables[0] ? selectedVariables[0].id : null;
       });
   }
 
@@ -188,7 +190,7 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
   private convertMesocomsToChecklistItem(items: Mesocosm[]): Observable<ChecklistItem<Mesocosm>[]> {
     return this.isSelectedService.getMesocosms()
       .pipe(take(1), map(selectedMesocosms => items.map(item => {
-        return {checked: this.isSelected(item.id, selectedMesocosms), item: item}
+        return {checked: this.isSelected(item.id, selectedMesocosms), item: item, disabled: !!this.selectedProfile && !!this.selectedProfile.mesocosms && !this.selectedProfile.mesocosms.includes(item.id)}
       })))
   }
 
@@ -200,7 +202,7 @@ export class PartnerProfilesComponent implements OnInit, OnDestroy {
   }
 
   private isSelected(id: string, selectedIds: string[]): boolean {
-    return selectedIds.length === 0 || selectedIds.includes(id);
+    return selectedIds.includes(id);
   }
 
   private createDataRangeCheckListItems() {

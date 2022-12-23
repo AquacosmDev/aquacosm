@@ -20,7 +20,7 @@
            class="fa-solid fa-info help"></i>
         <aqc-checklist class="flex-column" [checklistItems]="mesocosms" iconClass="fa-solid fa-prescription-bottle" (selectedItems)="setMesocosms($event)"></aqc-checklist>
       </div>
-      <div class="panel p-b-20 p-l-20 p-r-20 p-t-30" *ngIf="variables">
+      <div class="panel p-b-20 p-l-20 p-r-20 p-t-30 m-t-20" *ngIf="variables">
         <i [popper]="variableContent"
            [popperTrigger]="NgxPopperjsTriggers.click"
            [popperHideOnClickOutside]="true"

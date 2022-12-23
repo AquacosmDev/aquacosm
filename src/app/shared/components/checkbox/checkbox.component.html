@@ -1,4 +1,4 @@
-<div class="flex align-center cursor-pointer" (click)="toggleItem()">
+<div class="flex align-center cursor-pointer" (click)="toggleItem()" [class.disabled]="item.disabled">
   <ng-container *ngIf="row">
     <i *ngIf="item.checked" class="fa-regular fa-square-check m-r-5"></i>
     <i *ngIf="!item.checked" class="fa-regular fa-square m-r-5"></i>

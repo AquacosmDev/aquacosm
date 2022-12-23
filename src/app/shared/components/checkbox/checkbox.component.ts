@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { ChecklistItem } from '@shr//models/checklist-item.model';
 
 @Component({
@@ -7,7 +7,6 @@ import { ChecklistItem } from '@shr//models/checklist-item.model';
   styleUrls: ['./checkbox.component.scss']
 })
 export class CheckboxComponent {
-
   @Input() item!: ChecklistItem<any>;
   @Input() row = true;
   @Input() iconClass!: string;
@@ -17,12 +16,13 @@ export class CheckboxComponent {
   constructor() { }
 
   public toggleItem() {
-    if (this.multiselect) {
-      this.item.checked = !this.item.checked;
-    } else {
-      this.item.checked = true;
+    if (!this.item.disabled) {
+      if (this.multiselect) {
+        this.item.checked = !this.item.checked;
+      } else {
+        this.item.checked = true;
+      }
+      this.itemChange.emit(this.item);
     }
-    this.itemChange.emit(this.item);
   }
-
 }
